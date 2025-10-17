@@ -1,7 +1,6 @@
 import { PasskeyDAO } from '$lib/server/db/passkey';
 import { UserDAO } from '$lib/server/db/user';
 import { validateTOTP } from '$lib/server/totp';
-import type { User } from '$lib/types';
 import { logger } from '$lib/utils/logger';
 import { fail, type Actions } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
@@ -10,7 +9,7 @@ import z from 'zod';
 
 export const actions: Actions = {
   updateUsername: async ({ locals, request }) => {
-    const user = locals.user as User;
+    const user = locals.user!;
 
     try {
       const formData = Object.fromEntries(await request.formData());
@@ -33,7 +32,7 @@ export const actions: Actions = {
     return { action: 'general', success: true, message: 'successes.usernameUpdated' };
   },
   updateEmail: async ({ locals, request }) => {
-    const user = locals.user as User;
+    const user = locals.user!;
 
     try {
       const formData = Object.fromEntries(await request.formData());
@@ -55,7 +54,7 @@ export const actions: Actions = {
     return { action: 'general', success: true, message: 'successes.emailUpdated' };
   },
   changePassword: async ({ locals, request }) => {
-    const user = locals.user as User;
+    const user = locals.user!;
 
     try {
       const formData = Object.fromEntries(await request.formData());
@@ -88,7 +87,7 @@ export const actions: Actions = {
     return { action: 'changePassword', success: true, message: 'successes.resetPassword' };
   },
   deletePasskey: async ({ locals }) => {
-    const user = locals.user as User;
+    const user = locals.user!;
 
     try {
       await PasskeyDAO.deletePasskey(user.id);
@@ -104,7 +103,7 @@ export const actions: Actions = {
     }
   },
   unlinkTOTP: async ({ locals, request }) => {
-    const user = locals.user as User;
+    const user = locals.user!;
     const formData = Object.fromEntries(await request.formData());
     const { totp } = formData as {
       totp: string;
@@ -125,7 +124,7 @@ export const actions: Actions = {
     }
   },
   setUpTOTP: async ({ locals, request }) => {
-    const user = locals.user as User;
+    const user = locals.user!;
     const formData = Object.fromEntries(await request.formData());
     const { totp, TOTPsecret } = formData as {
       totp: string;

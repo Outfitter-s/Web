@@ -30,6 +30,8 @@ export interface ClothingItem {
   type: ClothingItemType;
   color: string;
   createdAt: Date;
+  name: string;
+  description: string;
   lastWornAt: MyOptional<Date>;
 }
 

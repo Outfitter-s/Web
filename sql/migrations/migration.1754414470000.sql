@@ -20,3 +20,4 @@ CREATE TABLE passkey (
     transport VARCHAR(255) NOT NULL DEFAULT 'internal',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
