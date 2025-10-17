@@ -1,0 +1,5 @@
+echo "🔍 Husky pre-commit hook triggered"
+
+bunx lint-staged
+
+bun run i18n:check

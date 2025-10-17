@@ -1,0 +1,233 @@
+{
+  "seo": {
+    "titleSuffix": "Outfitter",
+    "defaults": {
+      "title": "DEFAULT_TITLE",
+      "description": "DEFAULT_DESCRIPTION"
+    },
+    "homePage": {
+      "title": "Home"
+    },
+    "auth": {
+      "logIn": {
+        "title": "Log In"
+      },
+      "signUp": {
+        "title": "Sign Up"
+      }
+    }
+  },
+  "errors": {
+    "auth": {
+      "badUsername": "No user found with this username",
+      "invalidCredentials": "Invalid credentials. Please try again.",
+      "createUser": "Failed to create user",
+      "usernameTaken": "This username is already taken. Please choose another one.",
+      "userDoesNotExist": "User does not exist.",
+      "userNotFound": "User not found.",
+      "userIsRequired": "User is required.",
+      "usernameTooShort": "Username must be at least 3 characters long.",
+      "usernameTooLong": "Username must be at most 20 characters long.",
+      "unauthorized": "Unauthorized.",
+      "emailInUse": "This email is already in use in an active account.",
+      "invalidEmail": "Invalid email address.",
+      "createPasskey": "Failed to create passkey",
+      "passkeyAlreadyExists": "This passkey already exists.",
+      "challengeExpired": "The challenge has expired. Please try again.",
+      "noPasskey": "No passkey registered for this user.",
+      "verificationFailed": "Verification failed. Please try again.",
+      "passkeyLoginFailed": "Passkey login failed. Please try again.",
+      "passwordTooShort": "Password must be at least 8 characters long.",
+      "passwordTooLong": "Password must be at most 100 characters long.",
+      "totp": {
+        "invalidToken": "Invalid TOTP token.",
+        "registerFailed": "Failed to register TOTP. Please try again.",
+        "invalidCode": "Invalid TOTP code",
+        "notEnabled": "You must enable TOTP to perform this action.",
+        "needTOTP": "You need to provide a TOTP code to perform this action."
+      },
+      "passwordReset": {
+        "noToken": "No reset token is provided!",
+        "expiredToken": "The request expired!",
+        "passwordsDontMatch": "Passwords does not match!",
+        "noAccountWithEmail": "No account associated with this e-mail!",
+        "samePassword": "Wrong current password!"
+      }
+    },
+    "server": {
+      "connectionRefused": "Connection refused. Please try again later.",
+      "forbidden": "Forbidden"
+    },
+    "account": {
+      "settings": {
+        "cannotChangeUsername": "Cannot change username."
+      }
+    }
+  },
+  "successes": {
+    "passkeyAdded": "Passkey added successfully.",
+    "passkeyDeleted": "Passkey deleted successfully.",
+    "setUpTOTP": "TOTP has been set up successfully.",
+    "unlinkTOTP": "TOTP has been unlinked successfully.",
+    "resetPasswordRequest": "Go check your inbox to reset your password!",
+    "resetPassword": "Your password has been reset successfully!",
+    "usernameUpdated": "Username updated successfully.",
+    "emailUpdated": "Email updated successfully."
+  },
+  "auth": {
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "rememberMe": "Remember me",
+    "forgotPasswordKeyword": "Forgot password?",
+    "submit": "Submit",
+    "signIn": {
+      "title": "Sign in to your account",
+      "alreadyHaveAnAccount": {
+        "text": "Already have an account?",
+        "cta": "Log in"
+      }
+    },
+    "logIn": {
+      "title": "Log in to your account",
+      "dontHaveAnAccount": {
+        "text": "Don't have an account?",
+        "cta": "Sign up"
+      }
+    },
+    "passkey": {
+      "separator": "or",
+      "button": "Use Passkey"
+    },
+    "totp": {
+      "logIn": {
+        "title": "Log in with TOTP",
+        "description": "Enter your TOTP code to log in.",
+        "nextButton": "Next"
+      },
+      "settings": {
+        "page": {
+          "enable": {
+            "description": "2FA is not enabled for your account.",
+            "button": "Enable"
+          },
+          "disable": {
+            "description": "2FA is enabled for your account.",
+            "button": "Disable"
+          }
+        },
+        "manage": {
+          "title": "Manage TOTP",
+          "description": "You can manage your TOTP settings here.",
+          "button": "Disable TOTP",
+          "secondStep": {
+            "description": "Confirm your identity by entering your TOTP code.",
+            "cancel": "Cancel",
+            "confirm": "Disable"
+          }
+        },
+        "setup": {
+          "title": "Set up TOTP",
+          "description": "Scan the QR code with your authenticator app to set up TOTP.",
+          "button": "Set up TOTP",
+          "qrCodeAlt": "QR Code for 2FA setup",
+          "unableToScan": "Unable to scan? You can show the secret key :",
+          "showHideValue": "Show/hide value",
+          "confirmCode": "Confirm code",
+          "nextButton": "Next"
+        },
+        "success": {
+          "title": "TOTP Setup Successful",
+          "description": "You have successfully set up TOTP for your account.",
+          "message": "Your account is now protected with a second layer of security thanks to TOTP.",
+          "buttons": {
+            "close": "Close"
+          }
+        }
+      }
+    },
+    "forgotPassword": {
+      "title": "Forgot your password?",
+      "button": "Send reset link"
+    },
+    "resetPassword": {
+      "title": "Reset your password",
+      "button": "Reset password",
+      "successAction": "Log in"
+    },
+    "formWrapper": {
+      "back": "Back"
+    }
+  },
+  "errorPage": {
+    "cta": {
+      "goHome": "Go Home",
+      "goBack": "Go Back"
+    }
+  },
+  "account": {
+    "settings": {
+      "tabs": {
+        "general": {
+          "title": "General",
+          "description": "Update your general account settings.",
+          "changeUsername": {
+            "title": "Change username",
+            "alerts": {
+              "taken": {
+                "title": "Username taken",
+                "description": "The username {{username}} is already taken."
+              },
+              "available": {
+                "title": "Username available",
+                "description": "The username {{username}} is available!"
+              }
+            }
+          },
+          "changeEmail": {
+            "title": "Change email"
+          },
+          "theme": {
+            "title": "Theme"
+          }
+        },
+        "password": {
+          "title": "Password",
+          "description": "Change your password to keep your account secure."
+        },
+        "TOTP": {
+          "title": "TOTP",
+          "description": "Two-Factor Authentication (2FA) adds an extra layer of security to your account by requiring a second form of verification when logging in."
+        },
+        "passkey": {
+          "title": "Passkey",
+          "description": "A passkey is a secure way to log in to your account without a password. It uses cryptographic keys stored on your device.",
+          "register": {
+            "button": "Register Passkey"
+          },
+          "remove": {
+            "button": "Remove Passkey",
+            "modal": {
+              "confirm": "Remove",
+              "title": "Remove Passkey",
+              "description": "Are you sure you want to remove this passkey? This action cannot be undone.",
+              "cancel": "Cancel"
+            }
+          }
+        }
+      }
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "pricing": "Pricing",
+    "outfits": "Outfits",
+    "account": "Account",
+    "settings": "Settings",
+    "logIn": "Login",
+    "signUp": "Sign Up",
+    "wardrobe": "Wardrobe"
+  }
+}

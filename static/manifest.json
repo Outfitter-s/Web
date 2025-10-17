@@ -1,0 +1,65 @@
+{
+  "background_color": "#000000",
+  "categories": ["utilities"],
+  "description": "The Outfitter app",
+  "dir": "auto",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
+  "edge_side_panel": {
+    "preferred_width": 420
+  },
+  "icons": [
+    {
+      "purpose": "any",
+      "sizes": "192x192",
+      "src": "logos/logo_192.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "192x192",
+      "src": "logos/logo_192.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any",
+      "sizes": "512x512",
+      "src": "logos/logo_512.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "512x512",
+      "src": "logos/logo_512.png",
+      "type": "image/png"
+    }
+  ],
+  "lang": "en",
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  "name": "Outfitter",
+  "orientation": "portrait",
+  "prefer_related_applications": false,
+  "scope": "/",
+  "screenshots": [
+    {
+      "sizes": "537x1168",
+      "src": "/screenshots/Notes.png",
+      "type": "image/png"
+    },
+    {
+      "sizes": "537x1168",
+      "src": "/screenshots/Note.png",
+      "type": "image/png"
+    },
+    {
+      "sizes": "537x1168",
+      "src": "/screenshots/NoteSettings.png",
+      "type": "image/png"
+    }
+  ],
+  "short_name": "Outfitter",
+  "start_url": "/",
+  "theme_color": "#000000"
+}

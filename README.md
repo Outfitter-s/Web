@@ -5,6 +5,7 @@
 Outfitter est une application conçue dans le cadre d'un projet universitaire, qui permet aux utilisateurs de gérer leur garde-robe virtuelle, de partager leurs tenues et d'interagir avec la communauté autour de la mode.
 
 Une fois authentifié, chaque utilisateur peut :
+
 - **Enregistrer des photos** de ses articles de mode (vêtements, accessoires, etc.).
 - **Recevoir des recommandations d'outfits** générés à partir de sa garde-robe.
 - **Se prendre en photo** avec ses tenues et les publier sur l'application.
@@ -32,7 +33,6 @@ Une fois authentifié, chaque utilisateur peut :
 - **Stockage des images** : Local
 - **Déploiement** : Docker
 
-
 ## Contribuer
 
 Les contributions sont les bienvenues !
@@ -41,7 +41,7 @@ Merci de suivre les bonnes pratiques de développement et de soumettre vos Pull 
 ## Licence
 
 Ce projet est réalisé dans le cadre d'un projet universitaire.
-Licence GNU GPLv3
+Licence MIT
 
 ## Auteurs
 

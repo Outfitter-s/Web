@@ -1,0 +1,37 @@
+services:
+  web:
+    build: .
+    image: anguspllg/outfitter:latest
+    container_name: outfiter_web
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    environment:
+      - ORIGIN=http://localhost:4173
+    env_file:
+      - .env
+    ports:
+      - '4173:3000'
+
+  db:
+    image: postgres
+    container_name: outfiter_db
+    ports:
+      - '5432:5432'
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data:Z
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:Z
+
+  redis:
+    container_name: outfiter_redis
+    image: redis:alpine
+    ports:
+      - '6379:6379'
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
