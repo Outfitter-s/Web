@@ -13,6 +13,7 @@
   import * as Field from '$lib/components/ui/field';
   import { Button } from '$lib/components/ui/button';
   import * as Dialog from '$lib/components/ui/dialog';
+  import { capitalize } from '$lib/utils';
 
   interface Props {
     open?: boolean;
@@ -22,8 +23,6 @@
   let type = $state<ClothingItemType>(clothingItemTypes[0]);
   let { open = $bindable(false) }: Props = $props();
   let loading = $state(false);
-
-  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
   async function submitHandler(event: Event) {
     event.preventDefault();

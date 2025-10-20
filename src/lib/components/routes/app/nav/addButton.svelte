@@ -3,6 +3,7 @@
   import * as Dialog from '$lib/components/ui/dialog';
   import { t } from '$lib/i18n';
   import AddItem from './add_item.svelte';
+  import AddOutfit from './add_outfit.svelte';
 
   interface Props {
     open?: boolean;
@@ -25,6 +26,7 @@
 </script>
 
 <AddItem bind:open={itemOpen} />
+<AddOutfit bind:open={outfitOpen} />
 
 <Dialog.Root bind:open>
   <Dialog.Content>

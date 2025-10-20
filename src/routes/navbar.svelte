@@ -1,10 +1,10 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { Button } from '$lib/components/ui/button';
-  import { t } from '$lib/i18n';
+  // import { t } from '$lib/i18n';
   import { Home, Plus, Shirt, User } from '@lucide/svelte';
   import AddButton from '$lib/components/routes/app/nav/addButton.svelte';
-  import { slide } from 'svelte/transition';
+  // import { slide } from 'svelte/transition';
 
   let addOpen = $state(false);
 
@@ -32,9 +32,9 @@
         ]),
   ]);
 
-  const pathMatches = (path: string) => {
-    return page.url.pathname === path;
-  };
+  // const pathMatches = (path: string) => {
+  //   return page.url.pathname === path;
+  // };
 </script>
 
 <AddButton bind:open={addOpen} />
@@ -58,11 +58,11 @@
         <!-- svelte-ignore svelte_component_deprecated -->
         <svelte:component this={link.icon} class="z-10 size-5" />
       {/if}
-      {#if pathMatches(link.href)}
+      <!-- {#if pathMatches(link.href)}
         <span class="z-10 ltr:ml-2 rtl:mr-2" transition:slide={{ duration: 300, axis: 'x' }}
           >{$t(link.text)}</span
         >
-      {/if}
+      {/if} -->
     </Button>
   {/if}
 {/snippet}
