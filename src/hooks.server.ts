@@ -53,11 +53,15 @@ export const i18nHandler: Handle = async ({ event, resolve }) => {
 
   if (!locale) {
     // Get user preferred locale
-    locale = `${`${request.headers.get('accept-language')}`.match(/^[a-z]{2}/i)}`.toLowerCase();
+    const acceptLanguage = request.headers.get('accept-language');
+    const userLocales =
+      acceptLanguage?.split(',').map((lang) => lang.split(';')[0].trim().slice(0, 2)) || [];
 
-    // Set default locale if user preferred locale does not match
-    if (!locales.includes(locale)) locale = defaultLocale;
+    locale = userLocales.find((l) => locales.includes(l)) || defaultLocale;
   }
+
+  // Set default locale if user preferred locale does not match
+  if (!locales.includes(locale)) locale = defaultLocale;
 
   const localeConfig = i18nConfig.loaders.find((l) => l.locale === locale);
 
