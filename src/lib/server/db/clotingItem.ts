@@ -3,14 +3,15 @@ import sharp from 'sharp';
 import pool from '.';
 import { unlink } from 'fs/promises';
 import { getEnv } from '../utils';
+import { ImageProcessor } from '../imageProcessing';
 
 export interface ClothingItemTable {
   id: UUID;
   user_id: UUID;
   name: string;
   description: string;
-  type: string;
-  color: string;
+  type: ClothingItem['type'];
+  color: ClothingItem['color'];
   created_at: Date;
 }
 
@@ -19,7 +20,7 @@ export class ClothingItemDAO {
     return {
       id: row.id as UUID,
       imageUrl: `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/clothing_item/${row.id}.webp`,
-      type: row.type as ClothingItem['type'],
+      type: row.type,
       color: row.color,
       description: row.description,
       name: row.name,
@@ -47,7 +48,8 @@ export class ClothingItemDAO {
 
     // Process and save the image
     const outputPath = `assets/clothing_item/${clothingItem.id}.webp`;
-    await sharp(imageBuffer)
+    const processedImage = await ImageProcessor.removeBackground(imageBuffer);
+    await sharp(processedImage)
       .resize(1024, 1024, { fit: 'inside' })
       .toFormat('webp')
       .toFile(outputPath);

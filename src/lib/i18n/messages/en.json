@@ -77,7 +77,12 @@
     "resetPasswordRequest": "Go check your inbox to reset your password!",
     "resetPassword": "Your password has been reset successfully!",
     "usernameUpdated": "Username updated successfully.",
-    "emailUpdated": "Email updated successfully."
+    "emailUpdated": "Email updated successfully.",
+    "clothing": {
+      "item": {
+        "created": "Clothing item created successfully."
+      }
+    }
   },
   "auth": {
     "username": "Username",
@@ -233,6 +238,25 @@
     "settings": "Settings",
     "logIn": "Login",
     "signUp": "Sign Up",
-    "wardrobe": "Wardrobe"
+    "wardrobe": "Wardrobe",
+    "add": {
+      "title": "Add to your wardrobe",
+      "description": "Add a new item or outfit to your wardrobe.",
+      "item": "Item",
+      "outfit": "Outfit"
+    }
+  },
+  "wardrobe": {
+    "createItem": {
+      "title": "Add an item",
+      "description": "Fill out the form below to add a new clothing item to your wardrobe.",
+      "submit": "Create Item",
+      "fields": {
+        "name": "Name",
+        "type": "Type",
+        "color": "Color",
+        "image": "Image"
+      }
+    }
   }
 }
