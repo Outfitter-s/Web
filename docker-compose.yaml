@@ -23,7 +23,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./pg_data:/var/lib/postgresql/data:Z
+      - pg_data:/var/lib/postgresql/data:Z
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:Z
 
   redis:
@@ -35,3 +35,6 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+
+volumes:
+  pg_data:
