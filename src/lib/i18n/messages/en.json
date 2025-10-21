@@ -62,6 +62,11 @@
       "settings": {
         "cannotChangeUsername": "Cannot change username."
       }
+    },
+    "clothing": {
+      "item": {
+        "requiredField": "The following field{{s}} {{is}} required: {{field}}"
+      }
     }
   },
   "successes": {
@@ -72,7 +77,12 @@
     "resetPasswordRequest": "Go check your inbox to reset your password!",
     "resetPassword": "Your password has been reset successfully!",
     "usernameUpdated": "Username updated successfully.",
-    "emailUpdated": "Email updated successfully."
+    "emailUpdated": "Email updated successfully.",
+    "clothing": {
+      "item": {
+        "created": "Clothing item created successfully."
+      }
+    }
   },
   "auth": {
     "username": "Username",
@@ -228,6 +238,43 @@
     "settings": "Settings",
     "logIn": "Login",
     "signUp": "Sign Up",
-    "wardrobe": "Wardrobe"
+    "wardrobe": "Wardrobe",
+    "add": {
+      "title": "Add to your wardrobe",
+      "description": "Add a new item or outfit to your wardrobe.",
+      "item": "Item",
+      "outfit": "Outfit"
+    }
+  },
+  "wardrobe": {
+    "createItem": {
+      "title": "Add an item",
+      "description": "Fill out the form below to add a new clothing item to your wardrobe.",
+      "submit": "Create Item",
+      "fields": {
+        "name": "Name",
+        "type": "Type",
+        "color": "Color",
+        "image": "Image"
+      }
+    },
+    "itemList": {
+      "items": {
+        "title": "Items",
+        "empty": {
+          "title": "No Clothes Yet",
+          "description": "You haven't added any clothing items yet. Start by creating your first item.",
+          "createButton": "Create Item"
+        }
+      },
+      "outfits": {
+        "title": "Outfits",
+        "empty": {
+          "title": "No Outfits Yet",
+          "description": "You haven't created any outfits yet. Get started by mixing and matching your clothes.",
+          "createButton": "Create Outfit"
+        }
+      }
+    }
   }
 }
