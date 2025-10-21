@@ -69,7 +69,7 @@ export class ClothingItemDAO {
 
   static async getClothingItemsByUserId(userId: UUID): Promise<ClothingItem[]> {
     const res = await pool.query<ClothingItemTable>(
-      'SELECT * FROM clothing_item WHERE user_id = $1',
+      'SELECT * FROM clothing_item WHERE user_id = $1 ORDER BY created_at DESC',
       [userId]
     );
     return res.rows.map(ClothingItemDAO.convertToClothingItem);

@@ -257,6 +257,24 @@
         "color": "Color",
         "image": "Image"
       }
+    },
+    "itemList": {
+      "items": {
+        "title": "Items",
+        "empty": {
+          "title": "No Clothes Yet",
+          "description": "You haven't added any clothing items yet. Start by creating your first item.",
+          "createButton": "Create Item"
+        }
+      },
+      "outfits": {
+        "title": "Outfits",
+        "empty": {
+          "title": "No Outfits Yet",
+          "description": "You haven't created any outfits yet. Get started by mixing and matching your clothes.",
+          "createButton": "Create Outfit"
+        }
+      }
     }
   }
 }

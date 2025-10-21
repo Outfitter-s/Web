@@ -13,17 +13,14 @@
   import * as Field from '$lib/components/ui/field';
   import { Button } from '$lib/components/ui/button';
   import * as Dialog from '$lib/components/ui/dialog';
-
-  interface Props {
-    open?: boolean;
-  }
+  import { capitalize } from '$lib/utils';
+  import { itemOpen } from '.';
+  import { page } from '$app/state';
+  import { invalidateAll } from '$app/navigation';
 
   let color = $state<ClothingItemColor>(clothingItemColors[0]);
   let type = $state<ClothingItemType>(clothingItemTypes[0]);
-  let { open = $bindable(false) }: Props = $props();
   let loading = $state(false);
-
-  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
   async function submitHandler(event: Event) {
     event.preventDefault();
@@ -48,13 +45,14 @@
     } else {
       Toaster.success($t('successes.clothing.item.created'));
       (event.target as HTMLFormElement).reset();
-      open = false;
+      $itemOpen = false;
+      await invalidateAll();
     }
     loading = false;
   }
 </script>
 
-<Dialog.Root bind:open>
+<Dialog.Root bind:open={$itemOpen}>
   <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title>{$t('wardrobe.createItem.title')}</Dialog.Title>

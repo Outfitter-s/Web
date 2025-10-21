@@ -3,30 +3,25 @@
   import * as Dialog from '$lib/components/ui/dialog';
   import { t } from '$lib/i18n';
   import AddItem from './add_item.svelte';
-
-  interface Props {
-    open?: boolean;
-  }
-
-  let { open = $bindable(false) }: Props = $props();
-  let itemOpen = $state(false);
-  let outfitOpen = $state(false);
+  import AddOutfit from './add_outfit.svelte';
+  import { openState, itemOpen, outfitOpen } from '.';
 
   const choose = (choice: 'item' | 'outfit') => {
-    open = false;
+    $openState = false;
     setTimeout(() => {
       if (choice === 'item') {
-        itemOpen = true;
+        $itemOpen = true;
       } else {
-        outfitOpen = true;
+        $outfitOpen = true;
       }
     }, 200);
   };
 </script>
 
-<AddItem bind:open={itemOpen} />
+<AddItem />
+<AddOutfit />
 
-<Dialog.Root bind:open>
+<Dialog.Root bind:open={$openState}>
   <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title>{$t('nav.add.title')}</Dialog.Title>
