@@ -9,7 +9,7 @@ import z from 'zod';
 
 export const actions: Actions = {
   updateUsername: async ({ locals, request }) => {
-    const user = locals.user!;
+    const user = locals.user as User;
 
     try {
       const formData = Object.fromEntries(await request.formData());
@@ -32,7 +32,7 @@ export const actions: Actions = {
     return { action: 'general', success: true, message: 'successes.usernameUpdated' };
   },
   updateEmail: async ({ locals, request }) => {
-    const user = locals.user!;
+    const user = locals.user as User;
 
     try {
       const formData = Object.fromEntries(await request.formData());
@@ -54,7 +54,7 @@ export const actions: Actions = {
     return { action: 'general', success: true, message: 'successes.emailUpdated' };
   },
   changePassword: async ({ locals, request }) => {
-    const user = locals.user!;
+    const user = locals.user as User;
 
     try {
       const formData = Object.fromEntries(await request.formData());
@@ -87,7 +87,7 @@ export const actions: Actions = {
     return { action: 'changePassword', success: true, message: 'successes.resetPassword' };
   },
   deletePasskey: async ({ locals }) => {
-    const user = locals.user!;
+    const user = locals.user as User;
 
     try {
       await PasskeyDAO.deletePasskey(user.id);
@@ -103,7 +103,7 @@ export const actions: Actions = {
     }
   },
   unlinkTOTP: async ({ locals, request }) => {
-    const user = locals.user!;
+    const user = locals.user as User;
     const formData = Object.fromEntries(await request.formData());
     const { totp } = formData as {
       totp: string;
@@ -124,7 +124,7 @@ export const actions: Actions = {
     }
   },
   setUpTOTP: async ({ locals, request }) => {
-    const user = locals.user!;
+    const user = locals.user as User;
     const formData = Object.fromEntries(await request.formData());
     const { totp, TOTPsecret } = formData as {
       totp: string;
