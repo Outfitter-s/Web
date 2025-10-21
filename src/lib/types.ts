@@ -4,6 +4,20 @@ export type UUID /* UUID v4 */ = `${string}-${string}-${string}-${string}-${stri
 type MyOptional<T> = T | null;
 export const clothingItemTypes = ['top', 'bottom', 'shoes', 'accessory'] as const;
 export type ClothingItemType = (typeof clothingItemTypes)[number];
+export const clothingItemColors = [
+  'red',
+  'blue',
+  'green',
+  'black',
+  'white',
+  'yellow',
+  'purple',
+  'orange',
+  'pink',
+  'brown',
+  'gray',
+] as const;
+export type ClothingItemColor = (typeof clothingItemColors)[number];
 export interface User {
   id: UUID;
   username: string;
@@ -28,8 +42,10 @@ export interface ClothingItem {
   id: UUID;
   imageUrl: string;
   type: ClothingItemType;
-  color: string;
+  color: ClothingItemColor;
   createdAt: Date;
+  name: string;
+  description: string;
   lastWornAt: MyOptional<Date>;
 }
 

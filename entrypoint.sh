@@ -9,7 +9,7 @@ if [ -f .env ]; then
 fi
 
 # Create required directories
-dirs=("assets/{clothing_items,outfits}")
+dirs=("assets/{clothing_item,outfits}")
 for dir in ${dirs[@]}; do
   mkdir -p "$dir"
 done
