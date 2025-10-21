@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-tag=${$1:-latest}
+tag="${1:-latest}"
+echo "Building and pushing Docker image with tag: $tag"
 
 # Build the Docker image for the application
-docker build -t anguspllg/outffitter:$tag .
+docker build -t anguspllg/outfitter:$tag .
 # Push the image to the Docker registry
-docker push anguspllg/outffitter:$tag
+docker push anguspllg/outfitter:$tag
