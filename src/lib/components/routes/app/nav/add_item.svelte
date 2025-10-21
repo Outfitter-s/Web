@@ -50,7 +50,6 @@
     }
     loading = false;
   }
-  $inspect(page.data.items);
 </script>
 
 <Dialog.Root bind:open={$itemOpen}>

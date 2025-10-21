@@ -40,49 +40,51 @@
 {/snippet}
 
 {#if item}
-  <div class="flex grow flex-col p-2 lg:flex-row">
-    <!-- Image -->
-    <img
-      src={item.imageUrl}
-      class="aspect-square max-h-[800px] w-full rounded-lg object-cover object-center lg:w-1/2"
-      alt=""
-    />
+  <div class="p-2">
+    <div class="bg-card border-border flex flex-col overflow-hidden rounded-lg border lg:flex-row">
+      <!-- Image -->
+      <img
+        src={item.imageUrl}
+        class="aspect-square max-h-[800px] w-full object-cover object-center lg:w-1/2"
+        alt=""
+      />
 
-    <!-- Details -->
-    <div class="flex w-full flex-col gap-4 max-lg:pt-4 lg:w-1/2 lg:pl-4">
-      <h1 class="font-sans text-2xl font-bold">{item.name}</h1>
-      <p class="font-mono text-base font-normal wrap-normal">{item.description}</p>
+      <!-- Details -->
+      <div class="flex w-full flex-col gap-4 p-2 lg:w-1/2 lg:p-4">
+        <h1 class="font-sans text-2xl font-bold">{item.name}</h1>
+        <p class="font-mono text-base font-normal wrap-normal">{item.description}</p>
 
-      <div
-        class="grid w-full grid-rows-1"
-        style="grid-template-columns: repeat({item.lastWornAt ? 3 : 2}, minmax(0, 1fr));"
-      >
-        <div class="flex flex-col gap-1">
-          <div class="text-lg font-medium">
-            <Palette class="mr-2 mb-1 inline size-5" />
-            Color
-          </div>
-          <div class="flex flex-row items-center gap-2">
-            {@render colorDot(item.color)}
-            <span>{capitalize(item.color)}</span>
-          </div>
-        </div>
-        <div class="flex flex-col gap-1">
-          <div class="text-lg font-medium">
-            <Shirt class="mr-2 mb-1 inline size-5" />
-            Type
-          </div>
-          <div>{capitalize(item.type)}</div>
-        </div>
-        {#if item.lastWornAt}
+        <div
+          class="grid w-full grid-rows-1"
+          style="grid-template-columns: repeat({item.lastWornAt ? 3 : 2}, minmax(0, 1fr));"
+        >
           <div class="flex flex-col gap-1">
             <div class="text-lg font-medium">
-              <Calendar class="mr-2 mb-1 inline size-5" />
-              Last Worn
+              <Palette class="mr-2 mb-1 inline size-5" />
+              Color
             </div>
-            <div>{formatDate(item.lastWornAt)}</div>
+            <div class="flex flex-row items-center gap-2">
+              {@render colorDot(item.color)}
+              <span>{capitalize(item.color)}</span>
+            </div>
           </div>
-        {/if}
+          <div class="flex flex-col gap-1">
+            <div class="text-lg font-medium">
+              <Shirt class="mr-2 mb-1 inline size-5" />
+              Type
+            </div>
+            <div>{capitalize(item.type)}</div>
+          </div>
+          {#if item.lastWornAt}
+            <div class="flex flex-col gap-1">
+              <div class="text-lg font-medium">
+                <Calendar class="mr-2 mb-1 inline size-5" />
+                Last Worn
+              </div>
+              <div>{formatDate(item.lastWornAt)}</div>
+            </div>
+          {/if}
+        </div>
       </div>
     </div>
   </div>
