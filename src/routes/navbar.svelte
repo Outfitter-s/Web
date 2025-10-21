@@ -4,9 +4,8 @@
   // import { t } from '$lib/i18n';
   import { Home, Plus, Shirt, User } from '@lucide/svelte';
   import AddButton from '$lib/components/routes/app/nav/addButton.svelte';
+  import { openState } from '$lib/components/routes/app/nav';
   // import { slide } from 'svelte/transition';
-
-  let addOpen = $state(false);
 
   interface Link {
     href: string;
@@ -37,13 +36,13 @@
   // };
 </script>
 
-<AddButton bind:open={addOpen} />
+<AddButton />
 
 {#snippet entry(link: Link)}
   {#if link.href == 'add-item'}
     <Button
       variant="none"
-      onclick={() => (addOpen = !addOpen)}
+      onclick={() => ($openState = !$openState)}
       class=" border-border bg-card z-10 mx-auto -mt-6 size-14 rounded-full border p-2 shadow-xl"
     >
       <Plus class="size-full" />

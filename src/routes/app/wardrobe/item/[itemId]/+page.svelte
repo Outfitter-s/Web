@@ -49,11 +49,14 @@
     />
 
     <!-- Details -->
-    <div class="flex w-1/2 flex-col gap-4 max-lg:pt-4 lg:pl-4">
+    <div class="flex w-full flex-col gap-4 max-lg:pt-4 lg:w-1/2 lg:pl-4">
       <h1 class="font-sans text-2xl font-bold">{item.name}</h1>
       <p class="font-mono text-base font-normal wrap-normal">{item.description}</p>
 
-      <div class="grid w-full grid-cols-3 grid-rows-1">
+      <div
+        class="grid w-full grid-rows-1"
+        style="grid-template-columns: repeat({item.lastWornAt ? 3 : 2}, minmax(0, 1fr));"
+      >
         <div class="flex flex-col gap-1">
           <div class="text-lg font-medium">
             <Palette class="mr-2 mb-1 inline size-5" />

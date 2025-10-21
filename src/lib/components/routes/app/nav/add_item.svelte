@@ -14,14 +14,12 @@
   import { Button } from '$lib/components/ui/button';
   import * as Dialog from '$lib/components/ui/dialog';
   import { capitalize } from '$lib/utils';
-
-  interface Props {
-    open?: boolean;
-  }
+  import { itemOpen } from '.';
+  import { page } from '$app/state';
+  import { invalidateAll } from '$app/navigation';
 
   let color = $state<ClothingItemColor>(clothingItemColors[0]);
   let type = $state<ClothingItemType>(clothingItemTypes[0]);
-  let { open = $bindable(false) }: Props = $props();
   let loading = $state(false);
 
   async function submitHandler(event: Event) {
@@ -47,13 +45,15 @@
     } else {
       Toaster.success($t('successes.clothing.item.created'));
       (event.target as HTMLFormElement).reset();
-      open = false;
+      $itemOpen = false;
+      await invalidateAll();
     }
     loading = false;
   }
+  $inspect(page.data.items);
 </script>
 
-<Dialog.Root bind:open>
+<Dialog.Root bind:open={$itemOpen}>
   <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title>{$t('wardrobe.createItem.title')}</Dialog.Title>

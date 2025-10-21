@@ -24,7 +24,15 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
     const imageBuffer = Buffer.from(await image.arrayBuffer());
 
-    await ClothingItemDAO.uploadClothingItem(user.id, imageBuffer, name, description, type, color);
+    const item = await ClothingItemDAO.uploadClothingItem(
+      user.id,
+      imageBuffer,
+      name,
+      description,
+      type,
+      color
+    );
+    return json({ success: true, item });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     logger.error('Error creating clothing item :', msg);
