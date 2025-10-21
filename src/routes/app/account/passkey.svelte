@@ -65,19 +65,18 @@
 <AlertDialog.Root bind:open={removePasskeyModalOpen}>
   <AlertDialog.Content>
     <AlertDialog.Header>
-      <AlertDialog.Title>{$t('account.settings.tabs.passkey.remove.modal.title')}</AlertDialog.Title
-      >
+      <AlertDialog.Title>{$t('account.tabs.passkey.remove.modal.title')}</AlertDialog.Title>
       <AlertDialog.Description>
-        {$t('account.settings.tabs.passkey.remove.modal.description')}
+        {$t('account.tabs.passkey.remove.modal.description')}
       </AlertDialog.Description>
     </AlertDialog.Header>
     <AlertDialog.Footer>
       <AlertDialog.Cancel>
-        {$t('account.settings.tabs.passkey.remove.modal.cancel')}</AlertDialog.Cancel
+        {$t('account.tabs.passkey.remove.modal.cancel')}</AlertDialog.Cancel
       >
       <form action="?/deletePasskey" method="POST" class="w-fit" use:enhance>
         <AlertDialog.Action type="submit">
-          {$t('account.settings.tabs.passkey.remove.modal.confirm')}
+          {$t('account.tabs.passkey.remove.modal.confirm')}
           <ArrowRight class="size-4" />
         </AlertDialog.Action>
       </form>
@@ -87,10 +86,10 @@
 
 {#if user.passkey}
   <Button onclick={() => (removePasskeyModalOpen = true)}>
-    {$t('account.settings.tabs.passkey.remove.button')}
+    {$t('account.tabs.passkey.remove.button')}
   </Button>
 {:else}
   <Button onclick={registerPasskey}>
-    {$t('account.settings.tabs.passkey.register.button')}
+    {$t('account.tabs.passkey.register.button')}
   </Button>
 {/if}
