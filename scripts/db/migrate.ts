@@ -48,12 +48,19 @@ async function main() {
   const availableMigrations = (await readdir(join(HERE, '../sql/migrations'))).filter((f) =>
     f.match(/migration\.(\d+)\.sql/)
   );
-  const newMigrations = availableMigrations.filter((file) => {
-    const timeStamp = file.match(/migration\.(\d+)\.sql/);
-    if (!timeStamp) return false;
-    const migrationTime = new Date(parseInt(timeStamp[1], 10));
-    return !lastMigrationDate || migrationTime > lastMigrationDate;
-  });
+  const newMigrations = availableMigrations
+    .map((file) => {
+      const match = file.match(/migration\.(\d+)\.sql/);
+      if (!match) return null;
+      return {
+        file,
+        timestamp: parseInt(match[1], 10),
+        date: new Date(parseInt(match[1], 10)),
+      };
+    })
+    .filter((m) => m && (!lastMigrationDate || m.date > lastMigrationDate))
+    .sort((a, b) => a!.timestamp - b!.timestamp)
+    .map((m) => m!.file);
   console.log(`Available migrations: ${availableMigrations.length}`);
   console.log(`New migrations to apply: ${newMigrations.length}`);
 
