@@ -1,11 +1,11 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { Button } from '$lib/components/ui/button';
-  // import { t } from '$lib/i18n';
+  import { t } from '$lib/i18n';
   import { Home, Plus, Shirt, User } from '@lucide/svelte';
   import AddButton from '$lib/components/routes/app/nav/addButton.svelte';
   import { openState } from '$lib/components/routes/app/nav';
-  // import { slide } from 'svelte/transition';
+  import { slide } from 'svelte/transition';
 
   interface Link {
     href: string;
@@ -17,7 +17,7 @@
     ...(page.data?.user
       ? [
           { href: '/app', text: 'nav.home', icon: Home },
-          { href: '', text: 'Placeholder' },
+          { href: '', text: '' },
           { href: 'add-item', text: 'nav.outfits' },
           { href: '/app/wardrobe', text: 'nav.wardrobe', icon: Shirt },
           { href: '/app/account', text: 'nav.account', icon: User },
@@ -25,11 +25,11 @@
       : [
           { href: '/', text: 'nav.home' },
           { href: '/#about', text: 'nav.about' },
-          { href: '/#pricing', text: 'nav.pricing' },
           { href: '/auth/sign-up', text: 'nav.signUp' },
           { href: '/auth/log-in', text: 'nav.logIn' },
         ]),
   ]);
+  $inspect(links);
 
   // const pathMatches = (path: string) => {
   //   return page.url.pathname === path;
@@ -56,12 +56,11 @@
       {#if link.icon}
         <!-- svelte-ignore svelte_component_deprecated -->
         <svelte:component this={link.icon} class="z-10 size-5" />
-      {/if}
-      <!-- {#if pathMatches(link.href)}
+      {:else}
         <span class="z-10 ltr:ml-2 rtl:mr-2" transition:slide={{ duration: 300, axis: 'x' }}
           >{$t(link.text)}</span
         >
-      {/if} -->
+      {/if}
     </Button>
   {/if}
 {/snippet}
