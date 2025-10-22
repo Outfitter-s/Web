@@ -29,7 +29,6 @@
           { href: '/auth/log-in', text: 'nav.logIn' },
         ]),
   ]);
-  $inspect(links);
 
   // const pathMatches = (path: string) => {
   //   return page.url.pathname === path;

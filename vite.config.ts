@@ -9,7 +9,6 @@ export default defineConfig({
     fs: {
       allow: ['./config.json', 'assets/'],
     },
-    allowedHosts: ['outfitter.home.paillaugue.fr'],
   },
   assetsInclude: ['transactional/**/*.html'],
 });

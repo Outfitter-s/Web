@@ -65,7 +65,8 @@
     },
     "clothing": {
       "item": {
-        "requiredField": "The following field{{s}} {{is}} required: {{field}}"
+        "requiredField": "The following field{{s}} {{is}} required: {{field}}",
+        "classificationFailed": "Failed to classify the clothing item. Please enter values manually."
       }
     }
   },
@@ -255,7 +256,9 @@
         "name": "Name",
         "type": "Type",
         "color": "Color",
-        "image": "Image"
+        "image": {
+          "label": "Take a picture"
+        }
       }
     },
     "itemList": {

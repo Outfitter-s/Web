@@ -1,18 +1,29 @@
 services:
   web:
     build: .
-    image: anguspllg/outfitter:latest
+    image: anguspllg/outfitter_web:latest
     container_name: outfiter_web
     restart: unless-stopped
     depends_on:
       - db
       - redis
+      - image_processing
     environment:
       - ORIGIN=http://localhost:4173
     env_file:
       - .env
     ports:
       - '4173:3000'
+
+  image_processing:
+    image: anguspllg/outfitter_image_processing:latest
+    container_name: outfitter_image_processing
+    restart: unless-stopped
+    ports:
+      - '5000:5000'
+    environment:
+      - FRONTEND_ORIGIN=http://localhost:4173
+      - API_KEY=${IMAGE_PROCESSING_API_KEY}
 
   db:
     image: postgres
