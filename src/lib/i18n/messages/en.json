@@ -2,7 +2,7 @@
   "seo": {
     "titleSuffix": "Outfitter",
     "defaults": {
-      "title": "DEFAULT_TITLE",
+      "title": "Outfitter",
       "description": "DEFAULT_DESCRIPTION"
     },
     "homePage": {
