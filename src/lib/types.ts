@@ -2,7 +2,15 @@ import type { AuthenticatorTransportFuture, CredentialDeviceType } from '@simple
 
 export type UUID /* UUID v4 */ = `${string}-${string}-${string}-${string}-${string}`;
 type MyOptional<T> = T | null;
-export const clothingItemTypes = ['top', 'bottom', 'shoes', 'accessory'] as const;
+export const clothingItemTypes = [
+  'pants',
+  'sweater',
+  'dress',
+  'jacket',
+  'shirt',
+  'shoes',
+  'accessory',
+] as const;
 export type ClothingItemType = (typeof clothingItemTypes)[number];
 export const clothingItemColors = [
   'red',
