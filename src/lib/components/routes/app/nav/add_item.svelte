@@ -19,6 +19,7 @@
   import Spinner from '$lib/components/Spinner/Spinner.svelte';
   import { fade, slide } from 'svelte/transition';
   import { invalidateAll } from '$app/navigation';
+  import ColorDot from '$lib/components/colorDot.svelte';
 
   let processingImage = $state(false);
   let takePictureStates = $state({
@@ -279,10 +280,18 @@
         <Field.Field>
           <Field.Label for="color">{$t('wardrobe.createItem.fields.color')}</Field.Label>
           <Select.Root type="single" name="color" bind:value={color}>
-            <Select.Trigger>{capitalize(color)}</Select.Trigger>
+            <Select.Trigger>
+              <div class="flex flex-row items-center gap-2">
+                <ColorDot {color} />
+                {capitalize(color)}
+              </div>
+            </Select.Trigger>
             <Select.Content>
               {#each clothingItemColors as color}
-                <Select.Item value={color} label={capitalize(color)} />
+                <Select.Item value={color}>
+                  <ColorDot {color} />
+                  {capitalize(color)}
+                </Select.Item>
               {/each}
             </Select.Content>
           </Select.Root>
