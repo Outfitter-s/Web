@@ -12,7 +12,7 @@
 
 <div
   bind:this={ref}
-  class={cn('mt-auto flex flex-col gap-2 sm:flex-row sm:justify-end', className)}
+  class={cn('mt-auto flex flex-row justify-end gap-2', className)}
   {...restProps}
 >
   {@render children?.()}
