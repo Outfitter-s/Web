@@ -1,9 +1,12 @@
 import type { ClothingItem, UUID, ClothingItemType } from '$lib/types';
 import { ClothingItemDAO } from './clotingItem';
+import { getWeather } from '$lib/utils/weather';
 
 export async function generateOutfit(userId: UUID): Promise<ClothingItem[]> {
   const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
   const outfit: ClothingItem[] = [];
+
+  const weather = await getWeather();
 
   // Crée un tableau pour chaque type d'item
   const grouped: Record<ClothingItemType, ClothingItem[]> = {
