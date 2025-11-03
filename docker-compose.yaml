@@ -4,6 +4,8 @@ services:
     image: anguspllg/outfitter_web:latest
     container_name: outfiter_web
     restart: unless-stopped
+    volumes:
+       - ./assets:/app/assets:Z
     depends_on:
       - db
       - redis
@@ -16,7 +18,7 @@ services:
       - '4173:3000'
 
   image_processing:
-    image: anguspllg/outfitter_image_processing:latest
+    image: anguspllg/outfitter_image_processing:1.0.0
     container_name: outfitter_image_processing
     restart: unless-stopped
     ports:

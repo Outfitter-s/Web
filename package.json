@@ -19,7 +19,8 @@
     "android:port-forward": "adb forward tcp:9222 localabstract:chrome_devtools_remote",
     "repo:version-bump": "scripts/version-bump.sh",
     "repo:docker-build": "scripts/build-image.sh",
-    "repo:deploy": "scripts/build-image.sh"
+    "repo:deploy": "scripts/build-image.sh",
+    "test": "vitest"
   },
   "lint-staged": {
     "*.{js,ts,svelte,json,css,md}": "prettier --write"
@@ -56,7 +57,8 @@
     "tw-animate-css": "^1.3.7",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.40.0",
-    "vite": "^7.1.3"
+    "vite": "^7.1.3",
+    "vitest": "^4.0.6"
   },
   "dependencies": {
     "@simplewebauthn/browser": "^13.1.2",
