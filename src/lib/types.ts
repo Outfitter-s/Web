@@ -59,7 +59,7 @@ export interface ClothingItem {
 
 export interface Outfit {
   id: UUID;
-  top: MyOptional<ClothingItem>;
+  top: ClothingItem[];
   bottom: MyOptional<ClothingItem>;
   shoes: MyOptional<ClothingItem>;
   accessories: ClothingItem[];

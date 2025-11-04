@@ -21,6 +21,7 @@
     cards = await Promise.all(
       baseCards.map(async (card, idx) => {
         const outfit = await generateOutfit();
+        console.log('card : ', idx, 'outfit : ', outfit);
         return { ...card, id: idx, outfit };
       })
     );
