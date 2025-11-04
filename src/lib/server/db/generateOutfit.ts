@@ -31,6 +31,7 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
   const weather = await getWeather();
 
   const monochromeOutfit = getMonochromeOutfit(items);
+  const analogousOutfit = getAnalogueOutfit(items);
 
   // Crée un tableau pour chaque type d'item
   const grouped: Record<ClothingItemType, ClothingItem[]> = {
@@ -43,7 +44,7 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
     accessory: [],
   };
 
-  for (const item of monochromeOutfit) {
+  for (const item of analogousOutfit) {
     grouped[item.type].push(item);
   }
 
@@ -281,6 +282,199 @@ function getMonochromeOutfit(items: ClothingItem[]): ClothingItem[] {
     const maxNum = Math.min(availableAccessories.length, 3);
     const count = randIntInclusive(0, maxNum);
     const pool = [...availableAccessories];
+    for (let i = 0; i < count; i++) {
+      const idx = Math.floor(Math.random() * pool.length);
+      outfit.push(pool[idx]);
+      pool.splice(idx, 1);
+    }
+  }
+
+  return outfit;
+}
+
+function getAnalogousColors(color: ClothingItemColor, distance: number = 1): ClothingItemColor[] {
+  const neutralColors: ClothingItemColor[] = ['white', 'black', 'gray', 'brown'];
+
+  const index = COLOR_WHEEL.indexOf(color);
+
+  // Si la couleur n'est pas trouvée, retourner seulement cette couleur
+  if (index === -1) {
+    return [color];
+  }
+
+  // Si c'est une couleur neutre, elle va avec toutes les couleurs chromatiques
+  if (neutralColors.includes(color)) {
+    const chromaticColors = COLOR_WHEEL.filter((c) => !neutralColors.includes(c));
+    return [color, ...chromaticColors];
+  }
+
+  const analogousColors: ClothingItemColor[] = [color];
+
+  // Ajouter les couleurs voisines dans les deux directions
+  for (let i = 1; i <= distance; i++) {
+    // Couleur précédente (avec gestion circulaire)
+    const prevIndex = (index - i + COLOR_WHEEL.length) % COLOR_WHEEL.length;
+    const prevColor = COLOR_WHEEL[prevIndex];
+    // Éviter les couleurs neutres comme voisines directes
+    if (!neutralColors.includes(prevColor)) {
+      analogousColors.push(prevColor);
+    }
+
+    // Couleur suivante (avec gestion circulaire)
+    const nextIndex = (index + i) % COLOR_WHEEL.length;
+    const nextColor = COLOR_WHEEL[nextIndex];
+    if (!neutralColors.includes(nextColor)) {
+      analogousColors.push(nextColor);
+    }
+  }
+
+  return analogousColors;
+}
+
+function getAnalogueOutfit(items: ClothingItem[]): ClothingItem[] {
+  type ByType = Record<ClothingItemType, ClothingItem[]>;
+  const emptyByType = (): ByType => ({
+    pants: [],
+    sweater: [],
+    dress: [],
+    jacket: [],
+    shirt: [],
+    shoes: [],
+    accessory: [],
+  });
+
+  const neutralColors: ClothingItemColor[] = ['white', 'black', 'gray', 'brown'];
+
+  // Regrouper par couleur puis par type
+  const byColor: Record<string, ByType> = {};
+  for (const item of items) {
+    (byColor[item.color] ??= emptyByType())[item.type].push(item);
+  }
+
+  const colors = Object.keys(byColor) as ClothingItemColor[];
+  if (colors.length === 0) return [];
+
+  // Fonction helper pour vérifier si une couleur a un outfit valide
+  const hasTop = (bt: ByType) => bt.shirt.length + bt.dress.length > 0;
+
+  // Trier les couleurs disponibles selon leur position dans COLOR_WHEEL
+  const sortedColors = colors.sort((a, b) => {
+    const indexA = COLOR_WHEEL.indexOf(a);
+    const indexB = COLOR_WHEEL.indexOf(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+
+  // Trouver une couleur de base qui a au moins un top
+  let baseColor = sortedColors.find((c) => hasTop(byColor[c]));
+  if (!baseColor) {
+    baseColor = sortedColors[0];
+  }
+
+  // Obtenir les couleurs analogues (voisines)
+  const analogousColors = getAnalogousColors(baseColor, 1);
+
+  // Filtrer pour ne garder que les couleurs analogues disponibles dans la garde-robe
+  const availableAnalogousColors = analogousColors.filter((c) => colors.includes(c));
+
+  const outfit: ClothingItem[] = [];
+
+  // Top : priorité à la couleur de base
+  let topAdded = false;
+  if (byColor[baseColor].shirt.length > 0 || byColor[baseColor].dress.length > 0) {
+    const combinedTops = [...byColor[baseColor].shirt, ...byColor[baseColor].dress];
+    const top = combinedTops[Math.floor(Math.random() * combinedTops.length)];
+    outfit.push(top);
+    topAdded = true;
+
+    // Pants : peut être de la couleur de base OU d'une couleur analogue
+    if (top.type === 'shirt') {
+      // Collecter tous les pantalons des couleurs analogues disponibles
+      const allPants: ClothingItem[] = [];
+      for (const color of availableAnalogousColors) {
+        allPants.push(...byColor[color].pants);
+      }
+
+      if (allPants.length > 0) {
+        const pant = allPants[Math.floor(Math.random() * allPants.length)];
+        outfit.push(pant);
+      } else {
+        // Fallback : pantalon neutre
+        const neutralPantsAvailable = neutralColors.filter(
+          (c) => byColor[c] && byColor[c].pants.length > 0
+        );
+        if (neutralPantsAvailable.length > 0) {
+          const neutralColor =
+            neutralPantsAvailable[Math.floor(Math.random() * neutralPantsAvailable.length)];
+          const pant =
+            byColor[neutralColor].pants[
+              Math.floor(Math.random() * byColor[neutralColor].pants.length)
+            ];
+          outfit.push(pant);
+        }
+      }
+    }
+  }
+
+  // Si pas de top dans la couleur de base, essayer les couleurs analogues
+  if (!topAdded) {
+    for (const color of availableAnalogousColors) {
+      const combinedTops = [...byColor[color].shirt, ...byColor[color].dress];
+      if (combinedTops.length > 0) {
+        const top = combinedTops[Math.floor(Math.random() * combinedTops.length)];
+        outfit.push(top);
+        topAdded = true;
+
+        if (top.type === 'shirt' && byColor[color].pants.length > 0) {
+          const pant =
+            byColor[color].pants[Math.floor(Math.random() * byColor[color].pants.length)];
+          outfit.push(pant);
+        }
+        break;
+      }
+    }
+  }
+
+  // Shoes : de préférence dans les couleurs analogues
+  const allShoes: ClothingItem[] = [];
+  for (const color of availableAnalogousColors) {
+    allShoes.push(...byColor[color].shoes);
+  }
+
+  if (allShoes.length > 0) {
+    const shoes = allShoes[Math.floor(Math.random() * allShoes.length)];
+    outfit.push(shoes);
+  } else {
+    // Fallback : chaussures neutres
+    const neutralShoesAvailable = neutralColors.filter(
+      (c) => byColor[c] && byColor[c].shoes.length > 0
+    );
+    if (neutralShoesAvailable.length > 0) {
+      const neutralColor =
+        neutralShoesAvailable[Math.floor(Math.random() * neutralShoesAvailable.length)];
+      const shoes =
+        byColor[neutralColor].shoes[Math.floor(Math.random() * byColor[neutralColor].shoes.length)];
+      outfit.push(shoes);
+    }
+  }
+
+  // Accessories : mélange des couleurs analogues + neutres
+  const allAccessories: ClothingItem[] = [];
+  for (const color of availableAnalogousColors) {
+    allAccessories.push(...byColor[color].accessory);
+  }
+  // Ajouter les accessoires neutres
+  for (const neutralColor of neutralColors) {
+    if (byColor[neutralColor]) {
+      allAccessories.push(...byColor[neutralColor].accessory);
+    }
+  }
+
+  if (allAccessories.length > 0) {
+    const maxNum = Math.min(allAccessories.length, 3);
+    const count = randIntInclusive(0, maxNum);
+    const pool = [...allAccessories];
     for (let i = 0; i < count; i++) {
       const idx = Math.floor(Math.random() * pool.length);
       outfit.push(pool[idx]);

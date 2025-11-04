@@ -4,8 +4,10 @@
   import type { ClothingItem } from '$lib/types';
   import { capitalize } from '$lib/utils';
   import { DateFormatter } from '@internationalized/date';
-  import { Calendar, Palette, Shirt } from '@lucide/svelte';
+  import { Calendar, Palette, Shirt, Pencil } from '@lucide/svelte';
   import ColorDot from '$lib/components/colorDot.svelte';
+  import { Button } from '$lib/components/ui/button';
+  import { goto } from '$app/navigation';
 
   let itemId = $derived<string>(page.params.itemId as string);
   let items = $derived<ClothingItem[]>(page.data.items);
@@ -19,6 +21,10 @@
 
   const formatDate = (date: Date) => {
     return new DateFormatter(locale, { day: '2-digit', month: 'short' }).format(date);
+  };
+
+  const handleEdit = () => {
+    goto(`/app/wardrobe/item/${itemId}/edit`);
   };
 </script>
 
@@ -34,7 +40,13 @@
 
       <!-- Details -->
       <div class="flex w-full flex-col gap-4 p-2 lg:w-1/2 lg:p-4">
-        <h1 class="font-sans text-2xl font-bold">{item.name}</h1>
+        <div class="flex items-start justify-between">
+          <h1 class="font-sans text-2xl font-bold">{item.name}</h1>
+          <Button variant="outline" size="icon" onclick={handleEdit}>
+            <Pencil class="size-4" />
+          </Button>
+        </div>
+
         <p class="font-mono text-base font-normal wrap-normal">{item.description}</p>
 
         <div
