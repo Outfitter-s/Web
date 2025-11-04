@@ -6,6 +6,7 @@
   import { ArrowRight } from '@lucide/svelte';
   import confetti from 'canvas-confetti';
   import { page } from '$app/state';
+  import { onMount } from 'svelte';
 
   let cards: SwiperCard[] = $state(page.data.cards);
 
@@ -64,6 +65,24 @@
     acceptedCard = { open: false, card: null };
     chosenOutfit = { ...acceptedCard.card } as SwiperCard;
   }
+
+  async function fetchOutfit() {
+    const res = await fetch('/api/generate-outfit', {
+      method: 'POST',
+    });
+    const outfit = await res.json();
+    console.log(outfit); // Affiche l'outfit généré
+  }
+
+  onMount(() => {
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === 'o') {
+        fetchOutfit();
+      }
+    }
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  });
 </script>
 
 <Dialog.Root bind:open={acceptedCard.open} dismissible={false}>
