@@ -9,6 +9,8 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
 
   const weather = await getWeather();
 
+  const monochromeOutfit = getMonochromeOutfit(items);
+
   // Crée un tableau pour chaque type d'item
   const grouped: Record<ClothingItemType, ClothingItem[]> = {
     pants: [],
@@ -20,7 +22,7 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
     accessory: [],
   };
 
-  for (const item of items) {
+  for (const item of monochromeOutfit) {
     grouped[item.type].push(item);
   }
 
@@ -139,23 +141,68 @@ async function scoring(userId: UUID): Promise<ClothingItem[]> {
 }
 
 function getMonochromeOutfit(items: ClothingItem[]): ClothingItem[] {
-  // Exemple de logique pour générer une tenue monochrome
-  const outfit: ClothingItem[] = [];
-  const colorMap: Record<string, ClothingItem[]> = {};
+  type ByType = Record<ClothingItemType, ClothingItem[]>;
+  const emptyByType = (): ByType => ({
+    pants: [],
+    sweater: [],
+    dress: [],
+    jacket: [],
+    shirt: [],
+    shoes: [],
+    accessory: [],
+  });
 
-  // Regrouper les articles par couleur
+  // Regrouper par couleur puis par type
+  const byColor: Record<string, ByType> = {};
   for (const item of items) {
-    if (!colorMap[item.color]) {
-      colorMap[item.color] = [];
-    }
-    colorMap[item.color].push(item);
+    (byColor[item.color] ??= emptyByType())[item.type].push(item);
   }
 
-  // Sélectionner une couleur aléatoire et choisir des articles de cette couleur
-  const colors = Object.keys(colorMap);
-  if (colors.length > 0) {
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    outfit.push(...colorMap[randomColor]);
+  const colors = Object.keys(byColor);
+  if (colors.length === 0) return [];
+
+  // Choisir une couleur qui permet un outfit (top + shoes si possible)
+  const hasTop = (bt: ByType) => bt.shirt.length + bt.dress.length > 0;
+  const eligibleWithShoes = colors.filter((c) => hasTop(byColor[c]) && byColor[c].shoes.length > 0);
+  const eligible =
+    eligibleWithShoes.length > 0 ? eligibleWithShoes : colors.filter((c) => hasTop(byColor[c]));
+  const baseColor =
+    eligible.length > 0
+      ? eligible[Math.floor(Math.random() * eligible.length)]
+      : colors[Math.floor(Math.random() * colors.length)];
+  const group = byColor[baseColor];
+
+  const outfit: ClothingItem[] = [];
+
+  // Top (shirt ou dress)
+  const combinedTops = [...group.shirt, ...group.dress];
+  if (combinedTops.length > 0) {
+    const top = combinedTops[Math.floor(Math.random() * combinedTops.length)];
+    outfit.push(top);
+
+    // Pants (seulement si top est une shirt)
+    if (top.type === 'shirt' && group.pants.length > 0) {
+      const pant = group.pants[Math.floor(Math.random() * group.pants.length)];
+      outfit.push(pant);
+    }
+  }
+
+  // Shoes
+  if (group.shoes.length > 0) {
+    const shoes = group.shoes[Math.floor(Math.random() * group.shoes.length)];
+    outfit.push(shoes);
+  }
+
+  // Accessories (0..3), sans doublon
+  if (group.accessory.length > 0) {
+    const maxNum = Math.min(group.accessory.length, 3);
+    const count = randIntInclusive(0, maxNum);
+    const pool = [...group.accessory];
+    for (let i = 0; i < count; i++) {
+      const idx = Math.floor(Math.random() * pool.length);
+      outfit.push(pool[idx]);
+      pool.splice(idx, 1);
+    }
   }
 
   return outfit;
