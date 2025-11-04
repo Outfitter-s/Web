@@ -71,5 +71,5 @@ export interface SwiperCard {
   id: number;
   title: string;
   description?: string;
-  imageSrc: string;
+  outfit: Outfit;
 }

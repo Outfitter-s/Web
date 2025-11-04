@@ -2,13 +2,29 @@
   import { Swiper } from '$lib/components';
   import * as Dialog from '$lib/components/ui/dialog';
   import { Button } from '$lib/components/ui/button';
-  import type { SwiperCard } from '$lib/types';
+  import type { SwiperCard, Outfit } from '$lib/types';
   import { ArrowRight } from '@lucide/svelte';
   import confetti from 'canvas-confetti';
   import { page } from '$app/state';
   import { onMount } from 'svelte';
 
-  let cards: SwiperCard[] = $state(page.data.cards);
+  // Génère un outfit via l'API
+  async function generateOutfit(): Promise<Outfit> {
+    const res = await fetch('/api/generate-outfit', { method: 'POST' });
+    return await res.json();
+  }
+
+  let cards = $state<SwiperCard[]>([]);
+
+  onMount(async () => {
+    const baseCards = page.data.cards as Omit<SwiperCard, 'outfit'>[];
+    cards = await Promise.all(
+      baseCards.map(async (card, idx) => {
+        const outfit = await generateOutfit();
+        return { ...card, id: idx, outfit };
+      })
+    );
+  });
 
   interface Props {
     chosenOutfit?: SwiperCard | null;

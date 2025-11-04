@@ -1,10 +1,11 @@
-import type { ClothingItem, UUID, ClothingItemType } from '$lib/types';
+import type { Outfit, ClothingItem, ClothingItemType, UUID } from '$lib/types';
 import { ClothingItemDAO } from './clotingItem';
 import { getWeather } from '$lib/utils/weather';
 
-export async function generateOutfit(userId: UUID): Promise<ClothingItem[]> {
+type OutfitWithoutId = Omit<Outfit, 'id'>;
+
+export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
   const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
-  const outfit: ClothingItem[] = [];
 
   const weather = await getWeather();
 
@@ -25,46 +26,52 @@ export async function generateOutfit(userId: UUID): Promise<ClothingItem[]> {
 
   // Dress and shirts
   const combinedTops = [...grouped.shirt, ...grouped.dress];
-
   let top: ClothingItem | null = null;
   if (combinedTops.length > 0) {
     const randomIndex = Math.floor(Math.random() * combinedTops.length);
     top = combinedTops[randomIndex];
-    outfit.push(top);
   }
 
-  // Pants
-  if (top?.type === 'shirt') {
-    if (grouped.pants.length > 0) {
-      const randomIndex = Math.floor(Math.random() * grouped.pants.length);
-      let pant = grouped.pants[randomIndex];
-      outfit.push(pant);
-    }
+  // Pants (bottom)
+  let bottom: ClothingItem | null = null;
+  if (top?.type === 'shirt' && grouped.pants.length > 0) {
+    const randomIndex = Math.floor(Math.random() * grouped.pants.length);
+    bottom = grouped.pants[randomIndex];
+  } else if (top?.type === 'dress') {
+    bottom = null; // Une robe n'a pas de pantalon
   }
-
-  // A implémenter : Check la température dehors pour savoir si on prend un sweater ou un jacket
 
   // Shoes
+  let shoes: ClothingItem | null = null;
   if (grouped.shoes.length > 0) {
     const randomIndex = Math.floor(Math.random() * grouped.shoes.length);
-    let shoes = grouped.shoes[randomIndex];
-    outfit.push(shoes);
+    shoes = grouped.shoes[randomIndex];
   }
 
   // Accessories
+  let accessories: ClothingItem[] = [];
   if (grouped.accessory.length > 0) {
     const accessoryMaxNum = Math.min(grouped.accessory.length, 3);
     const accessoryNum = randIntInclusive(0, accessoryMaxNum);
-    console.log(accessoryNum);
 
+    // Pour éviter les doublons, on clone le tableau et on retire à chaque tirage
+    const available = [...grouped.accessory];
     for (let i = 0; i < accessoryNum; i++) {
-      const randomIndex = Math.floor(Math.random() * grouped.accessory.length);
-      let accessory = grouped.accessory[randomIndex];
-      outfit.push(accessory);
+      if (available.length === 0) break;
+      const randomIndex = Math.floor(Math.random() * available.length);
+      accessories.push(available[randomIndex]);
+      available.splice(randomIndex, 1);
     }
   }
 
-  return outfit;
+  return {
+    top,
+    bottom,
+    shoes,
+    accessories,
+    createdAt: new Date(),
+    wornAt: [],
+  };
 }
 
 // renvoie un entier aléatoire entre min et max (les deux inclus)
