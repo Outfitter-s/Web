@@ -177,6 +177,9 @@ function getMonochromeOutfit(items: ClothingItem[]): ClothingItem[] {
     accessory: [],
   });
 
+  // Définir les couleurs neutres
+  const neutralColors: ClothingItemColor[] = ['white', 'black', 'gray', 'brown'];
+
   // Regrouper par couleur puis par type
   const byColor: Record<string, ByType> = {};
   for (const item of items) {
@@ -190,11 +193,9 @@ function getMonochromeOutfit(items: ClothingItem[]): ClothingItem[] {
   const hasTop = (bt: ByType) => bt.shirt.length + bt.dress.length > 0;
 
   // Trier les couleurs disponibles selon leur position dans COLOR_WHEEL
-  // Les couleurs plus tôt dans COLOR_WHEEL ont la priorité
   const sortedColors = colors.sort((a, b) => {
     const indexA = COLOR_WHEEL.indexOf(a);
     const indexB = COLOR_WHEEL.indexOf(b);
-    // Si une couleur n'est pas dans COLOR_WHEEL, la mettre à la fin
     if (indexA === -1) return 1;
     if (indexB === -1) return -1;
     return indexA - indexB;
@@ -223,23 +224,63 @@ function getMonochromeOutfit(items: ClothingItem[]): ClothingItem[] {
     outfit.push(top);
 
     // Pants (seulement si top est une shirt)
-    if (top.type === 'shirt' && group.pants.length > 0) {
-      const pant = group.pants[Math.floor(Math.random() * group.pants.length)];
-      outfit.push(pant);
+    if (top.type === 'shirt') {
+      if (group.pants.length > 0) {
+        // Prendre un pantalon de la couleur principale
+        const pant = group.pants[Math.floor(Math.random() * group.pants.length)];
+        outfit.push(pant);
+      } else {
+        // Chercher un pantalon dans les couleurs neutres disponibles
+        const neutralPantsAvailable = neutralColors.filter(
+          (c) => byColor[c] && byColor[c].pants.length > 0
+        );
+
+        if (neutralPantsAvailable.length > 0) {
+          const neutralColor =
+            neutralPantsAvailable[Math.floor(Math.random() * neutralPantsAvailable.length)];
+          const pant =
+            byColor[neutralColor].pants[
+              Math.floor(Math.random() * byColor[neutralColor].pants.length)
+            ];
+          outfit.push(pant);
+        }
+      }
     }
   }
 
-  // Shoes
+  // Shoes - essayer d'abord la couleur de base, sinon prendre une couleur neutre
   if (group.shoes.length > 0) {
     const shoes = group.shoes[Math.floor(Math.random() * group.shoes.length)];
     outfit.push(shoes);
+  } else {
+    // Chercher des chaussures dans les couleurs neutres disponibles
+    const neutralShoesAvailable = neutralColors.filter(
+      (c) => byColor[c] && byColor[c].shoes.length > 0
+    );
+
+    if (neutralShoesAvailable.length > 0) {
+      const neutralColor =
+        neutralShoesAvailable[Math.floor(Math.random() * neutralShoesAvailable.length)];
+      const shoes =
+        byColor[neutralColor].shoes[Math.floor(Math.random() * byColor[neutralColor].shoes.length)];
+      outfit.push(shoes);
+    }
   }
 
-  // Accessories (0..3), sans doublon
-  if (group.accessory.length > 0) {
-    const maxNum = Math.min(group.accessory.length, 3);
+  // Accessories (0..3), sans doublon - essayer couleur de base puis neutres
+  const availableAccessories = [...group.accessory];
+
+  // Ajouter les accessoires neutres disponibles
+  for (const neutralColor of neutralColors) {
+    if (byColor[neutralColor] && neutralColor !== baseColor) {
+      availableAccessories.push(...byColor[neutralColor].accessory);
+    }
+  }
+
+  if (availableAccessories.length > 0) {
+    const maxNum = Math.min(availableAccessories.length, 3);
     const count = randIntInclusive(0, maxNum);
-    const pool = [...group.accessory];
+    const pool = [...availableAccessories];
     for (let i = 0; i < count; i++) {
       const idx = Math.floor(Math.random() * pool.length);
       outfit.push(pool[idx]);
