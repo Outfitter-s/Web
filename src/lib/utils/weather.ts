@@ -25,14 +25,13 @@ export async function getWeather(): Promise<
 }
 
 export async function getCity(): Promise<string | { error: string }> {
-  // helper pour geolocation en Promise
-  const getPosition = () =>
-    new Promise<GeolocationPosition>((resolve, reject) => {
-      if (typeof navigator === 'undefined' || !navigator.geolocation) {
-        return reject(new Error('Geolocation non disponible'));
-      }
-      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
-    });
+    const getPosition = () =>
+        new Promise<GeolocationPosition>((resolve, reject) => {
+            if (typeof navigator === 'undefined' || !navigator.geolocation) {
+                return reject(new Error('Geolocation non disponible'));
+            }
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+        });
 
   // 1) Essayer la géolocalisation (si utilisateur autorise)
   try {
