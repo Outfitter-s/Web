@@ -1,8 +1,29 @@
-import type { Outfit, ClothingItem, ClothingItemType, UUID } from '$lib/types';
+import type { Outfit, ClothingItem, ClothingItemType, ClothingItemColor, UUID } from '$lib/types';
 import { ClothingItemDAO } from './clotingItem';
 import { getWeather } from '$lib/utils/weather';
 
 type OutfitWithoutId = Omit<Outfit, 'id'>;
+
+function generateColorWheel(): ClothingItemColor[] {
+  // Définir l'ordre chromatique idéal
+  const chromaticOrder: ClothingItemColor[] = [
+    'red',
+    'orange',
+    'yellow',
+    'green',
+    'blue',
+    'purple',
+    'pink',
+  ];
+
+  // Couleurs neutres (séparées car elles vont avec tout)
+  const neutralColors: ClothingItemColor[] = ['white', 'black', 'gray', 'brown'];
+
+  // Combine chromatic order with neutral colors at the end
+  return [...chromaticOrder, ...neutralColors];
+}
+
+const COLOR_WHEEL = generateColorWheel();
 
 export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
   const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
@@ -162,20 +183,37 @@ function getMonochromeOutfit(items: ClothingItem[]): ClothingItem[] {
     (byColor[item.color] ??= emptyByType())[item.type].push(item);
   }
 
-  const colors = Object.keys(byColor);
+  const colors = Object.keys(byColor) as ClothingItemColor[];
   if (colors.length === 0) return [];
 
-  // Choisir une couleur qui permet un outfit (top + shoes si possible)
+  // Fonction helper pour vérifier si une couleur a un outfit valide
   const hasTop = (bt: ByType) => bt.shirt.length + bt.dress.length > 0;
-  const eligibleWithShoes = colors.filter((c) => hasTop(byColor[c]) && byColor[c].shoes.length > 0);
-  const eligible =
-    eligibleWithShoes.length > 0 ? eligibleWithShoes : colors.filter((c) => hasTop(byColor[c]));
-  const baseColor =
-    eligible.length > 0
-      ? eligible[Math.floor(Math.random() * eligible.length)]
-      : colors[Math.floor(Math.random() * colors.length)];
-  const group = byColor[baseColor];
 
+  // Trier les couleurs disponibles selon leur position dans COLOR_WHEEL
+  // Les couleurs plus tôt dans COLOR_WHEEL ont la priorité
+  const sortedColors = colors.sort((a, b) => {
+    const indexA = COLOR_WHEEL.indexOf(a);
+    const indexB = COLOR_WHEEL.indexOf(b);
+    // Si une couleur n'est pas dans COLOR_WHEEL, la mettre à la fin
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+
+  // Trouver la meilleure couleur selon COLOR_WHEEL avec top + shoes
+  let baseColor = sortedColors.find((c) => hasTop(byColor[c]) && byColor[c].shoes.length > 0);
+
+  // Si aucune couleur avec shoes, prendre celle avec top seulement
+  if (!baseColor) {
+    baseColor = sortedColors.find((c) => hasTop(byColor[c]));
+  }
+
+  // Fallback : n'importe quelle couleur
+  if (!baseColor) {
+    baseColor = sortedColors[0];
+  }
+
+  const group = byColor[baseColor];
   const outfit: ClothingItem[] = [];
 
   // Top (shirt ou dress)
