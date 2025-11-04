@@ -49,18 +49,18 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
 
   // Dress and shirts
   const combinedTops = [...grouped.shirt, ...grouped.dress];
-  let top: ClothingItem | null = null;
+  let top: ClothingItem[] = [];
   if (combinedTops.length > 0) {
     const randomIndex = Math.floor(Math.random() * combinedTops.length);
-    top = combinedTops[randomIndex];
+    top.push(combinedTops[randomIndex]);
   }
 
   // Pants (bottom)
   let bottom: ClothingItem | null = null;
-  if (top?.type === 'shirt' && grouped.pants.length > 0) {
+  if (top[0]?.type === 'shirt' && grouped.pants.length > 0) {
     const randomIndex = Math.floor(Math.random() * grouped.pants.length);
     bottom = grouped.pants[randomIndex];
-  } else if (top?.type === 'dress') {
+  } else if (top[0]?.type === 'dress') {
     bottom = null; // Une robe n'a pas de pantalon
   }
 
