@@ -1,5 +1,5 @@
 export async function getWeather(): Promise<
-  { temp: string; desc: string; rain: string } | { error: string }
+  { temp: string; desc: string; rain: string; uv: string } | { error: string }
 > {
   try {
     const city = await getCity();
@@ -15,6 +15,7 @@ export async function getWeather(): Promise<
         temp: data.current_condition[0].FeelsLikeC,
         desc: data.current_condition[0].weatherDesc[0].value,
         rain: data.current_condition[0].precipMM,
+        uv: data.current_condition[0].uvIndex,
       };
     } else {
       return { error: 'Impossible de déterminer la ville.' };

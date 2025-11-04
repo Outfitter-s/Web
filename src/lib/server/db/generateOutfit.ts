@@ -94,15 +94,18 @@ async function scoring(userId: UUID): Promise<ClothingItem[]> {
 
   const temp = Number.parseFloat(weather.temp || '0');
   const rain = Number.parseFloat(weather.rain || '0');
+  const uv = Number.parseFloat(weather.uv || '0');
 
   // TODO : Continuer scoring
   // Multiplicateurs utilisateur (tous à 1 par défaut)
-  const multipliers = { temp: 1, rain: 1, color: 1 };
-  const weights = { temp: 0.7, rain: 0.2, color: 0.1 }; // simple pondération
+  const multipliers = { temp: 1, rain: 1, color: 1, lastWorn: 1 };
+  const weights = { temp: 0.6, rain: 0.2, color: 0.1, lastWorn: 0.1 }; // simple pondération
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   //TODO : Scoring pour la température en fonction du type ET du titre/desc
+  //TODO : Scoring pour la couleur en fonction de la saison / météo
+  //TODO : Scoring pour la dernière fois porté
 
   const isWaterproof = (item: ClothingItem) => {
     const t = (item.type || '').toString().toLowerCase();
@@ -128,7 +131,8 @@ async function scoring(userId: UUID): Promise<ClothingItem[]> {
     const norm =
       weights.temp * multipliers.temp +
       weights.rain * multipliers.rain +
-      weights.color * multipliers.color;
+      weights.color * multipliers.color +
+      weights.lastWorn * multipliers.lastWorn;
     const score = norm > 0 ? clamp01((wRain + wColor) / norm) : 0;
 
     return { item, score };
