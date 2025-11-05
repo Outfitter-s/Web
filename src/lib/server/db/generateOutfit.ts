@@ -1,6 +1,7 @@
 import type { Outfit, ClothingItem, ClothingItemType, ClothingItemColor, UUID } from '$lib/types';
 import { ClothingItemDAO } from './clotingItem';
 import { getWeather } from '$lib/utils/weather';
+import { color } from 'bun';
 
 type OutfitWithoutId = Omit<Outfit, 'id'>;
 
@@ -27,8 +28,6 @@ const COLOR_WHEEL = generateColorWheel();
 
 export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
   const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
-
-  const weather = await getWeather();
 
   const monochromeOutfit = getMonochromeOutfit(items);
   const analogousOutfit = getAnalogueOutfit(items);
@@ -428,18 +427,34 @@ function getAnalogueOutfit(items: ClothingItem[]): ClothingItem[] {
 
 /////////////////////////////////////////////////////////////////////////
 
-async function scoring(userId: UUID): Promise<ClothingItem[]> {
-  const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
+async function scoring(items: ClothingItem[], profile: 'default' | 'comfort' | 'new' | 'style' | 'class' = 'default'): Promise<ClothingItem[]> {
   const weather = await getWeather();
   if ('error' in weather) return items;
 
   const temp = Number.parseFloat(weather.temp || '0');
   const rain = Number.parseFloat(weather.rain || '0');
-  const uv = Number.parseFloat(weather.uv || '0'); // 0..5
+  const uv = Number.parseFloat(weather.uv || '0');
 
-  // multiplicateurs (1 = défaut)
-  const multipliers = { temp: 1, rain: 1, color: 1, lastWorn: 1 };
-  const weights = { temp: 0.5, rain: 0.2, color: 0.2, lastWorn: 0.1 };
+  // Définir les poids en fonction du profil
+  let weights: Record<string, number>;
+  switch (profile) {
+    case 'comfort':
+      weights = { temp: 0.3, rain: 0.3, uv: 0.2, lastWorn: 0.1, color: 0.1 };
+      break;
+    case 'new':
+      weights = { temp: 0.2, rain: 0.2, uv: 0.1, lastWorn: 0.4, color: 0.1 }; 
+      break;
+    case 'style':
+      weights = { temp: 0.1, rain: 0.2, uv: 0.2, lastWorn: 0.2, color: 0.3 };
+      break;
+    case 'class':
+      weights = { temp: 0.1, rain: 0.1, uv: 0.1, lastWorn: 0.1, color: 0.6 }; 
+      break;
+    case 'default':
+    default:
+      weights = { temp: 0.2, rain: 0.2, uv: 0.2, lastWorn: 0.2, color: 0.2 };
+      break;
+  }
 
   const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -484,11 +499,11 @@ async function scoring(userId: UUID): Promise<ClothingItem[]> {
     return clamp01(Math.log(days + 1) / Math.log(31));
   }
 
-  const lightColors = ['white', 'yellow', 'pink', 'orange'];
-  const neutralColors = ['black', 'gray', 'brown'];
-  const chromatic = ['red', 'blue', 'green', 'purple'];
-
   function colorScoreForUV(color?: ClothingItemColor, uvVal: number = 0): number {
+    const lightColors = ['white', 'yellow', 'pink', 'orange'];
+    const neutralColors = ['black', 'gray', 'brown'];
+    const chromatic = ['red', 'blue', 'green', 'purple'];
+  
     const c = (color ?? '').toString().toLowerCase();
     let base = 0.5;
     if (lightColors.includes(c)) base = 0.8;
@@ -516,22 +531,18 @@ async function scoring(userId: UUID): Promise<ClothingItem[]> {
     const rainScore = rain > 1 ? (isWaterproof(item) ? 1 : 0.2) : isWaterproof(item) ? 0.4 : 0.6;
 
     // uv colors
-    const colScore = colorScoreForUV(item.color, uv);
+    const colUV = colorScoreForUV(item.color, uv);
 
     // last worn
     const lastScore = getLastWornScore((item as any).lastWornAt ?? null);
 
-    const wTemp = tempScore * weights.temp * multipliers.temp;
-    const wRain = rainScore * weights.rain * multipliers.rain;
-    const wColor = colScore * weights.color * multipliers.color;
-    const wLast = lastScore * weights.lastWorn * multipliers.lastWorn;
+    const wTemp = tempScore * weights.temp;
+    const wRain = rainScore * weights.rain;
+    const wUV = colUV * weights.uv;
+    const wLast = lastScore * weights.lastWorn;
 
-    const norm =
-      weights.temp * multipliers.temp +
-      weights.rain * multipliers.rain +
-      weights.color * multipliers.color +
-      weights.lastWorn * multipliers.lastWorn;
-    const raw = wTemp + wRain + wColor + wLast;
+    const norm = weights.temp + weights.rain + weights.uv + weights.lastWorn;
+    const raw = wTemp + wRain + wUV + wLast;
     const score = norm > 0 ? clamp01(raw / norm) : 0;
 
     return { item, score };
@@ -751,73 +762,4 @@ function getComplementaryOutfit(items: ClothingItem[]): ClothingItem[] {
         topAdded = true;
 
         // Pantalon : prendre d'une autre couleur complémentaire
-        if (top.type === 'shirt') {
-          const otherColors = availableComplementaryColors.filter((c) => c !== color);
-          const allPants: ClothingItem[] = [];
-          for (const otherColor of otherColors) {
-            allPants.push(...byColor[otherColor].pants);
-          }
-
-          if (allPants.length > 0) {
-            const pant = allPants[Math.floor(Math.random() * allPants.length)];
-            outfit.push(pant);
-          } else if (byColor[color].pants.length > 0) {
-            // Même couleur en dernier recours
-            const pant =
-              byColor[color].pants[Math.floor(Math.random() * byColor[color].pants.length)];
-            outfit.push(pant);
-          }
-        }
-        break;
-      }
-    }
-  }
-
-  // Shoes : peut être de n'importe quelle couleur du schéma complémentaire
-  const allShoes: ClothingItem[] = [];
-  for (const color of availableComplementaryColors) {
-    allShoes.push(...byColor[color].shoes);
-  }
-
-  if (allShoes.length > 0) {
-    const shoes = allShoes[Math.floor(Math.random() * allShoes.length)];
-    outfit.push(shoes);
-  } else {
-    // Fallback : chaussures neutres
-    const neutralShoesAvailable = neutralColors.filter(
-      (c) => byColor[c] && byColor[c].shoes.length > 0
-    );
-    if (neutralShoesAvailable.length > 0) {
-      const neutralColor =
-        neutralShoesAvailable[Math.floor(Math.random() * neutralShoesAvailable.length)];
-      const shoes =
-        byColor[neutralColor].shoes[Math.floor(Math.random() * byColor[neutralColor].shoes.length)];
-      outfit.push(shoes);
-    }
-  }
-
-  // Accessories : mélange des couleurs complémentaires + neutres (pour équilibrer)
-  const allAccessories: ClothingItem[] = [];
-  for (const color of availableComplementaryColors) {
-    allAccessories.push(...byColor[color].accessory);
-  }
-  // Ajouter les accessoires neutres (ils équilibrent le contraste)
-  for (const neutralColor of neutralColors) {
-    if (byColor[neutralColor]) {
-      allAccessories.push(...byColor[neutralColor].accessory);
-    }
-  }
-
-  if (allAccessories.length > 0) {
-    const maxNum = Math.min(allAccessories.length, 3);
-    const count = randIntInclusive(0, maxNum);
-    const pool = [...allAccessories];
-    for (let i = 0; i < count; i++) {
-      const idx = Math.floor(Math.random() * pool.length);
-      outfit.push(pool[idx]);
-      pool.splice(idx, 1);
-    }
-  }
-
-  return outfit;
-}
+        if
