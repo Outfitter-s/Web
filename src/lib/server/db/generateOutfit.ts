@@ -32,6 +32,7 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
 
   const monochromeOutfit = getMonochromeOutfit(items);
   const analogousOutfit = getAnalogueOutfit(items);
+  const complementaryOutfit = getComplementaryOutfit(items);
 
   // Crée un tableau pour chaque type d'item
   const grouped: Record<ClothingItemType, ClothingItem[]> = {
@@ -44,7 +45,7 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
     accessory: [],
   };
 
-  for (const item of analogousOutfit) {
+  for (const item of complementaryOutfit) {
     grouped[item.type].push(item);
   }
 
@@ -465,6 +466,287 @@ function getAnalogueOutfit(items: ClothingItem[]): ClothingItem[] {
     allAccessories.push(...byColor[color].accessory);
   }
   // Ajouter les accessoires neutres
+  for (const neutralColor of neutralColors) {
+    if (byColor[neutralColor]) {
+      allAccessories.push(...byColor[neutralColor].accessory);
+    }
+  }
+
+  if (allAccessories.length > 0) {
+    const maxNum = Math.min(allAccessories.length, 3);
+    const count = randIntInclusive(0, maxNum);
+    const pool = [...allAccessories];
+    for (let i = 0; i < count; i++) {
+      const idx = Math.floor(Math.random() * pool.length);
+      outfit.push(pool[idx]);
+      pool.splice(idx, 1);
+    }
+  }
+
+  return outfit;
+}
+
+function getComplementaryColor(color: ClothingItemColor): ClothingItemColor {
+  const neutralColors: ClothingItemColor[] = ['white', 'black', 'gray', 'brown'];
+
+  // Si c'est une couleur neutre, retourner une couleur chromatique aléatoire
+  if (neutralColors.includes(color)) {
+    const chromaticColors = COLOR_WHEEL.filter((c) => !neutralColors.includes(c));
+    return chromaticColors[Math.floor(Math.random() * chromaticColors.length)];
+  }
+
+  const index = COLOR_WHEEL.indexOf(color);
+  if (index === -1) return color;
+
+  // Calculer l'index de la couleur complémentaire
+  // Sur une roue de 7 couleurs chromatiques, l'opposé est à +3 ou +4 positions
+  const chromaticColors = COLOR_WHEEL.filter((c) => !neutralColors.includes(c));
+  const chromaticIndex = chromaticColors.indexOf(color);
+
+  if (chromaticIndex === -1) return color;
+
+  // Position opposée : ajouter la moitié du nombre de couleurs (arrondi)
+  const complementaryIndex =
+    (chromaticIndex + Math.floor(chromaticColors.length / 2)) % chromaticColors.length;
+
+  return chromaticColors[complementaryIndex];
+}
+
+function getComplementaryColors(color: ClothingItemColor): ClothingItemColor[] {
+  const neutralColors: ClothingItemColor[] = ['white', 'black', 'gray', 'brown'];
+
+  if (neutralColors.includes(color)) {
+    const chromaticColors = COLOR_WHEEL.filter((c) => !neutralColors.includes(c));
+    return chromaticColors;
+  }
+
+  const complementary = getComplementaryColor(color);
+  const complementaryIndex = COLOR_WHEEL.indexOf(complementary);
+
+  if (complementaryIndex === -1) return [color, complementary];
+
+  // Ajouter les couleurs voisines de la complémentaire pour plus de variété
+  const colors: ClothingItemColor[] = [color, complementary];
+
+  // Couleur avant la complémentaire
+  const prevIndex = (complementaryIndex - 1 + COLOR_WHEEL.length) % COLOR_WHEEL.length;
+  const prevColor = COLOR_WHEEL[prevIndex];
+  if (!neutralColors.includes(prevColor)) {
+    colors.push(prevColor);
+  }
+
+  // Couleur après la complémentaire
+  const nextIndex = (complementaryIndex + 1) % COLOR_WHEEL.length;
+  const nextColor = COLOR_WHEEL[nextIndex];
+  if (!neutralColors.includes(nextColor)) {
+    colors.push(nextColor);
+  }
+
+  return colors;
+}
+
+function getComplementaryOutfit(items: ClothingItem[]): ClothingItem[] {
+  type ByType = Record<ClothingItemType, ClothingItem[]>;
+  const emptyByType = (): ByType => ({
+    pants: [],
+    sweater: [],
+    dress: [],
+    jacket: [],
+    shirt: [],
+    shoes: [],
+    accessory: [],
+  });
+
+  const neutralColors: ClothingItemColor[] = ['white', 'black', 'gray', 'brown'];
+
+  // Regrouper par couleur puis par type
+  const byColor: Record<string, ByType> = {};
+  for (const item of items) {
+    (byColor[item.color] ??= emptyByType())[item.type].push(item);
+  }
+
+  const colors = Object.keys(byColor) as ClothingItemColor[];
+  if (colors.length === 0) return [];
+
+  // Fonction helper pour vérifier si une couleur a un outfit valide
+  const hasTop = (bt: ByType) => bt.shirt.length + bt.dress.length > 0;
+  const hasPants = (bt: ByType) => bt.pants.length > 0;
+
+  // Trier les couleurs disponibles selon leur position dans COLOR_WHEEL
+  const sortedColors = colors.sort((a, b) => {
+    const indexA = COLOR_WHEEL.indexOf(a);
+    const indexB = COLOR_WHEEL.indexOf(b);
+    if (indexA === -1) return 1;
+    if (indexB === -1) return -1;
+    return indexA - indexB;
+  });
+
+  // Trouver une couleur de base qui a au moins un top
+  let baseColor = sortedColors.find((c) => hasTop(byColor[c]));
+  if (!baseColor) {
+    baseColor = sortedColors[0];
+  }
+
+  // Obtenir les couleurs complémentaires
+  const complementaryColors = getComplementaryColors(baseColor);
+
+  // Filtrer pour ne garder que les couleurs complémentaires disponibles
+  const availableComplementaryColors = complementaryColors.filter((c) => colors.includes(c));
+
+  const baseHasTop = hasTop(byColor[baseColor]);
+  const baseHasPants = hasPants(byColor[baseColor]);
+
+  // Vérifier si les couleurs complémentaires (hors base) ont des tops et pantalons
+  const complementaryHasTop = availableComplementaryColors
+    .filter((c) => c !== baseColor)
+    .some((c) => hasTop(byColor[c]));
+  const complementaryHasPants = availableComplementaryColors
+    .filter((c) => c !== baseColor)
+    .some((c) => hasPants(byColor[c]));
+
+  // Décider de la stratégie :
+  // - Si base a top ET complémentaire a pants → normal (base=top, comp=pants)
+  // - Si complémentaire a top ET base a pants → inversé (comp=top, base=pants)
+  // - Sinon choisir aléatoirement
+  let useInvertedStrategy = false;
+
+  if (baseHasTop && complementaryHasPants && complementaryHasTop && baseHasPants) {
+    // Les deux stratégies sont possibles choisir aléatoirement
+    useInvertedStrategy = Math.random() > 0.5;
+  } else if (complementaryHasTop && baseHasPants && !baseHasTop) {
+    useInvertedStrategy = true;
+  } else if (baseHasTop && complementaryHasPants) {
+    useInvertedStrategy = false;
+  } else {
+    // Aucune des deux n'est idéale on fait de notre mieux
+    useInvertedStrategy = Math.random() > 0.5;
+  }
+
+  const outfit: ClothingItem[] = [];
+
+  // Définir les couleurs pour top et bottom selon la stratégie
+  const topColors = useInvertedStrategy
+    ? availableComplementaryColors.filter((c) => c !== baseColor)
+    : [baseColor];
+
+  const bottomColors = useInvertedStrategy
+    ? [baseColor]
+    : availableComplementaryColors.filter((c) => c !== baseColor);
+
+  // Top : essayer les couleurs définies
+  let topAdded = false;
+  for (const color of topColors) {
+    if (byColor[color] && (byColor[color].shirt.length > 0 || byColor[color].dress.length > 0)) {
+      const combinedTops = [...byColor[color].shirt, ...byColor[color].dress];
+      const top = combinedTops[Math.floor(Math.random() * combinedTops.length)];
+      outfit.push(top);
+      topAdded = true;
+
+      // Pants : essayer les couleurs complémentaires définies
+      if (top.type === 'shirt') {
+        const allPants: ClothingItem[] = [];
+        for (const pantColor of bottomColors) {
+          if (byColor[pantColor]) {
+            allPants.push(...byColor[pantColor].pants);
+          }
+        }
+
+        if (allPants.length > 0) {
+          const pant = allPants[Math.floor(Math.random() * allPants.length)];
+          outfit.push(pant);
+        } else {
+          // Fallback 1 : essayer toutes les couleurs complémentaires
+          const allComplementaryPants: ClothingItem[] = [];
+          for (const color of availableComplementaryColors) {
+            allComplementaryPants.push(...byColor[color].pants);
+          }
+
+          if (allComplementaryPants.length > 0) {
+            const pant =
+              allComplementaryPants[Math.floor(Math.random() * allComplementaryPants.length)];
+            outfit.push(pant);
+          } else {
+            // Fallback 2 : pantalon neutre
+            const neutralPantsAvailable = neutralColors.filter(
+              (c) => byColor[c] && byColor[c].pants.length > 0
+            );
+            if (neutralPantsAvailable.length > 0) {
+              const neutralColor =
+                neutralPantsAvailable[Math.floor(Math.random() * neutralPantsAvailable.length)];
+              const pant =
+                byColor[neutralColor].pants[
+                  Math.floor(Math.random() * byColor[neutralColor].pants.length)
+                ];
+              outfit.push(pant);
+            }
+          }
+        }
+      }
+      break;
+    }
+  }
+
+  // Si pas de top trouvé, essayer toutes les couleurs complémentaires
+  if (!topAdded) {
+    for (const color of availableComplementaryColors) {
+      const combinedTops = [...byColor[color].shirt, ...byColor[color].dress];
+      if (combinedTops.length > 0) {
+        const top = combinedTops[Math.floor(Math.random() * combinedTops.length)];
+        outfit.push(top);
+        topAdded = true;
+
+        // Pantalon : prendre d'une autre couleur complémentaire
+        if (top.type === 'shirt') {
+          const otherColors = availableComplementaryColors.filter((c) => c !== color);
+          const allPants: ClothingItem[] = [];
+          for (const otherColor of otherColors) {
+            allPants.push(...byColor[otherColor].pants);
+          }
+
+          if (allPants.length > 0) {
+            const pant = allPants[Math.floor(Math.random() * allPants.length)];
+            outfit.push(pant);
+          } else if (byColor[color].pants.length > 0) {
+            // Même couleur en dernier recours
+            const pant =
+              byColor[color].pants[Math.floor(Math.random() * byColor[color].pants.length)];
+            outfit.push(pant);
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  // Shoes : peut être de n'importe quelle couleur du schéma complémentaire
+  const allShoes: ClothingItem[] = [];
+  for (const color of availableComplementaryColors) {
+    allShoes.push(...byColor[color].shoes);
+  }
+
+  if (allShoes.length > 0) {
+    const shoes = allShoes[Math.floor(Math.random() * allShoes.length)];
+    outfit.push(shoes);
+  } else {
+    // Fallback : chaussures neutres
+    const neutralShoesAvailable = neutralColors.filter(
+      (c) => byColor[c] && byColor[c].shoes.length > 0
+    );
+    if (neutralShoesAvailable.length > 0) {
+      const neutralColor =
+        neutralShoesAvailable[Math.floor(Math.random() * neutralShoesAvailable.length)];
+      const shoes =
+        byColor[neutralColor].shoes[Math.floor(Math.random() * byColor[neutralColor].shoes.length)];
+      outfit.push(shoes);
+    }
+  }
+
+  // Accessories : mélange des couleurs complémentaires + neutres (pour équilibrer)
+  const allAccessories: ClothingItem[] = [];
+  for (const color of availableComplementaryColors) {
+    allAccessories.push(...byColor[color].accessory);
+  }
+  // Ajouter les accessoires neutres (ils équilibrent le contraste)
   for (const neutralColor of neutralColors) {
     if (byColor[neutralColor]) {
       allAccessories.push(...byColor[neutralColor].accessory);
