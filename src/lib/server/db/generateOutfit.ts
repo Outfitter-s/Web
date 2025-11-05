@@ -106,66 +106,6 @@ function randIntInclusive(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-async function scoring(userId: UUID): Promise<ClothingItem[]> {
-  const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
-
-  const weather = await getWeather();
-
-  // Si météo indisponible, renvoyer les items sans scoring
-  if ('error' in weather) return items;
-
-  const temp = Number.parseFloat(weather.temp || '0');
-  const rain = Number.parseFloat(weather.rain || '0');
-  const uv = Number.parseFloat(weather.uv || '0');
-
-  // TODO : Continuer scoring
-  // Multiplicateurs utilisateur (tous à 1 par défaut)
-  const multipliers = { temp: 1, rain: 1, color: 1, lastWorn: 1 };
-  const weights = { temp: 0.6, rain: 0.2, color: 0.1, lastWorn: 0.1 }; // simple pondération
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //TODO : Scoring pour la température en fonction du type ET du titre/desc
-  //TODO : Scoring pour la couleur en fonction de la saison / météo
-  //TODO : Scoring pour la dernière fois porté
-
-  const isWaterproof = (item: ClothingItem) => {
-    const t = (item.type || '').toString().toLowerCase();
-    if (t.includes('coat') || t.includes('rain')) return true;
-
-    const d = (item.description || '').toString().toLowerCase();
-    return d.includes('waterproof') || d.includes('impermeable') || d.includes('water repellent');
-  };
-
-  const colorScore = (_: ClothingItem) => 0.5; // placeholder neutre
-
-  // clamp01 : force une valeur entre 0 et 1 pour éviter les débordements
-  const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-  const scored = items.map((item) => {
-    const rainScore = rain > 1 ? (isWaterproof(item) ? 1 : 0.2) : isWaterproof(item) ? 0.4 : 0.6;
-
-    const colScore = colorScore(item);
-
-    //const wTemp = tempScore * weights.temp * multipliers.temp;
-    const wRain = rainScore * weights.rain * multipliers.rain;
-    const wColor = colScore * weights.color * multipliers.color;
-
-    const norm =
-      weights.temp * multipliers.temp +
-      weights.rain * multipliers.rain +
-      weights.color * multipliers.color +
-      weights.lastWorn * multipliers.lastWorn;
-    const score = norm > 0 ? clamp01((wRain + wColor) / norm) : 0;
-
-    return { item, score };
-  });
-
-  // Trier par score décroissant les items
-  // Ne fait pas de tenue à proprement parler, juste un classement pour en créer
-  scored.sort((a, b) => b.score - a.score);
-  return scored.map((s) => s.item);
-}
-
 function getMonochromeOutfit(items: ClothingItem[]): ClothingItem[] {
   type ByType = Record<ClothingItemType, ClothingItem[]>;
   const emptyByType = (): ByType => ({
@@ -241,7 +181,7 @@ function getMonochromeOutfit(items: ClothingItem[]): ClothingItem[] {
             neutralPantsAvailable[Math.floor(Math.random() * neutralPantsAvailable.length)];
           const pant =
             byColor[neutralColor].pants[
-              Math.floor(Math.random() * byColor[neutralColor].pants.length)
+            Math.floor(Math.random() * byColor[neutralColor].pants.length)
             ];
           outfit.push(pant);
         }
@@ -409,7 +349,7 @@ function getAnalogueOutfit(items: ClothingItem[]): ClothingItem[] {
             neutralPantsAvailable[Math.floor(Math.random() * neutralPantsAvailable.length)];
           const pant =
             byColor[neutralColor].pants[
-              Math.floor(Math.random() * byColor[neutralColor].pants.length)
+            Math.floor(Math.random() * byColor[neutralColor].pants.length)
             ];
           outfit.push(pant);
         }
@@ -483,4 +423,112 @@ function getAnalogueOutfit(items: ClothingItem[]): ClothingItem[] {
   }
 
   return outfit;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+async function scoring(userId: UUID): Promise<ClothingItem[]> {
+  const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
+  const weather = await getWeather();
+  if ('error' in weather) return items;
+
+  const temp = Number.parseFloat(weather.temp || '0');
+  const rain = Number.parseFloat(weather.rain || '0');
+  const uv = Number.parseFloat(weather.uv || '0'); // 0..5
+
+  // multiplicateurs (1 = défaut)
+  const multipliers = { temp: 1, rain: 1, color: 1, lastWorn: 1 };
+  const weights = { temp: 0.5, rain: 0.2, color: 0.2, lastWorn: 0.1 };
+
+  const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+
+  function getTempIdeal(type?: string): { ideal: number; tol: number } {
+    const t = (type ?? '').toString().toLowerCase().trim();
+
+    switch (t) {
+      case 'jacket':
+        return { ideal: 6, tol: 10 };
+      case 'sweater':
+        return { ideal: 12, tol: 8 };
+      case 'pants':
+        return { ideal: 18, tol: 12 };
+      case 'dress':
+        return { ideal: 22, tol: 8 };
+      case 'shirt':
+        return { ideal: 20, tol: 8 };
+      case 'shoes':
+        return { ideal: 20, tol: 12 };
+      case 'accessory':
+        return { ideal: 20, tol: 15 };
+      default:
+        return { ideal: 20, tol: 10 };
+    }
+  }
+
+  function isWaterproof(item: ClothingItem) {
+    const t = (item.type || '').toString().toLowerCase();
+    if (t.includes('coat') || t.includes('rain')) return true;
+
+    const d = (item.description || '').toString().toLowerCase();
+    return d.includes('waterproof') || d.includes('impermeable') || d.includes('water repellent');
+  }
+
+  function getLastWornScore(lastWornAt: Date | null): number {
+    if (!lastWornAt) return 1; 
+    //log function to favor items not worn recently (1 points for 30+ days)
+    const days = Math.max(0, Math.floor((Date.now() - lastWornAt.getTime()) / (1000 * 60 * 60 * 24)));
+    return clamp01(Math.log(days + 1) / Math.log(31));
+  }
+
+  const lightColors = ['white', 'yellow', 'pink', 'orange'];
+  const neutralColors = ['black', 'gray', 'brown'];
+  const chromatic = ['red', 'blue', 'green', 'purple'];
+
+  function colorScoreForUV(color?: ClothingItemColor, uvVal: number = 0): number {
+    const c = (color ?? '').toString().toLowerCase();
+    let base = 0.5;
+    if (lightColors.includes(c)) base = 0.8;
+    else if (neutralColors.includes(c)) base = 0.6;
+    else if (chromatic.includes(c)) base = 0.5;
+    else base = 0.5;
+
+    if (uvVal >= 3) {
+      if (lightColors.includes(c)) base += 0.15;
+      else if (chromatic.includes(c)) base -= 0.1;
+    } else if (uvVal <= 1) {
+      if (chromatic.includes(c)) base += 0.1;
+      else if (lightColors.includes(c)) base -= 0.05;
+    }
+    return clamp01(base);
+  }
+
+  const scored = items.map((item) => {
+    // temp
+    const { ideal, tol } = getTempIdeal(item.type?.toString());
+    const tempDiff = Math.abs(temp - ideal);
+    const tempScore = clamp01(1 - tempDiff / Math.max(1, tol));
+
+    // rain
+    const rainScore = rain > 1 ? (isWaterproof(item) ? 1 : 0.2) : isWaterproof(item) ? 0.4 : 0.6;
+
+    // uv colors
+    const colScore = colorScoreForUV(item.color, uv);
+
+    // last worn
+    const lastScore = getLastWornScore((item as any).lastWornAt ?? null);
+
+    const wTemp = tempScore * weights.temp * multipliers.temp;
+    const wRain = rainScore * weights.rain * multipliers.rain;
+    const wColor = colScore * weights.color * multipliers.color;
+    const wLast = lastScore * weights.lastWorn * multipliers.lastWorn;
+
+    const norm = weights.temp * multipliers.temp + weights.rain * multipliers.rain + weights.color * multipliers.color + weights.lastWorn * multipliers.lastWorn;
+    const raw = wTemp + wRain + wColor + wLast;
+    const score = norm > 0 ? clamp01(raw / norm) : 0;
+
+    return { item, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.map((s) => s.item);
 }
