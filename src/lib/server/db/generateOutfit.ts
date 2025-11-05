@@ -47,7 +47,7 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
     top.push(combinedTops[randomIndex]);
   }
 
-  const scoredItems = await scoring(items, 'default', top);
+  // const scoredItems = await scoring(items, 'default', top);
 
   // Pants (bottom)
   let bottom: ClothingItem | null = null;
