@@ -8,13 +8,16 @@ import {
   getComplementaryOutfit,
   getTriadicOutfit,
 } from './outfitStrategies';
+import { color } from 'bun';
 
 type OutfitWithoutId = Omit<Outfit, 'id'>;
 
 export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
   const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
 
-  const weather = await getWeather();
+  if (!items || items.length === 0) {
+    throw new Error('Aucun vêtement trouvé pour cet utilisateur.');
+  }
 
   const monochromeOutfit = getMonochromeOutfit(items);
   const analogousOutfit = getAnalogueOutfit(items);
@@ -44,10 +47,13 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
     top.push(combinedTops[randomIndex]);
   }
 
+  const scoredItems = await scoring(items, 'default', top);
+
   // Pants (bottom)
   let bottom: ClothingItem | null = null;
   if (top[0]?.type === 'shirt' && grouped.pants.length > 0) {
-    const randomIndex = Math.floor(Math.random() * grouped.pants.length);
+    // Take random pant from top 10 scored pants, same for the next one
+    const randomIndex = Math.floor(Math.random() * Math.min(10, grouped.pants.length));
     bottom = grouped.pants[randomIndex];
   } else if (top[0]?.type === 'dress') {
     bottom = null; // Une robe n'a pas de pantalon
@@ -56,7 +62,7 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
   // Shoes
   let shoes: ClothingItem | null = null;
   if (grouped.shoes.length > 0) {
-    const randomIndex = Math.floor(Math.random() * grouped.shoes.length);
+    const randomIndex = Math.floor(Math.random() * Math.min(10, grouped.shoes.length));
     shoes = grouped.shoes[randomIndex];
   }
 
@@ -76,6 +82,8 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
     }
   }
 
+  //TODO : rajouter les potentiels vestes/sweaters, etc.
+
   return {
     top,
     bottom,
@@ -88,18 +96,38 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
 
 /////////////////////////////////////////////////////////////////////////
 
-async function scoring(userId: UUID): Promise<ClothingItem[]> {
-  const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
+async function scoring(
+  items: ClothingItem[],
+  profile: 'default' | 'comfort' | 'new' | 'style' | 'class' = 'default',
+  top: ClothingItem
+): Promise<ClothingItem[]> {
   const weather = await getWeather();
   if ('error' in weather) return items;
 
   const temp = Number.parseFloat(weather.temp || '0');
   const rain = Number.parseFloat(weather.rain || '0');
-  const uv = Number.parseFloat(weather.uv || '0'); // 0..5
+  const uv = Number.parseFloat(weather.uv || '0');
 
-  // multiplicateurs (1 = défaut)
-  const multipliers = { temp: 1, rain: 1, color: 1, lastWorn: 1 };
-  const weights = { temp: 0.5, rain: 0.2, color: 0.2, lastWorn: 0.1 };
+  // Définir les poids en fonction du profil
+  let weights: Record<string, number>;
+  switch (profile) {
+    case 'comfort':
+      weights = { temp: 0.3, rain: 0.3, uv: 0.2, lastWorn: 0.1, color: 0.1 };
+      break;
+    case 'new':
+      weights = { temp: 0.2, rain: 0.2, uv: 0.1, lastWorn: 0.4, color: 0.1 };
+      break;
+    case 'style':
+      weights = { temp: 0.1, rain: 0.2, uv: 0.2, lastWorn: 0.2, color: 0.3 };
+      break;
+    case 'class':
+      weights = { temp: 0.1, rain: 0.1, uv: 0.1, lastWorn: 0.1, color: 0.6 };
+      break;
+    case 'default':
+    default:
+      weights = { temp: 0.2, rain: 0.2, uv: 0.2, lastWorn: 0.2, color: 0.2 };
+      break;
+  }
 
   const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
@@ -144,11 +172,11 @@ async function scoring(userId: UUID): Promise<ClothingItem[]> {
     return clamp01(Math.log(days + 1) / Math.log(31));
   }
 
-  const lightColors = ['white', 'yellow', 'pink', 'orange'];
-  const neutralColors = ['black', 'gray', 'brown'];
-  const chromatic = ['red', 'blue', 'green', 'purple'];
-
   function colorScoreForUV(color?: ClothingItemColor, uvVal: number = 0): number {
+    const lightColors = ['white', 'yellow', 'pink', 'orange'];
+    const neutralColors = ['black', 'gray', 'brown'];
+    const chromatic = ['red', 'blue', 'green', 'purple'];
+
     const c = (color ?? '').toString().toLowerCase();
     let base = 0.5;
     if (lightColors.includes(c)) base = 0.8;
@@ -176,22 +204,18 @@ async function scoring(userId: UUID): Promise<ClothingItem[]> {
     const rainScore = rain > 1 ? (isWaterproof(item) ? 1 : 0.2) : isWaterproof(item) ? 0.4 : 0.6;
 
     // uv colors
-    const colScore = colorScoreForUV(item.color, uv);
+    const colUV = colorScoreForUV(item.color, uv);
 
     // last worn
     const lastScore = getLastWornScore((item as any).lastWornAt ?? null);
 
-    const wTemp = tempScore * weights.temp * multipliers.temp;
-    const wRain = rainScore * weights.rain * multipliers.rain;
-    const wColor = colScore * weights.color * multipliers.color;
-    const wLast = lastScore * weights.lastWorn * multipliers.lastWorn;
+    const wTemp = tempScore * weights.temp;
+    const wRain = rainScore * weights.rain;
+    const wUV = colUV * weights.uv;
+    const wLast = lastScore * weights.lastWorn;
 
-    const norm =
-      weights.temp * multipliers.temp +
-      weights.rain * multipliers.rain +
-      weights.color * multipliers.color +
-      weights.lastWorn * multipliers.lastWorn;
-    const raw = wTemp + wRain + wColor + wLast;
+    const norm = weights.temp + weights.rain + weights.uv + weights.lastWorn;
+    const raw = wTemp + wRain + wUV + wLast;
     const score = norm > 0 ? clamp01(raw / norm) : 0;
 
     return { item, score };
