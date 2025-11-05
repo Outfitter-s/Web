@@ -65,7 +65,8 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
   // Pants (bottom)
   let bottom: ClothingItem | null = null;
   if (top[0]?.type === 'shirt' && grouped.pants.length > 0) {
-    const randomIndex = Math.floor(Math.random() * grouped.pants.length);
+    // Take random pant from top 10 scored pants, same for the next one
+    const randomIndex = Math.floor(Math.random() * Math.min(10, grouped.pants.length));
     bottom = grouped.pants[randomIndex];
   } else if (top[0]?.type === 'dress') {
     bottom = null; // Une robe n'a pas de pantalon
@@ -74,7 +75,7 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
   // Shoes
   let shoes: ClothingItem | null = null;
   if (grouped.shoes.length > 0) {
-    const randomIndex = Math.floor(Math.random() * grouped.shoes.length);
+    const randomIndex = Math.floor(Math.random() * Math.min(10, grouped.shoes.length));
     shoes = grouped.shoes[randomIndex];
   }
 
@@ -93,6 +94,8 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
       available.splice(randomIndex, 1);
     }
   }
+
+  //TODO : rajouter les potentiels vestes/sweaters, etc.
 
   return {
     top,
