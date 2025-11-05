@@ -29,6 +29,10 @@ const COLOR_WHEEL = generateColorWheel();
 export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
   const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
 
+  if (!items || items.length === 0) {
+    throw new Error("Aucun vêtement trouvé pour cet utilisateur.");
+  }
+
   const monochromeOutfit = getMonochromeOutfit(items);
   const analogousOutfit = getAnalogueOutfit(items);
   const complementaryOutfit = getComplementaryOutfit(items);
@@ -55,6 +59,8 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
     const randomIndex = Math.floor(Math.random() * combinedTops.length);
     top.push(combinedTops[randomIndex]);
   }
+
+  const scoredItems = await scoring(items, "default", top);
 
   // Pants (bottom)
   let bottom: ClothingItem | null = null;
@@ -427,7 +433,7 @@ function getAnalogueOutfit(items: ClothingItem[]): ClothingItem[] {
 
 /////////////////////////////////////////////////////////////////////////
 
-async function scoring(items: ClothingItem[], profile: 'default' | 'comfort' | 'new' | 'style' | 'class' = 'default'): Promise<ClothingItem[]> {
+async function scoring(items: ClothingItem[], profile: 'default' | 'comfort' | 'new' | 'style' | 'class' = 'default', top: ClothingItem): Promise<ClothingItem[]> {
   const weather = await getWeather();
   if ('error' in weather) return items;
 
