@@ -21,7 +21,6 @@
   import { invalidateAll } from '$app/navigation';
   import ColorDot from '$lib/components/colorDot.svelte';
 
-  let processingImage = $state(false);
   let takePictureStates = $state({
     open: false,
     videoStream: null as MediaStream | null,
@@ -33,21 +32,8 @@
   });
   const width = 320; // We will scale the photo width to this
   let height = 0; // This will be computed based on the input stream
-  let color = $state<ClothingItemColor>(clothingItemColors[0]);
-  let type = $state<ClothingItemType>(clothingItemTypes[0]);
   let loading = $state(false);
   let processingImage = $state(false);
-  let takePictureStates = $state({
-    open: false,
-    videoStream: null as MediaStream | null,
-    canvas: null as HTMLCanvasElement | null,
-    capturedImage: null as string | null,
-    error: null as string | null,
-    videoElement: null as HTMLVideoElement | null,
-    streaming: false,
-  });
-  const width = 320; // We will scale the photo width to this
-  let height = 0; // This will be computed based on the input stream
 
   $effect(() => {
     if (!$itemOpen) {
@@ -109,19 +95,6 @@
     if (!$itemOpen) {
       resetForm();
     }
-  });
-
-  type FormValues = {
-    name: string;
-    description: string;
-    color: ClothingItemColor;
-    type: ClothingItemType;
-  };
-  let formValues = $state<FormValues>({
-    name: '',
-    description: '',
-    color: clothingItemColors[0],
-    type: clothingItemTypes[0],
   });
 
   async function submitHandler(event: Event) {
@@ -211,6 +184,7 @@
       };
       closeCamera();
       $itemOpen = true;
+      onImageUpload();
     } else {
       clearPhoto();
     }
@@ -352,11 +326,11 @@
 
         <Field.Field>
           <Field.Label for="color">{$t('wardrobe.createItem.fields.color')}</Field.Label>
-          <Select.Root type="single" name="color" bind:value={color}>
+          <Select.Root type="single" name="color" bind:value={formValues.color}>
             <Select.Trigger>
               <div class="flex flex-row items-center gap-2">
-                <ColorDot {color} />
-                {capitalize(color)}
+                <ColorDot color={formValues.color} />
+                {capitalize(formValues.color)}
               </div>
             </Select.Trigger>
             <Select.Content>
