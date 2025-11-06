@@ -57,6 +57,8 @@ export interface ClothingItem {
   lastWornAt: MyOptional<Date>;
 }
 
+export type ScoredClothingItem = ClothingItem & { score: number };
+
 export interface Outfit {
   id: UUID;
   top: ClothingItem[];
