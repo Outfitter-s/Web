@@ -3,10 +3,11 @@
   import { page } from '$app/state';
   import { Toaster } from '$lib/components/Toast/toast';
   import * as Alert from '$lib/components/ui/alert';
+  import * as Select from '$lib/components/ui/select';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
-  import { t } from '$lib/i18n';
+  import { t, setLocale, locales, locale } from '$lib/i18n';
   import { logger } from '$lib/utils/logger';
   import { AlertCircle, CheckCheck, Moon, Sun } from '@lucide/svelte';
   import { toggleMode } from 'mode-watcher';
@@ -20,6 +21,14 @@
     controller: new AbortController(),
   });
   let updateEmailLoading = $state(false);
+  let value = $state(locale);
+  const triggerContent = $derived(locales.find((f) => f === value) ?? '');
+
+  $effect(() => {
+    if (value) {
+      setLocale(value);
+    }
+  });
 
   async function onUsernameInput() {
     if (formValues.username !== initialFormValues.username) {
@@ -84,12 +93,11 @@
     {#if checkUsernameStatusData.available}
       <Alert.Root variant="success">
         <AlertCircle />
-        <Alert.Title
-          >{$t('account.settings.tabs.general.changeUsername.alerts.available.title')}</Alert.Title
+        <Alert.Title>{$t('account.tabs.general.changeUsername.alerts.available.title')}</Alert.Title
         >
         <Alert.Description>
           <p>
-            {$t('account.settings.tabs.general.changeUsername.alerts.available.description', {
+            {$t('account.tabs.general.changeUsername.alerts.available.description', {
               username: formValues.username,
             })}
           </p>
@@ -98,12 +106,10 @@
     {:else}
       <Alert.Root variant="destructive">
         <CheckCheck />
-        <Alert.Title
-          >{$t('account.settings.tabs.general.changeUsername.alerts.taken.title')}</Alert.Title
-        >
+        <Alert.Title>{$t('account.tabs.general.changeUsername.alerts.taken.title')}</Alert.Title>
         <Alert.Description>
           <p>
-            {$t('account.settings.tabs.general.changeUsername.alerts.taken.description', {
+            {$t('account.tabs.general.changeUsername.alerts.taken.description', {
               username: formValues.username,
             })}
           </p>
@@ -117,7 +123,7 @@
     disabled={checkUsernameStatusData.loading || formValues.username === initialFormValues.username}
     loading={checkUsernameStatusData.loading}
   >
-    {$t('account.settings.tabs.general.changeUsername.title')}
+    {$t('account.tabs.general.changeUsername.title')}
   </Button>
 </form>
 
@@ -143,12 +149,31 @@
     disabled={updateEmailLoading || formValues.email === initialFormValues.email}
     loading={updateEmailLoading}
   >
-    {$t('account.settings.tabs.general.changeEmail.title')}
+    {$t('account.tabs.general.changeEmail.title')}
   </Button>
 </form>
 
 <div class="space-y-2">
-  <Label>{$t('account.settings.tabs.general.theme.title')}</Label>
+  <label for="language">{$t('account.tabs.general.changeLang.title')}</label>
+  <Select.Root type="single" name="langue selected" bind:value>
+    <Select.Trigger class="w-[180px]">
+      {triggerContent}
+    </Select.Trigger>
+    <Select.Content>
+      <Select.Group>
+        <Select.Label>
+          {$t('account.tabs.general.changeLang.title')}
+        </Select.Label>
+        {#each locales as loc}
+          <Select.Item value={loc} label={loc}></Select.Item>
+        {/each}
+      </Select.Group>
+    </Select.Content>
+  </Select.Root>
+</div>
+
+<div class="space-y-2">
+  <Label>{$t('account.tabs.general.theme.title')}</Label>
   <Button onclick={toggleMode} variant="outline" size="icon">
     <Sun class="size-[1.2rem] scale-100 rotate-0 !transition-all dark:scale-0 dark:-rotate-90" />
     <Moon

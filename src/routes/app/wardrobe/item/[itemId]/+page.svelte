@@ -5,6 +5,7 @@
   import { capitalize } from '$lib/utils';
   import { DateFormatter } from '@internationalized/date';
   import { Calendar, Palette, Shirt } from '@lucide/svelte';
+  import ColorDot from '$lib/components/colorDot.svelte';
 
   let itemId = $derived<string>(page.params.itemId as string);
   let items = $derived<ClothingItem[]>(page.data.items);
@@ -16,28 +17,10 @@
     }
   });
 
-  const colorMap: Record<ClothingItem['color'], string> = {
-    red: 'bg-red-500',
-    blue: 'bg-blue-500',
-    green: 'bg-green-500',
-    yellow: 'bg-yellow-500',
-    black: 'bg-black',
-    white: 'bg-white',
-    gray: 'bg-gray-500',
-    brown: 'bg-yellow-800',
-    purple: 'bg-purple-500',
-    pink: 'bg-pink-500',
-    orange: 'bg-orange-500',
-  };
-
   const formatDate = (date: Date) => {
     return new DateFormatter(locale, { day: '2-digit', month: 'short' }).format(date);
   };
 </script>
-
-{#snippet colorDot(color: ClothingItem['color'])}
-  <div class={'size-4 rounded-full ' + (colorMap[color] || 'bg-gray-500')}></div>
-{/snippet}
 
 {#if item}
   <div class="p-2">
@@ -64,7 +47,7 @@
               Color
             </div>
             <div class="flex flex-row items-center gap-2">
-              {@render colorDot(item.color)}
+              <ColorDot color={item.color} />
               <span>{capitalize(item.color)}</span>
             </div>
           </div>

@@ -11,26 +11,26 @@
     {
       name: 'General',
       component: General,
-      title: 'account.settings.tabs.general.title',
-      description: 'account.settings.tabs.general.description',
+      title: 'account.tabs.general.title',
+      description: 'account.tabs.general.description',
     },
     {
       name: 'Password',
       component: Password,
-      title: 'account.settings.tabs.password.title',
-      description: 'account.settings.tabs.password.description',
+      title: 'account.tabs.password.title',
+      description: 'account.tabs.password.description',
     },
     {
       name: 'TOTP',
       component: Totp,
-      title: 'account.settings.tabs.TOTP.title',
-      description: 'account.settings.tabs.TOTP.description',
+      title: 'account.tabs.TOTP.title',
+      description: 'account.tabs.TOTP.description',
     },
     {
       name: 'Passkey',
       component: Passkey,
-      title: 'account.settings.tabs.passkey.title',
-      description: 'account.settings.tabs.passkey.description',
+      title: 'account.tabs.passkey.title',
+      description: 'account.tabs.passkey.description',
     },
   ];
 </script>

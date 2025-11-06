@@ -2,7 +2,7 @@
   "seo": {
     "titleSuffix": "Outfitter",
     "defaults": {
-      "title": "DEFAULT_TITLE",
+      "title": "Outfitter",
       "description": "DEFAULT_DESCRIPTION"
     },
     "homePage": {
@@ -178,53 +178,54 @@
     }
   },
   "account": {
-    "settings": {
-      "tabs": {
-        "general": {
-          "title": "General",
-          "description": "Update your general account settings.",
-          "changeUsername": {
-            "title": "Change username",
-            "alerts": {
-              "taken": {
-                "title": "Username taken",
-                "description": "The username {{username}} is already taken."
-              },
-              "available": {
-                "title": "Username available",
-                "description": "The username {{username}} is available!"
-              }
+    "tabs": {
+      "general": {
+        "title": "General",
+        "description": "Update your general account settings.",
+        "changeUsername": {
+          "title": "Change username",
+          "alerts": {
+            "taken": {
+              "title": "Username taken",
+              "description": "The username {{username}} is already taken."
+            },
+            "available": {
+              "title": "Username available",
+              "description": "The username {{username}} is available!"
             }
-          },
-          "changeEmail": {
-            "title": "Change email"
-          },
-          "theme": {
-            "title": "Theme"
           }
         },
-        "password": {
-          "title": "Password",
-          "description": "Change your password to keep your account secure."
+        "changeLang": {
+          "title": "Language"
         },
-        "TOTP": {
-          "title": "TOTP",
-          "description": "Two-Factor Authentication (2FA) adds an extra layer of security to your account by requiring a second form of verification when logging in."
+        "changeEmail": {
+          "title": "Change email"
         },
-        "passkey": {
-          "title": "Passkey",
-          "description": "A passkey is a secure way to log in to your account without a password. It uses cryptographic keys stored on your device.",
-          "register": {
-            "button": "Register Passkey"
-          },
-          "remove": {
-            "button": "Remove Passkey",
-            "modal": {
-              "confirm": "Remove",
-              "title": "Remove Passkey",
-              "description": "Are you sure you want to remove this passkey? This action cannot be undone.",
-              "cancel": "Cancel"
-            }
+        "theme": {
+          "title": "Theme"
+        }
+      },
+      "password": {
+        "title": "Password",
+        "description": "Change your password to keep your account secure."
+      },
+      "TOTP": {
+        "title": "TOTP",
+        "description": "Two-Factor Authentication (2FA) adds an extra layer of security to your account by requiring a second form of verification when logging in."
+      },
+      "passkey": {
+        "title": "Passkey",
+        "description": "A passkey is a secure way to log in to your account without a password. It uses cryptographic keys stored on your device.",
+        "register": {
+          "button": "Register Passkey"
+        },
+        "remove": {
+          "button": "Remove Passkey",
+          "modal": {
+            "confirm": "Remove",
+            "title": "Remove Passkey",
+            "description": "Are you sure you want to remove this passkey? This action cannot be undone.",
+            "cancel": "Cancel"
           }
         }
       }

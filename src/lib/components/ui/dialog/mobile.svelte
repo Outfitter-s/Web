@@ -41,8 +41,8 @@
         e.preventDefault();
       }
     };
-
     document.addEventListener('touchmove', disablePullToRefresh, { passive: false });
+
     return () => {
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('touchmove', disablePullToRefresh);

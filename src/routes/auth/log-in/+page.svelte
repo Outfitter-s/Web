@@ -68,7 +68,7 @@
   }
 </script>
 
-<SEO title={$t('seo.auth.logIn.title')} />
+<SEO title={"Log in"} />
 
 <Dialog.Root bind:open={totpModalOpen}>
   <Dialog.Content>
