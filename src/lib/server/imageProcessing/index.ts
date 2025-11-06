@@ -1,6 +1,5 @@
 import { clothingItemTypes, type ClothingItemColor, type ClothingItemType } from '$lib/types';
 import ColorThief from 'colorthief';
-import * as tf from '@tensorflow/tfjs-node';
 import { getEnv } from '../utils';
 import { logger } from '$lib/utils/logger';
 type RGB = [number, number, number];
@@ -18,18 +17,6 @@ const clothingItemColorsMapping: Record<ClothingItemColor, RGB> = {
   brown: [139, 69, 19],
   gray: [128, 128, 128],
 };
-
-let model: tf.LayersModel | null = null;
-
-export async function loadModel() {
-  if (!model) {
-    const modelURL = new URL(
-      '../../../../ai/imageClassification/tfjs_model/model.json',
-      import.meta.url
-    );
-    model = await tf.loadLayersModel(`file://${modelURL.pathname}`);
-  }
-}
 
 export class ImageProcessor {
   static async removeBackground(imageBuffer: Buffer): Promise<Buffer> {

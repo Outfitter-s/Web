@@ -18,7 +18,7 @@ services:
       - '4173:3000'
 
   image_processing:
-    image: anguspllg/outfitter_image_processing:1.0.0
+    image: anguspllg/outfitter_image_processing:latest
     container_name: outfitter_image_processing
     restart: unless-stopped
     ports:
