@@ -1,6 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import { enhancedImages } from '@sveltejs/enhanced-img';
 
 export default defineConfig({
@@ -9,7 +9,11 @@ export default defineConfig({
     fs: {
       allow: ['./config.json', 'assets/'],
     },
-    allowedHosts: ['outfitter.home.paillaugue.fr'],
   },
   assetsInclude: ['transactional/**/*.html'],
+  resolve: process.env.VITEST
+    ? {
+        conditions: ['browser'],
+      }
+    : undefined,
 });

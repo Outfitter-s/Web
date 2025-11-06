@@ -36,6 +36,74 @@
   let color = $state<ClothingItemColor>(clothingItemColors[0]);
   let type = $state<ClothingItemType>(clothingItemTypes[0]);
   let loading = $state(false);
+  let processingImage = $state(false);
+  let takePictureStates = $state({
+    open: false,
+    videoStream: null as MediaStream | null,
+    canvas: null as HTMLCanvasElement | null,
+    capturedImage: null as string | null,
+    error: null as string | null,
+    videoElement: null as HTMLVideoElement | null,
+    streaming: false,
+  });
+  const width = 320; // We will scale the photo width to this
+  let height = 0; // This will be computed based on the input stream
+
+  $effect(() => {
+    if (!$itemOpen) {
+      resetForm();
+    }
+  });
+
+  type FormValues = {
+    name: string;
+    description: string;
+    color: ClothingItemColor;
+    type: ClothingItemType;
+  };
+  let formValues = $state<FormValues>({
+    name: '',
+    description: '',
+    color: clothingItemColors[0],
+    type: clothingItemTypes[0],
+  });
+
+  async function onImageUpload() {
+    processingImage = true;
+    if (!takePictureStates.capturedImage) {
+      return;
+    }
+    const response = await fetch(takePictureStates.capturedImage);
+    const blob = await response.blob();
+    const file = new File([blob], 'uploaded_image.png', { type: blob.type });
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      const res = await fetch('/api/wardrobe/classify-item', {
+        method: 'POST',
+        body: formData,
+      });
+      const result = await res.json();
+      if (res.ok) {
+        if (result.type) formValues.type = result.type;
+        if (result.color) formValues.color = result.color;
+        if (result.type && result.color)
+          formValues.name = `${capitalize(result.color)} ${result.type}`;
+        const buffer = result.buffer;
+        const byteArray = new Uint8Array(buffer.data ?? buffer);
+        const blob = new Blob([byteArray], { type: result.mime || 'image/png' });
+        takePictureStates.capturedImage = URL.createObjectURL(blob);
+      } else {
+        logger.error('Classification error:', result.message);
+        Toaster.error($t('errors.clothing.item.classificationFailed'));
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      logger.error('Error classifying clothing item :', msg);
+      Toaster.error($t('errors.clothing.item.classificationFailed'));
+    }
+    processingImage = false;
+  }
 
   $effect(() => {
     if (!$itemOpen) {
@@ -256,19 +324,24 @@
 
       <Field.Field>
         <Field.Label for="name">{$t('wardrobe.createItem.fields.name')}</Field.Label>
-        <Input id="name" name="name" type="text" />
+        <Input id="name" name="name" type="text" bind:value={formValues.name} />
       </Field.Field>
 
       <Field.Field>
         <Field.Label for="description">Description</Field.Label>
-        <Input id="description" name="description" type="text" />
+        <Input
+          id="description"
+          name="description"
+          type="text"
+          bind:value={formValues.description}
+        />
       </Field.Field>
 
       <div class="grid grid-cols-2 gap-2">
         <Field.Field>
           <Field.Label for="type">{$t('wardrobe.createItem.fields.type')}</Field.Label>
-          <Select.Root type="single" name="type" bind:value={type}>
-            <Select.Trigger>{capitalize(type)}</Select.Trigger>
+          <Select.Root type="single" name="type" bind:value={formValues.type}>
+            <Select.Trigger>{capitalize(formValues.type)}</Select.Trigger>
             <Select.Content>
               {#each clothingItemTypes as type}
                 <Select.Item value={type} label={capitalize(type)} />

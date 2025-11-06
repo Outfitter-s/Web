@@ -53,7 +53,7 @@ export interface ClothingItem {
   color: ClothingItemColor;
   createdAt: Date;
   name: string;
-  description: string;
+  description: string | null;
   lastWornAt: MyOptional<Date>;
 }
 

@@ -31,10 +31,8 @@
       }
     };
 
-    // Add event listener to the document
     document.addEventListener('touchmove', disablePullToRefresh, { passive: false });
 
-    // Clean up the event listener on unmount
     return () => {
       document.removeEventListener('touchmove', disablePullToRefresh);
     };

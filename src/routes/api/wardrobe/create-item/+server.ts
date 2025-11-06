@@ -7,7 +7,7 @@ import { json } from '@sveltejs/kit';
 
 const schema = z.object({
   name: z.string().min(1).max(100),
-  description: z.string().min(1).max(500),
+  description: z.string().max(500).optional(),
   type: z.enum(clothingItemTypes),
   color: z.enum(clothingItemColors),
   image: z.instanceof(File).refine((file) => file.size > 0, { message: 'Image file is required' }),
@@ -28,7 +28,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       user.id,
       imageBuffer,
       name,
-      description,
+      description || null,
       type,
       color
     );

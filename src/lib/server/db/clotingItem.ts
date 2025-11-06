@@ -1,9 +1,8 @@
 import type { ClothingItem, UUID } from '$lib/types';
-import sharp from 'sharp';
 import pool from '.';
 import { unlink } from 'fs/promises';
 import { getEnv } from '../utils';
-import { ImageProcessor } from '../imageProcessing';
+import { writeFile } from 'fs/promises';
 
 export interface ClothingItemTable {
   id: UUID;
@@ -19,7 +18,7 @@ export class ClothingItemDAO {
   static convertToClothingItem(row: ClothingItemTable): ClothingItem {
     return {
       id: row.id as UUID,
-      imageUrl: `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/clothing_item/${row.id}.webp`,
+      imageUrl: `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/clothing_item/${row.id}.png`,
       type: row.type,
       color: row.color,
       description: row.description,
@@ -46,13 +45,8 @@ export class ClothingItemDAO {
     }
     const clothingItem = ClothingItemDAO.convertToClothingItem(res.rows[0]);
 
-    // Process and save the image
-    const outputPath = `assets/clothing_item/${clothingItem.id}.webp`;
-    const processedImage = await ImageProcessor.removeBackground(imageBuffer);
-    await sharp(processedImage)
-      .resize(1024, 1024, { fit: 'inside' })
-      .toFormat('webp')
-      .toFile(outputPath);
+    const outputPath = new URL(clothingItem.imageUrl).pathname.slice(1); // Remove leading '/'
+    await writeFile(outputPath, imageBuffer);
 
     return clothingItem;
   }
@@ -77,6 +71,6 @@ export class ClothingItemDAO {
 
   static async deleteClothingItem(id: UUID): Promise<void> {
     await pool.query('DELETE FROM clothing_item WHERE id = $1', [id]);
-    await unlink(`assets/clothing_item/${id}.webp`);
+    await unlink(`assets/clothing_item/${id}.png`);
   }
 }
