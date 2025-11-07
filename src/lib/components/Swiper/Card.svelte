@@ -135,7 +135,7 @@
         style="grid-template-rows: repeat({outfitParts}, 1fr);"
       >
         {#if card.outfit.top && card.outfit.top.length > 0}
-          <div class="flex h-full flex-col gap-1 overflow-hidden rounded-lg bg-gray-900 p-2">
+          <div class="flex h-full flex-col gap-1 overflow-hidden">
             <div
               class="grid h-full"
               style="grid-template-columns: repeat({card.outfit.top.length}, 1fr); gap: 0.5rem;"
@@ -155,9 +155,7 @@
           </div>
         {/if}
         {#if card.outfit.bottom}
-          <div
-            class="flex h-full w-full flex-col items-center overflow-hidden rounded-lg bg-gray-900 p-2"
-          >
+          <div class="flex h-full w-full flex-col items-center overflow-hidden">
             <img
               src={card.outfit.bottom.imageUrl}
               alt={card.outfit.bottom.name}
@@ -168,7 +166,7 @@
           </div>
         {/if}
         {#if card.outfit.accessories && card.outfit.accessories.length > 0}
-          <div class="flex h-full flex-col gap-1 overflow-hidden rounded-lg bg-gray-900 p-2">
+          <div class="flex h-full flex-col gap-1 overflow-hidden">
             <div
               class="grid h-full"
               style="grid-template-columns: repeat({card.outfit.accessories
@@ -189,9 +187,7 @@
           </div>
         {/if}
         {#if card.outfit.shoes}
-          <div
-            class="flex h-full w-full flex-col items-center overflow-hidden rounded-lg bg-gray-900 p-2"
-          >
+          <div class="flex h-full w-full flex-col items-center overflow-hidden">
             <img
               src={card.outfit.shoes.imageUrl}
               alt={card.outfit.shoes.name}
@@ -224,7 +220,7 @@
     >
       <div
         class={cn(
-          'rounded-3xl-full size-20 p-4',
+          'size-20 rounded-full p-4',
           move.currentX > 0
             ? 'bg-green-500/50 text-green-800 dark:text-green-950'
             : 'bg-red-500/50 text-red-800 dark:text-red-950'
