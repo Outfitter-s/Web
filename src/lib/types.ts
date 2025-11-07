@@ -57,9 +57,11 @@ export interface ClothingItem {
   lastWornAt: MyOptional<Date>;
 }
 
+export type ScoredClothingItem = ClothingItem & { score: number };
+
 export interface Outfit {
   id: UUID;
-  top: MyOptional<ClothingItem>;
+  top: ClothingItem[];
   bottom: MyOptional<ClothingItem>;
   shoes: MyOptional<ClothingItem>;
   accessories: ClothingItem[];
@@ -71,5 +73,5 @@ export interface SwiperCard {
   id: number;
   title: string;
   description?: string;
-  imageSrc: string;
+  outfit: Outfit;
 }
