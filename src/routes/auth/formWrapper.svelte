@@ -1,8 +1,8 @@
 <script lang="ts">
   import { cn, isMobile, navHeight } from '$lib/utils';
   import type { SvelteHTMLElements } from 'svelte/elements';
-  import FormImageDark from '$lib/assets/authForm/FormImageDark.jpg?enhanced';
-  import FormImageLight from '$lib/assets/authForm/FormImageLight.jpg?enhanced';
+  import FormImageDark from '$lib/assets/authForm/FormImageDark.jpg';
+  import FormImageLight from '$lib/assets/authForm/FormImageLight.jpg';
   import { mode } from 'mode-watcher';
   import * as Card from '$lib/components/ui/card';
   import Button from '$lib/components/ui/button/button.svelte';
@@ -78,14 +78,14 @@
       )}
     >
       {#if mode.current === 'dark'}
-        <enhanced:img
+        <img
           draggable="false"
           src={FormImageDark}
           class="absolute inset-0 size-full object-cover"
           alt=""
         />
       {:else}
-        <enhanced:img
+        <img
           draggable="false"
           src={FormImageLight}
           class="absolute inset-0 size-full object-cover"
@@ -95,14 +95,14 @@
     </div>
   {:else}
     {#if mode.current === 'dark'}
-      <enhanced:img
+      <img
         draggable="false"
         src={FormImageDark}
         class="absolute inset-0 size-full object-cover"
         alt=""
       />
     {:else}
-      <enhanced:img
+      <img
         draggable="false"
         src={FormImageLight}
         class="absolute inset-0 size-full object-cover"
