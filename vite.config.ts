@@ -16,4 +16,7 @@ export default defineConfig({
         conditions: ['browser'],
       }
     : undefined,
+  test: {
+    environment: 'jsdom',
+  },
 });
