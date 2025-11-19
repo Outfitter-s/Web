@@ -20,7 +20,8 @@
     "repo:version-bump": "scripts/version-bump.sh",
     "repo:docker-build": "scripts/build-image.sh",
     "repo:deploy": "scripts/build-image.sh",
-    "test": "vitest"
+    "test": "vitest",
+    "test:watch": "vitest --watch"
   },
   "lint-staged": {
     "*.{js,ts,svelte,json,css,md}": "prettier --write"
