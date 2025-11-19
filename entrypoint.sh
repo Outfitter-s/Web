@@ -9,14 +9,15 @@ if [ -f .env ]; then
 fi
 
 # Create required directories
-dirs=("assets/{clothing_item,outfits}")
-for dir in ${dirs[@]}; do
+dirs="assets/clothing_item assets/outfits"
+for dir in $dirs; do
   mkdir -p "$dir"
 done
 
 port=${POSTGRES_PORT:-5432}
 host=${POSTGRES_HOST:-db}
 retries=0
+echo "Checking database connection to $host:$port..."
 until nc -z "$host" "$port"; do
   retries=$((retries + 1))
   echo "Waiting for database to be ready ($retries)..."
