@@ -25,4 +25,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: anguspllg/outfitter_web:latest
+          tags: |
+            anguspllg/outfitter_web:latest
+            anguspllg/outfitter_web:${{ github.ref_name }}
