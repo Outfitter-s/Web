@@ -28,7 +28,7 @@ until nc -z "$host" "$port"; do
   sleep 2
 done
 # Run database migrations
-npm run db:migrate
+bun run db:migrate
 
 # Launch prod server
 node build/index.js

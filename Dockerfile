@@ -1,14 +1,18 @@
 FROM node:22-alpine AS build
 WORKDIR /app
 
+# Install bun
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:${PATH}"
+
 COPY ./package.json .
-RUN --mount=type=cache,target=/root/.npm npm install
+RUN --mount=type=cache,target=/root/.npm bun install
 
 # Copy the application code
 COPY . .
 
 # Build
-RUN npm run build
+RUN bun run build
 
 # Prod server
 FROM node:22-alpine AS prod
