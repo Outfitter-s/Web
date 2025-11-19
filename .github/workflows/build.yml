@@ -1,6 +1,9 @@
 name: Build docker image
 
-on: release
+on:
+  release:
+    types:
+      - published
 
 jobs:
   build-image:
@@ -26,5 +29,5 @@ jobs:
         with:
           push: true
           tags: |
-            anguspllg/outfitter_web:latest
-            anguspllg/outfitter_web:${{ github.ref_name }}
+            ${{ vars.DOCKERHUB_USERNAME }}/outfitter_web:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/outfitter_web:${{ github.ref_name }}
