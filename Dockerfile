@@ -6,7 +6,7 @@ RUN curl -fsSL https://bun.sh/install | bash
 ENV PATH="/root/.bun/bin:${PATH}"
 
 COPY ./package.json .
-RUN --mount=type=cache,target=/root/.npm bun install
+RUN --mount=type=cache,target=/root/.bun bun install
 
 # Copy the application code
 COPY . .
