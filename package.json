@@ -36,7 +36,7 @@
     "@tailwindcss/vite": "^4.1.12",
     "@tanstack/table-core": "^8.20.5",
     "@types/bun": "latest",
-    "bits-ui": "^2.9.4",
+    "bits-ui": "^2.14.4",
     "embla-carousel-svelte": "^8.6.0",
     "eslint": "^9.33.0",
     "eslint-config-prettier": "^10.1.8",
