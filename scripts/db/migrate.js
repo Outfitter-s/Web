@@ -10,21 +10,21 @@ import { HERE } from '../shared.js';
 import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
 
-const getLastMigrationDate = async (): Promise<Date> => {
-  const { rows } = await pool.query<{ created_at: string }>(
+const getLastMigrationDate = async () => {
+  const { rows } = await pool.query(
     'SELECT created_at FROM migrations ORDER BY created_at DESC LIMIT 1'
   );
   return rows.length > 0 ? new Date(rows[0].created_at) : new Date(0);
 };
 
-const setLastMigrationDate = async (date: Date): Promise<void> => {
+const setLastMigrationDate = async (date) => {
   await pool.query('INSERT INTO migrations (name, created_at) VALUES ($1, $2)', [
     'last_migration',
     date.toISOString(),
   ]);
 };
 
-async function applyMigration(name: string) {
+async function applyMigration(name) {
   const migrationPath = join(HERE, `../sql/migrations/${name}`);
   const sql = await readFile(migrationPath, 'utf8');
   if (!sql) {
@@ -59,8 +59,8 @@ async function main() {
       };
     })
     .filter((m) => m && (!lastMigrationDate || m.date > lastMigrationDate))
-    .sort((a, b) => a!.timestamp - b!.timestamp)
-    .map((m) => m!.file);
+    .sort((a, b) => a.timestamp - b.timestamp)
+    .map((m) => m.file);
   console.log(`Available migrations: ${availableMigrations.length}`);
   console.log(`New migrations to apply: ${newMigrations.length}`);
 

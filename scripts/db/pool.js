@@ -2,7 +2,7 @@ import pg from 'pg';
 
 const { Pool } = pg;
 
-let pool: pg.Pool;
+let pool;
 
 try {
   pool = new Pool({

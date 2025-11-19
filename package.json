@@ -12,7 +12,7 @@
     "lint": "prettier --check . && eslint .",
     "prepare": "husky",
     "i18n:check": "if command -v bun >/dev/null 2>&1; then bun scripts/checkTranslations.ts; else node scripts/checkTranslations.ts; fi",
-    "db:migrate": "if command -v bun >/dev/null 2>&1; then bun scripts/db/migrate.ts; else node scripts/db/migrate.ts; fi",
+    "db:migrate": "if command -v bun >/dev/null 2>&1; then bun scripts/db/migrate.js; else node scripts/db/migrate.js; fi",
     "db:create-migration": "if command -v bun >/dev/null 2>&1; then bun scripts/db/createMigration.ts; else node scripts/db/createMigration.ts; fi",
     "android:emulator": "emulator -avd Medium_Phone_API_36.0",
     "android:open": "adb shell am start -a android.intent.action.VIEW -d http://10.0.2.2:5173",

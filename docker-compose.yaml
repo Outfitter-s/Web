@@ -10,10 +10,12 @@ services:
       - db
       - redis
       - image_processing
-    environment:
-      - ORIGIN=http://localhost:4173
     env_file:
       - .env
+    environment:
+      - ORIGIN=http://localhost:4173
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
     ports:
       - '4173:3000'
 
