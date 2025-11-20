@@ -33,7 +33,7 @@
       throw new Error('Item not found');
     }
     name = item.name;
-    description = item.description;
+    description = item.description || '';
     color = item.color;
     type = item.type;
   });
@@ -58,9 +58,6 @@
   });
 
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-  const handleCancel = () => {
-    goto(`/app/wardrobe/item/${itemId}`);
-  };
 </script>
 
 {#if item}
@@ -127,7 +124,7 @@
 
       <div class="flex gap-2">
         <Button type="submit" class="flex-1">Save Changes</Button>
-        <Button type="button" variant="outline" onclick={handleCancel}>Cancel</Button>
+        <Button type="button" variant="outline" href="/app/wardrobe/item/{itemId}">Cancel</Button>
       </div>
     </form>
   </div>

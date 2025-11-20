@@ -1,7 +1,12 @@
 import { ClothingItemDAO } from '$lib/server/db/clotingItem';
 import type { ClothingItemColor, ClothingItemType } from '$lib/types';
-import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import { fail, redirect, error } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
+
+// TODO: Re-write the whole back-end because whoever did this is an absolute maniac (looking at you, paqui and ChatGPT)
+export const load = (async () => {
+  throw error(404, 'Not Found');
+}) satisfies PageServerLoad;
 
 export const actions: Actions = {
   update_item: async ({ request, locals, params }) => {
