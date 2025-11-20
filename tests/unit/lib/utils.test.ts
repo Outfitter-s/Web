@@ -1,13 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import {
-  cn,
-  noop,
-  urlStartsWith,
-  capitalize,
-  copyToClipboard,
-  isMobile,
-  navHeight,
-} from '../../../src/lib/utils';
+import { cn, noop, urlStartsWith, capitalize, copyToClipboard } from '$lib/utils';
 
 // 1. Mock Svelte Reactivity
 vi.mock('svelte/reactivity', () => {

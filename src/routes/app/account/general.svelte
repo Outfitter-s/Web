@@ -160,14 +160,9 @@
       {triggerContent}
     </Select.Trigger>
     <Select.Content>
-      <Select.Group>
-        <Select.Label>
-          {$t('account.tabs.general.changeLang.title')}
-        </Select.Label>
-        {#each locales as loc}
-          <Select.Item value={loc} label={loc}></Select.Item>
-        {/each}
-      </Select.Group>
+      {#each locales as loc}
+        <Select.Item value={loc} label={loc}></Select.Item>
+      {/each}
     </Select.Content>
   </Select.Root>
 </div>
@@ -175,9 +170,9 @@
 <div class="space-y-2">
   <Label>{$t('account.tabs.general.theme.title')}</Label>
   <Button onclick={toggleMode} variant="outline" size="icon">
-    <Sun class="size-[1.2rem] scale-100 rotate-0 !transition-all dark:scale-0 dark:-rotate-90" />
+    <Sun class="size-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
     <Moon
-      class="absolute size-[1.2rem] scale-0 rotate-90 !transition-all dark:scale-100 dark:rotate-0"
+      class="absolute size-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
     />
     <span class="sr-only">Toggle theme</span>
   </Button>

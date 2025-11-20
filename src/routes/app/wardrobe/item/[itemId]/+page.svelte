@@ -7,7 +7,6 @@
   import { Calendar, Palette, Shirt, Pencil } from '@lucide/svelte';
   import ColorDot from '$lib/components/colorDot.svelte';
   import { Button } from '$lib/components/ui/button';
-  import { goto } from '$app/navigation';
 
   let itemId = $derived<string>(page.params.itemId as string);
   let items = $derived<ClothingItem[]>(page.data.items);
@@ -21,10 +20,6 @@
 
   const formatDate = (date: Date) => {
     return new DateFormatter(locale, { day: '2-digit', month: 'short' }).format(date);
-  };
-
-  const handleEdit = () => {
-    goto(`/app/wardrobe/item/${itemId}/edit`);
   };
 </script>
 
@@ -42,7 +37,7 @@
       <div class="flex w-full flex-col gap-4 p-2 lg:w-1/2 lg:p-4">
         <div class="flex items-start justify-between">
           <h1 class="font-sans text-2xl font-bold">{item.name}</h1>
-          <Button variant="outline" size="icon" onclick={handleEdit}>
+          <Button variant="outline" size="icon" href="/app/wardrobe/item/{itemId}/edit">
             <Pencil class="size-4" />
           </Button>
         </div>

@@ -71,7 +71,5 @@ export interface Outfit {
 
 export interface SwiperCard {
   id: number;
-  title: string;
-  description?: string;
   outfit: Outfit;
 }

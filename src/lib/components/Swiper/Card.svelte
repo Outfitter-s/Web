@@ -199,13 +199,6 @@
         {/if}
       </div>
     </div>
-
-    <div class="p-2">
-      <h2 class="text-lg font-bold">{card.title}</h2>
-      {#if card.description}
-        <p class="text-muted-foreground text-sm">{card.description}</p>
-      {/if}
-    </div>
     <div
       class={cn(
         'absolute inset-0 flex flex-col items-center justify-center',
