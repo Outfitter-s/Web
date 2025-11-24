@@ -85,7 +85,7 @@
     "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
     "qrcode": "^1.5.4",
-    "redis": "^5.8.2",
+    "redis": "^5.10.0",
     "sharp": "^0.34.4",
     "speakeasy": "^2.0.0",
     "sveltekit-superforms": "^2.27.4",
