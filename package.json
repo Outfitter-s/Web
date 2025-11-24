@@ -60,7 +60,7 @@
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.40.0",
     "vite": "^7.1.3",
-    "vitest": "^4.0.10"
+    "vitest": "^4.0.13"
   },
   "dependencies": {
     "@simplewebauthn/browser": "^13.1.2",
