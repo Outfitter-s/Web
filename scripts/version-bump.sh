@@ -82,19 +82,29 @@ main() {
   git commit -m "Bump version to $new_version"
   git push origin "$bump_branch"
 
-  # Create a pull request and merge it
+  # Create a pull request
   gh pr create --base "$release_branch" --head "$bump_branch" --title "Version Bump to $new_version" --body "This PR bumps the version to $new_version."
   if [[ $? -ne 0 ]]; then
     echo "Error: Failed to create a pull request."
     exit 1
   fi
-  gh pr merge --auto --squash "$bump_branch"
+
+  # Wait for tests to pass before merging
+  echo "Waiting for workflows to pass..."
+  gh pr checks "$bump_branch" --watch
+  if [[ $? -ne 0 ]]; then
+    echo "Error: Tests did not pass."
+    exit 1
+  fi
+
+  # Merge the pull request
+  gh pr merge --squash "$bump_branch"
   if [[ $? -ne 0 ]]; then
     echo "Error: Failed to merge the pull request."
     exit 1
   fi
 
-  # Push the changes to the release branch
+  # Clean up local branch
   git checkout "$release_branch"
   git pull origin "$release_branch"
   git branch -D "$bump_branch"
@@ -105,7 +115,7 @@ main() {
     echo "Error: Failed to create a GitHub release."
     exit 1
   }
-  echo "Version bumped to $new_version and changes pushed to the release branch '$bump_branch'."
+  echo "Version bumped to $new_version and released."
 }
 
 main "$@"
