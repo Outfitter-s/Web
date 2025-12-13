@@ -77,7 +77,7 @@
     "chalk": "^5.6.2",
     "clsx": "^2.1.1",
     "colorthief": "^2.6.0",
-    "inquirer": "^12.11.1",
+    "inquirer": "^13.0.2",
     "iovalkey": "^0.3.3",
     "jsonwebtoken": "^9.0.3",
     "nodemailer": "^7.0.11",
