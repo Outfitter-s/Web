@@ -1,7 +1,16 @@
 import type { AuthenticatorTransportFuture, CredentialDeviceType } from '@simplewebauthn/browser';
+import z from 'zod';
 
-export type UUID /* UUID v4 */ = `${string}-${string}-${string}-${string}-${string}`;
-type MyOptional<T> = T | null;
+export const UUID = z.uuidv4();
+export type UUID = z.infer<typeof UUID>;
+export const DateZ = z.date().or(
+  z
+    .string()
+    .refine((date) => !isNaN(Date.parse(date)), {
+      message: 'Invalid date string',
+    })
+    .transform((date) => new Date(date))
+);
 export const clothingItemTypes = [
   'pants',
   'sweater',
@@ -26,15 +35,17 @@ export const clothingItemColors = [
   'gray',
 ] as const;
 export type ClothingItemColor = (typeof clothingItemColors)[number];
-export interface User {
-  id: UUID;
-  username: string;
-  email: string;
-  passwordHash: string;
-  createdAt: Date;
-  totpSecret?: string;
-  passkey: Passkey | null;
-}
+
+export const UserZ = z.object({
+  id: z.uuidv4(),
+  username: z.string().min(3).max(30),
+  email: z.email(),
+  passwordHash: z.string(),
+  createdAt: DateZ,
+  totpSecret: z.string().optional(),
+  passkey: z.any().nullable(),
+});
+export type User = z.infer<typeof UserZ>;
 
 export interface Passkey {
   id: Base64URLString;
@@ -46,30 +57,43 @@ export interface Passkey {
   transports?: AuthenticatorTransportFuture[];
 }
 
-export interface ClothingItem {
-  id: UUID;
-  imageUrl: string;
-  type: ClothingItemType;
-  color: ClothingItemColor;
-  createdAt: Date;
-  name: string;
-  description: string | null;
-  lastWornAt: MyOptional<Date>;
-}
+export const ClothingItemZ = z.object({
+  id: z.uuidv4().or(z.string()),
+  imageUrl: z.url(),
+  type: z.enum(clothingItemTypes),
+  color: z.enum(clothingItemColors),
+  createdAt: DateZ,
+  name: z.string().min(1).max(100),
+  description: z.string().max(500).nullable(),
+  lastWornAt: DateZ.nullable(),
+});
+export type ClothingItem = z.infer<typeof ClothingItemZ>;
 
 export type ScoredClothingItem = ClothingItem & { score: number };
 
-export interface Outfit {
-  id: UUID;
-  top: ClothingItem[];
-  bottom: MyOptional<ClothingItem>;
-  shoes: MyOptional<ClothingItem>;
-  accessories: ClothingItem[];
-  createdAt: Date;
-  wornAt: Date[];
-}
+export const OutfitZ = z.object({
+  id: z.uuidv4(),
+  top: z.array(ClothingItemZ).min(1),
+  bottom: ClothingItemZ.nullable(),
+  shoes: ClothingItemZ.nullable(),
+  accessories: z.array(ClothingItemZ),
+  createdAt: DateZ,
+  wornAt: z.array(DateZ),
+});
+export type Outfit = z.infer<typeof OutfitZ>;
 
 export interface SwiperCard {
   id: number;
-  outfit: Outfit;
+  outfit: Omit<Outfit, 'id'>;
 }
+
+export const WeatherZ = z.object({
+  temp: z.number(),
+  rain: z.number(),
+  desc: z.string(),
+  uv: z.number(),
+});
+export type Weather = z.infer<typeof WeatherZ>;
+
+export const roles = ['user', 'admin'] as const; // Keep the roles in order of power (used by `isRoleBelow` in `./roles/index.ts`)
+export type Role = (typeof roles)[number];

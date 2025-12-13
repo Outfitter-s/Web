@@ -1,11 +1,9 @@
 import { clamp01 } from './utils';
 import { getTempIdeal } from './utils';
-import type { ScoredClothingItem } from '$lib/types';
+import type { ScoredClothingItem, Weather } from '$lib/types';
 
-export function tempScore(item: ScoredClothingItem, weather: any): number {
-  const temp = Number.parseFloat(weather.temp || '0');
-
+export function tempScore(item: ScoredClothingItem, weather: Weather): number {
   const { ideal, tol } = getTempIdeal(item.type?.toString());
-  const tempDiff = Math.abs(temp - ideal);
+  const tempDiff = Math.abs(weather.temp - ideal);
   return clamp01(1 - tempDiff / Math.max(1, tol));
 }

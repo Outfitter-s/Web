@@ -56,7 +56,8 @@
     },
     "server": {
       "connectionRefused": "Connection refused. Please try again later.",
-      "forbidden": "Forbidden"
+      "forbidden": "Forbidden",
+      "weatherFetchFailed": "Failed to fetch weather data. Please try again later."
     },
     "account": {
       "settings": {
@@ -66,8 +67,13 @@
     "clothing": {
       "item": {
         "requiredField": "The following field{{s}} {{is}} required: {{field}}",
-        "classificationFailed": "Failed to classify the clothing item. Please enter values manually."
+        "classificationFailed": "Failed to classify the clothing item. Please enter values manually.",
+        "missingImage": "Image file is required"
       }
+    },
+    "outfitGeneration": {
+      "notEnoughItems": "Not enough clothing items to generate an outfit. Please add more items to your wardrobe.",
+      "apiError": "Failed to generate outfit due to an internal error. Please try again later."
     }
   },
   "successes": {
@@ -90,6 +96,8 @@
     "email": "Email",
     "password": "Password",
     "confirmPassword": "Confirm password",
+    "newPassword": "New password",
+    "currentPassword": "Current password",
     "rememberMe": "Remember me",
     "forgotPasswordKeyword": "Forgot password?",
     "submit": "Submit",
@@ -202,7 +210,12 @@
           "title": "Change email"
         },
         "theme": {
-          "title": "Theme"
+          "theme": "Theme",
+          "mode": "Mode"
+        },
+        "logout": "Log out",
+        "danger": {
+          "title": "Danger Zone"
         }
       },
       "password": {
@@ -257,6 +270,7 @@
         "name": "Name",
         "type": "Type",
         "color": "Color",
+        "description": "Description",
         "image": {
           "label": "Take a picture"
         }
@@ -278,6 +292,21 @@
           "description": "You haven't created any outfits yet. Get started by mixing and matching your clothes.",
           "createButton": "Create Outfit"
         }
+      }
+    },
+    "outfitGeneration": {
+      "swiper": {
+        "loadingText": "Generating your outfits...",
+        "noMoreCards": {
+          "title": "No more outfits",
+          "subTitle": "Please come back later."
+        }
+      },
+      "chooseOutfitModal": {
+        "title": "Choose this outfit",
+        "description": "This will be the outfit you will be rocking today!",
+        "confirmButton": "Choose",
+        "cancelButton": "I changed my mind"
       }
     }
   }

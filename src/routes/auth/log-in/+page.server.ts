@@ -8,6 +8,7 @@ import { validateTOTP } from '$lib/server/totp';
 import { defs } from '$lib/utils/form';
 import z from 'zod';
 import { env } from '$env/dynamic/private';
+import { getCookiePrefix } from '$lib/server/utils';
 
 export const actions: Actions = {
   logIn: async ({ request, cookies }) => {
@@ -52,7 +53,7 @@ export const actions: Actions = {
         }
       }
 
-      cookies.set('token', generateAccessToken(user.id), {
+      cookies.set(getCookiePrefix('token'), generateAccessToken(user.id), {
         path: '/',
         httpOnly: true,
         sameSite: 'lax',

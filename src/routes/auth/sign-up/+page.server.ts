@@ -7,6 +7,7 @@ import { logger } from '$lib/utils/logger';
 import { defs } from '$lib/utils/form';
 import z from 'zod';
 import { env } from '$env/dynamic/private';
+import { getCookiePrefix } from '$lib/server/utils';
 
 export const actions: Actions = {
   signUp: async ({ request, cookies }) => {
@@ -27,7 +28,7 @@ export const actions: Actions = {
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(password, salt);
       const createdUser = await UserDAO.createUser(username, email, hash);
-      cookies.set('token', generateAccessToken(createdUser.id), {
+      cookies.set(getCookiePrefix('token'), generateAccessToken(createdUser.id), {
         path: '/',
         httpOnly: true,
         sameSite: 'lax',

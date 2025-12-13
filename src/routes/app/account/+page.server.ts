@@ -59,23 +59,24 @@ export const actions: Actions = {
     try {
       const formData = Object.fromEntries(await request.formData());
       const schema = z.object({
-        password: defs.password,
+        currentPassword: defs.password,
+        newPassword: defs.password,
         confirmPassword: defs.password,
       });
       const form = schema.safeParse(formData);
       if (!form.success) throw new Error(form.error.issues[0].message);
-      const { password, confirmPassword } = form.data;
+      const { currentPassword, newPassword, confirmPassword } = form.data;
 
-      if (password !== confirmPassword)
+      if (newPassword !== confirmPassword)
         throw new Error('errors.auth.passwordReset.passwordsDontMatch');
 
       // Check if the password is the same as the current one
-      if (await bcrypt.compare(password, user.passwordHash))
+      if (!(await bcrypt.compare(currentPassword, user.passwordHash)))
         throw new Error('errors.auth.passwordReset.samePassword');
 
       // Hash password
       const salt = await bcrypt.genSalt(10);
-      const hash = await bcrypt.hash(password, salt);
+      const hash = await bcrypt.hash(newPassword, salt);
 
       await UserDAO.updateUser(user.id, { passwordHash: hash });
     } catch (e) {

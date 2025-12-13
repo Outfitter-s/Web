@@ -2,29 +2,64 @@
   import { Swiper } from '$lib/components';
   import * as Dialog from '$lib/components/ui/dialog';
   import { Button } from '$lib/components/ui/button';
-  import type { SwiperCard, Outfit } from '$lib/types';
+  import { OutfitZ, type SwiperCard } from '$lib/types';
   import { ArrowRight } from '@lucide/svelte';
   import confetti from 'canvas-confetti';
-  import { page } from '$app/state';
   import { onMount } from 'svelte';
+  import { logger } from '$lib/utils/logger';
+  import z from 'zod';
+  import i18n from '$lib/i18n';
+  import { getWeather } from '$lib/utils/weather';
+  import type { Weather } from '$lib/types';
 
-  // Génère un outfit via l'API
-  async function generateOutfit(): Promise<Outfit> {
-    const res = await fetch('/api/generate-outfit', { method: 'POST' });
-    return await res.json();
+  const cId = $props.id(); // Deterministic client ID for outfit generation
+
+  async function generateCards(count: number = 5): Promise<SwiperCard[]> {
+    if (!weather) {
+      weather = await getWeather();
+    }
+    const cards: SwiperCard[] = [];
+    const res = await fetch('/api/wardrobe/generate-outfit', {
+      method: 'POST',
+      body: JSON.stringify({ count, weather }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data?.error || 'errors.outfitGeneration.apiError');
+    }
+    // Validate outfit structure returned by the API against SwiperCard OutfitZ schema
+    const isValid = z.array(OutfitZ.omit({ id: true })).safeParse(data);
+    if (!isValid.success) {
+      throw new Error('errors.outfitGeneration.apiError');
+    }
+    for (const outfit of isValid.data) {
+      cards.push({
+        id: outfitId,
+        outfit,
+      });
+      outfitId++;
+    }
+    return cards;
   }
 
+  // Deterministically generate a number from the input string using a hash function
+  function hashStringToNumber(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash << 5) - hash + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash);
+  }
+
+  let outfitId: number = $state(hashStringToNumber(cId)); // Start from a hash of the client ID
   let cards = $state<SwiperCard[]>([]);
+  let loadingCards = $state(true);
+  let weather = $state<Weather | null>(null);
 
   onMount(async () => {
-    const baseCards = page.data.cards as Omit<SwiperCard, 'outfit'>[];
-    cards = await Promise.all(
-      baseCards.map(async (card, idx) => {
-        const outfit = await generateOutfit();
-        console.log('card : ', idx, 'outfit : ', outfit);
-        return { ...card, id: idx, outfit };
-      })
-    );
+    cards = await generateCards(5);
+    loadingCards = false;
   });
 
   interface Props {
@@ -88,7 +123,7 @@
       method: 'POST',
     });
     const outfit = await res.json();
-    console.log(outfit); // Affiche l'outfit généré
+    logger.debug(outfit); // Affiche l'outfit généré
   }
 
   onMount(() => {
@@ -105,18 +140,21 @@
 <Dialog.Root bind:open={acceptedCard.open} dismissible={false}>
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>Choose this outfit</Dialog.Title>
-      <Dialog.Description>This will be the outfit you will be rocking today!</Dialog.Description>
+      <Dialog.Title>{i18n.t('wardrobe.outfitGeneration.chooseOutfitModal.title')}</Dialog.Title>
+      <Dialog.Description
+        >{i18n.t('wardrobe.outfitGeneration.chooseOutfitModal.description')}</Dialog.Description
+      >
     </Dialog.Header>
 
     <Dialog.Footer>
       <Button
         type="button"
         variant="secondary"
-        onclick={() => (acceptedCard = { open: false, card: null })}>I changed my mind</Button
+        onclick={() => (acceptedCard = { open: false, card: null })}
+        >{i18n.t('wardrobe.outfitGeneration.chooseOutfitModal.cancelButton')}</Button
       >
       <Button onclick={handleConfirm}>
-        Confirm
+        {i18n.t('wardrobe.outfitGeneration.chooseOutfitModal.confirmButton')}
         <ArrowRight class="size-4" />
       </Button>
     </Dialog.Footer>
@@ -127,13 +165,7 @@
 {#if !chosenOutfit}
   <section class="relative flex h-full grow flex-col overflow-hidden">
     <div class="mx-auto flex h-full w-full max-w-[500px] grow flex-col p-2">
-      <Swiper bind:cards {onSwiped} />
+      <Swiper bind:cards bind:loading={loadingCards} {onSwiped} />
     </div>
-  </section>
-{:else}
-  <section class="flex h-full grow flex-col items-center justify-center p-4 text-center">
-    <h1 class="mb-4 text-2xl font-bold">You have chosen your outfit for today!</h1>
-    <p class="text-muted-foreground mb-8">Feel free to change it anytime by coming back here.</p>
-    TIMELINE
   </section>
 {/if}

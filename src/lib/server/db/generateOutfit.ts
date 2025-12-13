@@ -1,6 +1,5 @@
-import type { Outfit, ClothingItemType, UUID, ScoredClothingItem } from '$lib/types';
+import type { Outfit, ClothingItemType, UUID, ScoredClothingItem, Weather } from '$lib/types';
 import { ClothingItemDAO } from './clotingItem';
-import { getWeather } from '$lib/utils/weather';
 import { selectRandomAccessories } from './outfitStrategies/utils';
 import {
   lastWornScore,
@@ -17,12 +16,25 @@ import { PROFILE_WEIGHTS } from './outfitStrategies/consts';
 
 type OutfitWithoutId = Omit<Outfit, 'id'>;
 
-export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
+export async function generateOutfits(
+  userId: UUID,
+  weather: Weather,
+  count: number
+): Promise<OutfitWithoutId[]> {
+  const outfits: OutfitWithoutId[] = [];
+  for (let i = 0; i < count; i++) {
+    const outfit = await generateOutfit(userId, weather);
+    outfits.push(outfit);
+  }
+  return outfits;
+}
+
+export async function generateOutfit(userId: UUID, weather: Weather): Promise<OutfitWithoutId> {
   const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
   const chooseBetween = 3;
 
   if (!items || items.length === 0) {
-    throw new Error('Aucun vêtement trouvé pour cet utilisateur.');
+    throw new Error('errors.outfitGeneration.notEnoughItems');
   }
 
   // Add temp score to items
@@ -36,18 +48,17 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
     (item) => item.type === 'dress' || item.type === 'shirt'
   );
 
-  let top: ScoredClothingItem[] = [];
+  const top: ScoredClothingItem[] = [];
   if (tops.length > 0) {
     const randomIndex = Math.floor(Math.random() * tops.length);
     top.push(tops[randomIndex]);
   }
 
-  let weights = PROFILE_WEIGHTS['default'];
-  const weather = await getWeather();
+  const weights = PROFILE_WEIGHTS['default'];
 
   // For loop over each item
   for (const item of scored) {
-    // Use scoring functions between choosen top and actuel item
+    // Use scoring functions between chosen top and actuel item
     item.score += lastWornScore(item) * weights.lastWorn;
     item.score += monochromeScore(top[0], item);
     item.score += complementaryScore(top[0], item);
@@ -105,11 +116,9 @@ export async function generateOutfit(userId: UUID): Promise<OutfitWithoutId> {
     accessories = selectRandomAccessories(grouped.accessory, 3);
   }
 
-  const tempValue = 'temp' in weather ? Number.parseFloat(weather.temp ?? '0') : 0;
-  const rainValue = 'rain' in weather ? Number.parseFloat(weather.rain ?? '0') : 0;
   const tempThreshold = 20;
 
-  if (tempValue < tempThreshold || rainValue > 1) {
+  if (weather.temp < tempThreshold || weather.rain > 1) {
     let extraTop: ScoredClothingItem | undefined;
     if (grouped.jacket.length > 0) {
       const randomIndex = Math.floor(

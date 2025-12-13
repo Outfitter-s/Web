@@ -10,18 +10,16 @@
     onSwiped?: (card: SwiperCard, accepted: boolean) => void;
   }
 
-  const outfitParts = $derived(
-    () =>
-      [
-        card.outfit.top && card.outfit.top.length > 0,
-        !!card.outfit.bottom,
-        !!card.outfit.shoes,
-        card.outfit.accessories && card.outfit.accessories.length > 0,
-      ].filter(Boolean).length
-  );
-
   let { card, onSwiped, index }: Props = $props();
 
+  const outfitParts = $derived(
+    [
+      card.outfit.top && card.outfit.top.length > 0,
+      !!card.outfit.bottom,
+      !!card.outfit.shoes,
+      card.outfit.accessories && card.outfit.accessories.length > 0,
+    ].filter(Boolean).length
+  );
   let move = $state({
     startX: 0,
     startY: 0,
@@ -108,7 +106,10 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-  class="absolute top-1/2 left-1/2 h-fit max-h-full w-full select-none"
+  class={cn(
+    'absolute top-1/2 left-1/2 h-fit max-h-full w-full select-none',
+    move.isSwiped ? 'pointer-events-none cursor-grabbing' : 'cursor-grab'
+  )}
   ontouchstart={onTouchStart}
   ontouchmove={onTouchMove}
   ontouchend={onTouchEnd}

@@ -1,7 +1,7 @@
-import type { ScoredClothingItem } from '$lib/types';
+import type { ScoredClothingItem, Weather } from '$lib/types';
 import { clamp01 } from './utils';
 
-export function colorForUVScore(item: ScoredClothingItem, weather: any): number {
+export function colorForUVScore(item: ScoredClothingItem, weather: Weather): number {
   const lightColors = ['white', 'yellow', 'pink', 'orange'];
   const neutralColors = ['black', 'gray', 'brown'];
   const chromatic = ['red', 'blue', 'green', 'purple'];
@@ -13,7 +13,7 @@ export function colorForUVScore(item: ScoredClothingItem, weather: any): number 
   else if (chromatic.includes(c)) base = 0.5;
   else base = 0.5;
 
-  const uv = Number.parseFloat(weather.uv || '0');
+  const uv = weather.uv;
 
   if (uv >= 3) {
     if (lightColors.includes(c)) base += 0.15;

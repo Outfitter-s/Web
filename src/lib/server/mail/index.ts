@@ -1,8 +1,7 @@
 import { env } from '$env/dynamic/private';
-import config from '$conf';
 import { createTransport } from 'nodemailer';
-import { readdir, readFile } from 'fs/promises';
-import { join } from 'path';
+import { readdir, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 const PROJECT_ROOT = process.cwd();
 
@@ -53,7 +52,7 @@ export async function sendMail({
   }
 
   await transporter.sendMail({
-    from: `no-reply@${config.project_name}.com`,
+    from: `no-reply@outfitter.com`,
     to,
     subject,
     html: body,

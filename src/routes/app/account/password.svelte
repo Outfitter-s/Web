@@ -5,7 +5,7 @@
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
-  import { t } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import { logger } from '$lib/utils/logger';
 
   let loading = $state(false);
@@ -35,12 +35,16 @@
   }}
 >
   <div class="space-y-2">
-    <Label for="email">{$t('auth.password')}</Label>
-    <Input name="password" type="password" />
+    <Label for="currentPassword">{i18n.t('auth.currentPassword')}</Label>
+    <Input name="currentPassword" type="password" />
   </div>
   <div class="space-y-2">
-    <Label for="email">{$t('auth.confirmPassword')}</Label>
+    <Label for="newPassword">{i18n.t('auth.newPassword')}</Label>
+    <Input name="newPassword" type="password" />
+  </div>
+  <div class="space-y-2">
+    <Label for="confirmPassword">{i18n.t('auth.confirmPassword')}</Label>
     <Input name="confirmPassword" type="password" />
   </div>
-  <Button type="submit" {loading}>{$t('auth.resetPassword.button')}</Button>
+  <Button type="submit" {loading}>{i18n.t('auth.resetPassword.button')}</Button>
 </form>

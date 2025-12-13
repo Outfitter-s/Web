@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { locale } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import { DateFormatter } from '@internationalized/date';
   import { onMount } from 'svelte';
 
@@ -18,7 +18,7 @@
   ]; // This represents the last outfits/2 outfits, today, and the next outfits/2 outfits
 
   const formatDate = (date: Date) => {
-    return new DateFormatter(locale, { day: '2-digit', month: 'short' }).format(date);
+    return new DateFormatter(i18n.locale, { day: '2-digit', month: 'short' }).format(date);
   };
 
   onMount(() => {

@@ -2,7 +2,7 @@
   import { Toaster } from '$lib/components/Toast/toast';
   import Input from '$lib/components/ui/input/input.svelte';
   import * as Select from '$lib/components/ui/select';
-  import { t } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import {
     clothingItemColors,
     clothingItemTypes,
@@ -80,13 +80,12 @@
         const blob = new Blob([byteArray], { type: result.mime || 'image/png' });
         takePictureStates.capturedImage = URL.createObjectURL(blob);
       } else {
-        logger.error('Classification error:', result.message);
-        Toaster.error($t('errors.clothing.item.classificationFailed'));
+        throw new Error(result.message);
       }
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       logger.error('Error classifying clothing item :', msg);
-      Toaster.error($t('errors.clothing.item.classificationFailed'));
+      Toaster.error('errors.clothing.item.classificationFailed');
     }
     processingImage = false;
   }
@@ -116,7 +115,7 @@
     if (!res.ok) {
       const fields = result.message.split(', ');
       const multiple = fields.length > 1;
-      const msg = $t('errors.clothing.item.requiredField', {
+      const msg = i18n.t('errors.clothing.item.requiredField', {
         field: result.message,
         s: multiple ? 's' : '',
         is: multiple ? 'are' : 'is',
@@ -124,7 +123,7 @@
       logger.error('Creation error:', msg);
       Toaster.error(msg);
     } else {
-      Toaster.success($t('successes.clothing.item.created'));
+      Toaster.success(i18n.t('successes.clothing.item.created'));
       (event.target as HTMLFormElement).reset();
       $itemOpen = false;
       await invalidateAll();
@@ -258,8 +257,8 @@
 <Dialog.Root bind:open={$itemOpen}>
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>{$t('wardrobe.createItem.title')}</Dialog.Title>
-      <Dialog.Description>{$t('wardrobe.createItem.description')}</Dialog.Description>
+      <Dialog.Title>{i18n.t('wardrobe.createItem.title')}</Dialog.Title>
+      <Dialog.Description>{i18n.t('wardrobe.createItem.description')}</Dialog.Description>
     </Dialog.Header>
     <form onsubmit={submitHandler} class="mt-6 flex flex-col gap-4">
       <div class="flex w-full flex-col">
@@ -271,7 +270,7 @@
           >
             <Camera class="size-6" />
             <span class="text-muted-foreground">
-              {$t('wardrobe.createItem.fields.image.label')}
+              {i18n.t('wardrobe.createItem.fields.image.label')}
             </span>
           </button>
         {:else}
@@ -297,12 +296,14 @@
       </div>
 
       <Field.Field>
-        <Field.Label for="name">{$t('wardrobe.createItem.fields.name')}</Field.Label>
+        <Field.Label for="name">{i18n.t('wardrobe.createItem.fields.name')}</Field.Label>
         <Input id="name" name="name" type="text" bind:value={formValues.name} />
       </Field.Field>
 
       <Field.Field>
-        <Field.Label for="description">Description</Field.Label>
+        <Field.Label for="description"
+          >{i18n.t('wardrobe.createItem.fields.description')}</Field.Label
+        >
         <Input
           id="description"
           name="description"
@@ -313,7 +314,7 @@
 
       <div class="grid grid-cols-2 gap-2">
         <Field.Field>
-          <Field.Label for="type">{$t('wardrobe.createItem.fields.type')}</Field.Label>
+          <Field.Label for="type">{i18n.t('wardrobe.createItem.fields.type')}</Field.Label>
           <Select.Root type="single" name="type" bind:value={formValues.type}>
             <Select.Trigger>{capitalize(formValues.type)}</Select.Trigger>
             <Select.Content>
@@ -325,7 +326,7 @@
         </Field.Field>
 
         <Field.Field>
-          <Field.Label for="color">{$t('wardrobe.createItem.fields.color')}</Field.Label>
+          <Field.Label for="color">{i18n.t('wardrobe.createItem.fields.color')}</Field.Label>
           <Select.Root type="single" name="color" bind:value={formValues.color}>
             <Select.Trigger>
               <div class="flex flex-row items-center gap-2">
@@ -346,7 +347,7 @@
       </div>
 
       <Dialog.Footer>
-        <Button type="submit" {loading}>{$t('wardrobe.createItem.submit')}</Button>
+        <Button type="submit" {loading}>{i18n.t('wardrobe.createItem.submit')}</Button>
       </Dialog.Footer>
     </form>
   </Dialog.Content>

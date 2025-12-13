@@ -1,5 +1,4 @@
 import { logger } from '$lib/utils/logger';
-import config from '$conf';
 import type { User } from '$lib/types';
 import speakeasy from 'speakeasy';
 import { UserDAO } from '$lib/server/db/user';
@@ -17,7 +16,6 @@ export const validateTOTP = async (secret: string, token: string) => {
 };
 
 export const registerTOTP = async (user: User) => {
-  const projectName = config.project_name;
   try {
     // Generate a new TOTP secret
     const secret = speakeasy.generateSecret({ length: 20 });
@@ -28,7 +26,7 @@ export const registerTOTP = async (user: User) => {
     // Generate QR Code url
     const otpAuthUrl =
       secret.otpauth_url ??
-      `otpauth://totp/${projectName}:${user.email}?secret=${secret.base32}&issuer=${projectName}`;
+      `otpauth://totp/outfitter:${user.email}?secret=${secret.base32}&issuer=outfitter`;
 
     return otpAuthUrl;
   } catch (error) {

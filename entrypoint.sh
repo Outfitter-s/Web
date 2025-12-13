@@ -8,12 +8,6 @@ if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 fi
 
-# Create required directories
-dirs="assets/clothing_item assets/outfits"
-for dir in $dirs; do
-  mkdir -p "$dir"
-done
-
 port=${POSTGRES_PORT:-5432}
 host=${POSTGRES_HOST:-db}
 retries=0
@@ -31,4 +25,4 @@ done
 bun run db:migrate
 
 # Launch prod server
-node build/index.js
+bun --bun run build/index.js

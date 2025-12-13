@@ -3,7 +3,7 @@
   import { logger } from '$lib/utils/logger';
   import { Toaster } from '$lib/components/Toast/toast';
   import { enhance } from '$app/forms';
-  import { t } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import { page } from '$app/state';
   import { ArrowRight } from '@lucide/svelte';
   import { Button } from '$lib/components/ui/button';
@@ -65,18 +65,18 @@
 <AlertDialog.Root bind:open={removePasskeyModalOpen}>
   <AlertDialog.Content>
     <AlertDialog.Header>
-      <AlertDialog.Title>{$t('account.tabs.passkey.remove.modal.title')}</AlertDialog.Title>
+      <AlertDialog.Title>{i18n.t('account.tabs.passkey.remove.modal.title')}</AlertDialog.Title>
       <AlertDialog.Description>
-        {$t('account.tabs.passkey.remove.modal.description')}
+        {i18n.t('account.tabs.passkey.remove.modal.description')}
       </AlertDialog.Description>
     </AlertDialog.Header>
     <AlertDialog.Footer>
       <AlertDialog.Cancel>
-        {$t('account.tabs.passkey.remove.modal.cancel')}</AlertDialog.Cancel
+        {i18n.t('account.tabs.passkey.remove.modal.cancel')}</AlertDialog.Cancel
       >
       <form action="?/deletePasskey" method="POST" class="w-fit" use:enhance>
         <AlertDialog.Action type="submit">
-          {$t('account.tabs.passkey.remove.modal.confirm')}
+          {i18n.t('account.tabs.passkey.remove.modal.confirm')}
           <ArrowRight class="size-4" />
         </AlertDialog.Action>
       </form>
@@ -86,10 +86,10 @@
 
 {#if user.passkey}
   <Button onclick={() => (removePasskeyModalOpen = true)}>
-    {$t('account.tabs.passkey.remove.button')}
+    {i18n.t('account.tabs.passkey.remove.button')}
   </Button>
 {:else}
   <Button onclick={registerPasskey}>
-    {$t('account.tabs.passkey.register.button')}
+    {i18n.t('account.tabs.passkey.register.button')}
   </Button>
 {/if}

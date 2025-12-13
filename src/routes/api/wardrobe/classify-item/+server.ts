@@ -6,14 +6,16 @@ import { ImageProcessor } from '$lib/server/imageProcessing';
 import sharp from 'sharp';
 
 const schema = z.object({
-  image: z.instanceof(File).refine((file) => file.size > 0, { message: 'Image file is required' }),
+  image: z
+    .instanceof(File)
+    .refine((file) => file.size > 0, { message: 'errors.clothing.item.missingImage' }),
 });
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
     const formData = Object.fromEntries(await request.formData());
     const form = schema.safeParse(formData);
-    if (!form.success) throw new Error(form.error.issues.map((i) => i.path[0]).join(', '));
+    if (!form.success) throw new Error(form.error.issues[0].message);
 
     const { image } = form.data;
     const imageBuffer = await sharp(await image.arrayBuffer())

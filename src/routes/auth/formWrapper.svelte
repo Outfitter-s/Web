@@ -3,11 +3,11 @@
   import type { SvelteHTMLElements } from 'svelte/elements';
   import FormImageDark from '$lib/assets/authForm/FormImageDark.jpg';
   import FormImageLight from '$lib/assets/authForm/FormImageLight.jpg';
-  import { mode } from 'mode-watcher';
   import * as Card from '$lib/components/ui/card';
   import Button from '$lib/components/ui/button/button.svelte';
-  import { t } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import { ArrowLeft } from '@lucide/svelte';
+  import Globals from '$lib/globals.svelte';
 
   interface Props {
     reverse?: boolean;
@@ -59,7 +59,7 @@
     <div class="animate-in zoom-in-0 absolute top-20 left-6 z-10">
       <Button variant="secondary" class="flex-row gap-2" href={back}>
         <ArrowLeft class="size-4" />
-        {$t('auth.formWrapper.back')}
+        {i18n.t('auth.formWrapper.back')}
       </Button>
     </div>
   {/if}
@@ -77,7 +77,7 @@
         reverse ? 'slide-in-from-left rounded-r-[60px]' : 'slide-in-from-right rounded-l-[60px]'
       )}
     >
-      {#if mode.current === 'dark'}
+      {#if Globals.theme.mode.effective === 'dark'}
         <img
           draggable="false"
           src={FormImageDark}
@@ -94,7 +94,7 @@
       {/if}
     </div>
   {:else}
-    {#if mode.current === 'dark'}
+    {#if Globals.theme.mode.effective === 'dark'}
       <img
         draggable="false"
         src={FormImageDark}
