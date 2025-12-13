@@ -1,0 +1,7 @@
+:root[data-theme='<THEME_NAME>'],
+html[data-theme='<THEME_NAME>'] {
+}
+
+:root[data-theme='<THEME_NAME>'].dark,
+html[data-theme='<THEME_NAME>'].dark {
+}

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { t } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import { pageTitle } from '.';
 
   interface Props {
@@ -11,10 +11,10 @@
 
   let {
     title = '',
-    description = $t('seo.defaults.description'),
+    description = i18n.t('seo.defaults.description'),
     image = '/favicon.ico',
   }: Props = $props();
-  let derivedTitle = $derived(title + ' | ' + $t('seo.titleSuffix'));
+  let derivedTitle = $derived(title + ' | ' + i18n.t('seo.titleSuffix'));
 
   $effect(() => {
     pageTitle.set(title);

@@ -1,28 +1,36 @@
-FROM oven/bun:alpine AS build
+FROM oven/bun:1-alpine AS base
 WORKDIR /app
 
-# Install dependencies
-COPY ./package.json .
-COPY ./bun.lock .
-RUN bun install
+# install dependencies into temp directory
+# this will cache them and speed up future builds
+FROM base AS install
+RUN mkdir -p /temp/dev
+COPY package.json bun.lock /temp/dev/
+RUN cd /temp/dev && bun install --frozen-lockfile
 
-# Copy the application code
+# install with --production (exclude devDependencies)
+RUN mkdir -p /temp/prod
+COPY package.json bun.lock /temp/prod/
+RUN cd /temp/prod && bun install --frozen-lockfile --production --ignore-scripts
+
+# copy node_modules from temp directory
+# then copy all (non-ignored) project files into the image
+FROM base AS prerelease
+COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
-
-# Build
-RUN bun run build
+ENV NODE_ENV=production
+RUN bun --bun run build
 
 # Prod server
-FROM oven/bun:alpine AS prod
+FROM base AS release
+RUN apk add --no-cache iputils
 WORKDIR /app
-COPY --from=build /app/build build/
-COPY --from=build /app/node_modules node_modules/
-COPY --from=build /app/package.json .
-COPY --from=build /app/entrypoint.sh .
-COPY --from=build /app/scripts scripts/
-COPY --from=build /app/sql sql/
+COPY --from=install /temp/prod/node_modules node_modules
+COPY --from=prerelease /app/package.json .
+COPY --from=prerelease /app/build build/
+COPY --from=prerelease /app/entrypoint.sh .
+COPY --from=prerelease /app/scripts scripts/
+COPY --from=prerelease /app/sql sql/
+# USER bun
 EXPOSE 4173
-ENV NODE_ENV=production
-ENV POSTGRES_HOST=db
-ENV REDIS_HOST=redis
 CMD [ "sh", "./entrypoint.sh" ]

@@ -1,81 +1,80 @@
-import { config } from './config';
-import { i18nLogger } from '$lib/utils/logger';
-import { readable } from 'svelte/store';
+import type enTranslations from './messages/en.json';
+import langs from './lang.json';
 
-type Required<T> = {
-  [P in keyof T]-?: T[P];
-};
+const loaders: Loader[] = Object.keys(langs).map((lang) => ({
+  locale: lang as keyof typeof langs,
+  loader: async () => (await import(`./messages/${lang}.json`)).default,
+  getDir: () => (['ar', 'he', 'fa', 'ur'].includes(lang) ? 'rtl' : 'ltr'),
+}));
 
 export type Dir = 'rtl' | 'ltr';
+export type LangCode = keyof typeof langs;
 
-interface Loader {
-  locale: string;
-  dir?: Dir;
-  loader: () => Promise<Record<string, unknown>>;
+interface Loader<T = Record<string, unknown>> {
+  locale: LangCode;
+  getDir: () => Dir;
+  loader: () => Promise<T>;
 }
-
-type InternalConfig = Required<Config>;
-
 export interface Config {
-  defaultLocale: string;
-  loaders: Loader[];
+  defaultLocale: LangCode;
 }
+
+// Helper type to flatten nested object keys with dot notation
+type FlattenKeys<T, P extends string = ''> = T extends object
+  ? {
+      [K in keyof T & string]: T[K] extends object ? FlattenKeys<T[K], `${P}${K}.`> : `${P}${K}`;
+    }[keyof T & string]
+  : never;
+
+// Create an i18n instance with proper typing
+type Translations = typeof enTranslations;
 
 export class i18n {
-  private _config: InternalConfig;
-  private _locale = $state<string>('en');
+  private _config: Config;
   private _currentPageTranslations = $state<Record<string, string>>({});
-  private _dir = $state<Dir>('ltr');
 
-  constructor(config: Config) {
-    this._config = this.normalizeConfig(config);
-    this._locale = config.defaultLocale;
-    i18nLogger.debug(`i18n initialized with default locale "${config.defaultLocale}"`);
+  locale = $state<LangCode>('en');
+  dir = $state<Dir>('ltr');
+
+  get loaders() {
+    return loaders;
   }
 
-  private normalizeConfig(config: Config): InternalConfig {
-    const defaultDir = 'ltr';
-    config.loaders.map((loader) => {
-      loader.dir ??= defaultDir;
-      return loader;
-    });
-
-    return config;
+  constructor(config: Config) {
+    this._config = config;
+    this.locale = config.defaultLocale;
+    console.debug(`i18n initialized with default locale "${config.defaultLocale}"`);
   }
 
   get config() {
     return this._config;
   }
 
-  get locale() {
-    return this._locale;
+  get locales() {
+    return loaders.map((loader) => loader.locale);
   }
 
-  get locales() {
-    return this._config.loaders.map((loader) => loader.locale);
+  getLocaleName(key: LangCode): string {
+    return langs[key];
   }
 
   get defaultLocale() {
     return this._config.defaultLocale;
   }
 
-  get dir() {
-    return this._dir;
-  }
-
-  setLocale(locale: string, hook?: boolean) {
+  setLocale = (locale: string, hook?: boolean) => {
     if (!locale) {
       return;
     }
-    i18nLogger.debug(`Setting locale to "${locale}"`);
+    console.debug(`Setting locale to "${locale}"`);
     if (this.isLocaleSupported(locale)) {
       this.loadTranslations(locale);
-      if (locale !== this._locale) {
-        this._locale = locale;
-        this._dir = config.loaders.find((l) => l.locale === locale)?.dir as Dir;
+      if (locale !== this.locale) {
+        this.locale = locale;
+        this.dir = loaders.find((l) => l.locale === locale)!.getDir();
       }
     } else {
-      i18nLogger.error(`Locale ${locale} not supported`);
+      console.error(`Locale ${locale} not supported`);
       throw new Error(`Locale ${locale} not supported`);
     }
 
@@ -87,10 +86,10 @@ export class i18n {
     document.cookie = `locale=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
     // Then set the new locale cookie
     document.cookie = `locale=${locale}; path=/; max-age=31536000`;
-  }
+  };
 
-  private isLocaleSupported(locale: string): boolean {
-    return this.locales.includes(locale);
+  private isLocaleSupported(locale: string): locale is LangCode {
+    return loaders.some((loader) => loader.locale === locale);
   }
 
   // Take a deeply nested object and flatten it into a single level object with dot notation
@@ -114,20 +113,20 @@ export class i18n {
   }
 
   // Load translations for the current locale in memory
-  async loadTranslations(locale: string) {
-    if (locale === this._locale && Object.keys(this._currentPageTranslations).length !== 0) return;
-    const loader = this._config.loaders.find((l) => l.locale === locale);
+  loadTranslations = async (locale: string) => {
+    if (locale === this.locale && Object.keys(this._currentPageTranslations).length !== 0) return;
+    const loader = loaders.find((l) => l.locale === locale);
     if (loader) {
       this._currentPageTranslations = this.flattenTranslations(await loader.loader());
     } else {
-      i18nLogger.error(`Loader for locale ${locale} not found`);
+      console.error(`Loader for locale ${locale} not found`);
       throw new Error(`Loader for locale ${locale} not found`);
     }
 
-    i18nLogger.debug(
+    console.debug(
       `${Object.keys(this._currentPageTranslations).length} "${locale}" translations loaded`
     );
-  }
+  };
 
   // Get the translations for the current page
   get translations() {
@@ -136,20 +135,18 @@ export class i18n {
 
   // Main client entrypoint to get a single translation.
   // Updates when the locale changes
-  get t() {
-    return readable((key: string, params?: Record<string, unknown>) => {
-      if (Object.keys(this._currentPageTranslations).length === 0) {
-        return key;
-      }
-      const translation = this._currentPageTranslations[key];
-      if (translation) {
-        return translation.replace(/\{{([a-zA-Z0-9]+)\}}/g, (_, index) =>
-          String(params?.[index] || '')
-        );
-      } else {
-        i18nLogger.warn(`Translation for key "${key}" not found`);
-      }
+  t = (key: FlattenKeys<Translations>, params?: Record<string, unknown>) => {
+    if (Object.keys(this._currentPageTranslations).length === 0) {
       return key;
-    });
-  }
+    }
+    const translation = this._currentPageTranslations[key];
+    if (translation) {
+      return translation.replace(/\{{([a-zA-Z0-9]+)\}}/g, (_, index) =>
+        String(params?.[index] || '')
+      );
+    } else {
+      console.warn(`Translation for key "${key}" not found`);
+    }
+    return key;
+  };
 }

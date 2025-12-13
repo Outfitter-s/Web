@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { generateAuthenticationOptions } from '@simplewebauthn/server';
 import type { RequestHandler } from './$types';
-import { Redis } from '$lib/server/db/caching';
+import { Caching } from '$lib/server/db/caching';
 import { rpID } from '$lib/server/db/passkey';
 
 export const GET: RequestHandler = async () => {
@@ -11,8 +11,7 @@ export const GET: RequestHandler = async () => {
     rpID: rpID,
     userVerification: 'preferred',
   });
-  await Redis.set(`authenticationChallenge:${UUID}`, opts.challenge, {
-    condition: undefined,
+  await Caching.set(`authenticationChallenge:${UUID}`, opts.challenge, {
     ttl: 10,
   });
 

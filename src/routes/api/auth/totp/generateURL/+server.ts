@@ -2,11 +2,9 @@ import { json } from '@sveltejs/kit';
 import { logger } from '$lib/utils/logger';
 import speakeasy from 'speakeasy';
 import type { RequestHandler } from './$types';
-import config from '$conf';
 
 export const GET: RequestHandler = async ({ locals }) => {
   const user = locals.user!;
-  const projectName = config.project_name;
   try {
     // Generate a new TOTP secret
     const secret = speakeasy.generateSecret({ length: 20 });
@@ -14,7 +12,7 @@ export const GET: RequestHandler = async ({ locals }) => {
     // Generate QR Code url
     const otpAuthUrl =
       secret.otpauth_url ??
-      `otpauth://totp/${projectName}:${user.email}?secret=${secret.base32}&issuer=${projectName}`;
+      `otpauth://totp/outfitter:${user.email}?secret=${secret.base32}&issuer=outfitter`;
 
     return json({ url: otpAuthUrl, secret: secret.base32 });
   } catch (error) {

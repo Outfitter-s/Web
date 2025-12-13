@@ -7,10 +7,15 @@
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
-  import { t, setLocale, locales, locale } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import { logger } from '$lib/utils/logger';
-  import { AlertCircle, CheckCheck, Moon, Sun } from '@lucide/svelte';
-  import { toggleMode } from 'mode-watcher';
+  import { AlertCircle, CheckCheck, LogOut, Monitor, Moon, Sun } from '@lucide/svelte';
+  import Theming, { availableModes, availableThemes, type Mode } from '$lib/theming/index.svelte';
+  import { capitalize } from '$lib/utils';
+  import { Hr } from '$lib/components';
+
+  let currentTheme = $state(page.data.theme);
+  let currentLocale = $state(i18n.locale);
 
   let formValues = $state({ username: page.data.user.username, email: page.data.user.email });
   let initialFormValues = $state({ ...formValues });
@@ -21,19 +26,12 @@
     controller: new AbortController(),
   });
   let updateEmailLoading = $state(false);
-  let value = $state(locale);
-  const triggerContent = $derived(locales.find((f) => f === value) ?? '');
-
-  $effect(() => {
-    if (value) {
-      setLocale(value);
-    }
-  });
 
   async function onUsernameInput() {
-    if (formValues.username !== initialFormValues.username) {
+    const newUsername = formValues.username.trim();
+    if (newUsername !== initialFormValues.username) {
       checkUsernameStatusData.loading = true;
-      checkUsernameStatusData.available = await isUsernameTakenFunc(formValues.username);
+      checkUsernameStatusData.available = await isUsernameTakenFunc(newUsername);
     } else {
       checkUsernameStatusData.available = false;
     }
@@ -72,6 +70,16 @@
   }
 </script>
 
+{#snippet modeIcon(mode: Mode)}
+  {#if mode === 'system'}
+    <Monitor class="size-full" />
+  {:else if mode === 'dark'}
+    <Moon class="size-full" />
+  {:else if mode === 'light'}
+    <Sun class="size-full" />
+  {/if}
+{/snippet}
+
 <form
   action="?/updateUsername"
   class="space-y-4"
@@ -85,7 +93,7 @@
   }}
 >
   <div class="space-y-2">
-    <Label for="username">{$t('auth.username')}</Label>
+    <Label for="username">{i18n.t('auth.username')}</Label>
     <Input name="username" bind:value={formValues.username} oninput={onUsernameInput} />
   </div>
 
@@ -93,11 +101,12 @@
     {#if checkUsernameStatusData.available}
       <Alert.Root variant="success">
         <AlertCircle />
-        <Alert.Title>{$t('account.tabs.general.changeUsername.alerts.available.title')}</Alert.Title
+        <Alert.Title
+          >{i18n.t('account.tabs.general.changeUsername.alerts.available.title')}</Alert.Title
         >
         <Alert.Description>
           <p>
-            {$t('account.tabs.general.changeUsername.alerts.available.description', {
+            {i18n.t('account.tabs.general.changeUsername.alerts.available.description', {
               username: formValues.username,
             })}
           </p>
@@ -106,10 +115,11 @@
     {:else}
       <Alert.Root variant="destructive">
         <CheckCheck />
-        <Alert.Title>{$t('account.tabs.general.changeUsername.alerts.taken.title')}</Alert.Title>
+        <Alert.Title>{i18n.t('account.tabs.general.changeUsername.alerts.taken.title')}</Alert.Title
+        >
         <Alert.Description>
           <p>
-            {$t('account.tabs.general.changeUsername.alerts.taken.description', {
+            {i18n.t('account.tabs.general.changeUsername.alerts.taken.description', {
               username: formValues.username,
             })}
           </p>
@@ -123,7 +133,7 @@
     disabled={checkUsernameStatusData.loading || formValues.username === initialFormValues.username}
     loading={checkUsernameStatusData.loading}
   >
-    {$t('account.tabs.general.changeUsername.title')}
+    {i18n.t('account.tabs.general.changeUsername.title')}
   </Button>
 </form>
 
@@ -140,7 +150,7 @@
   }}
 >
   <div class="space-y-2">
-    <Label for="email">{$t('auth.email')}</Label>
+    <Label for="email">{i18n.t('auth.email')}</Label>
     <Input name="email" bind:value={formValues.email} type="email" />
   </div>
 
@@ -149,31 +159,90 @@
     disabled={updateEmailLoading || formValues.email === initialFormValues.email}
     loading={updateEmailLoading}
   >
-    {$t('account.tabs.general.changeEmail.title')}
+    {i18n.t('account.tabs.general.changeEmail.title')}
   </Button>
 </form>
 
-<div class="space-y-2">
-  <label for="language">{$t('account.tabs.general.changeLang.title')}</label>
-  <Select.Root type="single" name="langue selected" bind:value>
-    <Select.Trigger class="w-[180px]">
-      {triggerContent}
-    </Select.Trigger>
-    <Select.Content>
-      {#each locales as loc}
-        <Select.Item value={loc} label={loc}></Select.Item>
-      {/each}
-    </Select.Content>
-  </Select.Root>
+<div class="grid grid-cols-3 gap-4">
+  <div class="flex flex-col gap-2">
+    <Label for="modeSelect">{i18n.t('account.tabs.general.theme.mode')}</Label>
+    <Select.Root
+      type="single"
+      name="modeSelect"
+      bind:value={currentTheme.mode.mode}
+      onValueChange={() => Theming.setMode(currentTheme.mode.mode, currentTheme.theme)}
+    >
+      <Select.Trigger class="w-[180px]">
+        <div class="flex items-center gap-2">
+          <span class="size-4">
+            {@render modeIcon(currentTheme.mode.mode)}
+          </span>
+          {capitalize(currentTheme.mode.mode)}
+        </div>
+      </Select.Trigger>
+      <Select.Content>
+        {#each availableModes as mode (mode)}
+          <Select.Item
+            value={mode}
+            disabled={mode === currentTheme.mode.mode}
+            class="flex items-center gap-2"
+          >
+            <span class="size-4">
+              {@render modeIcon(mode)}
+            </span>
+            {capitalize(mode)}
+          </Select.Item>
+        {/each}
+      </Select.Content>
+    </Select.Root>
+  </div>
+  <div class="flex flex-col gap-2">
+    <Label for="themeSelect">{i18n.t('account.tabs.general.theme.theme')}</Label>
+    <Select.Root
+      type="single"
+      name="themeSelect"
+      bind:value={currentTheme.theme}
+      onValueChange={() => Theming.setTheme(currentTheme.theme, currentTheme.mode.mode)}
+    >
+      <Select.Trigger class="w-[180px]">
+        {capitalize(currentTheme.theme)}
+      </Select.Trigger>
+      <Select.Content>
+        {#each availableThemes as theme (theme)}
+          <Select.Item value={theme} disabled={theme === currentTheme.theme}>
+            {capitalize(theme)}
+          </Select.Item>
+        {/each}
+      </Select.Content>
+    </Select.Root>
+  </div>
+  <div class="flex flex-col gap-2">
+    <Label for="langSelect">{i18n.t('account.tabs.general.changeLang.title')}</Label>
+    <Select.Root
+      type="single"
+      name="langSelect"
+      bind:value={currentLocale}
+      onValueChange={(val) => i18n.setLocale(val)}
+    >
+      <Select.Trigger class="w-[180px]">
+        {capitalize(i18n.getLocaleName(currentLocale))}
+      </Select.Trigger>
+      <Select.Content>
+        {#each i18n.locales as loc}
+          <Select.Item value={loc} disabled={loc === currentLocale}>
+            {capitalize(i18n.getLocaleName(loc))}
+          </Select.Item>
+        {/each}
+      </Select.Content>
+    </Select.Root>
+  </div>
 </div>
 
-<div class="space-y-2">
-  <Label>{$t('account.tabs.general.theme.title')}</Label>
-  <Button onclick={toggleMode} variant="outline" size="icon">
-    <Sun class="size-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-    <Moon
-      class="absolute size-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0"
-    />
-    <span class="sr-only">Toggle theme</span>
+<Hr class={{ container: 'mb-0' }} text={i18n.t('account.tabs.general.danger.title')} />
+
+<div class="grid grid-cols-3 gap-4">
+  <Button variant="destructive" href="/auth/log-out" class="gap-2">
+    <LogOut class="size-4" />
+    {i18n.t('account.tabs.general.logout')}
   </Button>
 </div>

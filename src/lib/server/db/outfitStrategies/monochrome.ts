@@ -1,5 +1,4 @@
-import type { ScoredClothingItem } from '$lib/types';
-import { NEUTRAL_COLORS } from './consts';
+import { type ScoredClothingItem, NEUTRAL_COLORS } from '$lib/types';
 
 export function monochromeScore(base: ScoredClothingItem, compare: ScoredClothingItem): number {
   if (!base.color || !compare.color) return 0;

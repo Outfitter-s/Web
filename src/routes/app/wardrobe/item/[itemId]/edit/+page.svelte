@@ -7,7 +7,7 @@
   import * as Select from '$lib/components/ui/select';
   import { Button } from '$lib/components/ui/button';
   import * as Field from '$lib/components/ui/field/index.js';
-  import { t } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import {
     clothingItemColors,
     clothingItemTypes,
@@ -43,7 +43,7 @@
       if (form?.error) {
         const fields = form.message.split(', ');
         const multiple = fields.length > 1;
-        const msg = $t('errors.clothing.item.requiredField', {
+        const msg = i18n.t('errors.clothing.item.requiredField', {
           field: form.message,
           s: multiple ? 's' : '',
           is: multiple ? 'are' : 'is',

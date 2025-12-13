@@ -1,7 +1,7 @@
-import { join } from 'path';
-import { readdir, readFile } from 'fs/promises';
+import { join } from 'node:path';
+import { readdir, readFile } from 'node:fs/promises';
 import chalk from 'chalk';
-import { TRANSLATIONS_FILES_DIR } from './shared.js';
+import { TRANSLATIONS_FILES_DIR } from './shared.ts';
 
 const GREEN = chalk.green;
 const RED = chalk.red;
@@ -19,8 +19,11 @@ export async function loadTranslationMaps() {
   return translationMaps;
 }
 
-export const flattenTranslations = (translations, prefix = '') => {
-  return Object.entries(translations).reduce((acc, [key, value]) => {
+export function flattenTranslations(
+  translations: Record<string, string>,
+  prefix = ''
+): Record<string, string> {
+  return Object.entries(translations).reduce((acc: Record<string, string>, [key, value]) => {
     if (typeof value === 'object' && value !== null) {
       return {
         ...acc,
@@ -30,7 +33,7 @@ export const flattenTranslations = (translations, prefix = '') => {
     acc[`${prefix}${key}`] = value;
     return acc;
   }, {});
-};
+}
 
 async function checkTranslations() {
   const hasErrors: { type: string; file: string; message: string }[] = [];

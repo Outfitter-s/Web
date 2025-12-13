@@ -3,8 +3,8 @@
   import * as Empty from '$lib/components/ui/empty';
   import { Button } from '$lib/components/ui/button';
   import { Shirt } from '@lucide/svelte';
-  import { outfitOpen, itemOpen } from '$lib/components/routes/app/nav';
-  import { t } from '$lib/i18n';
+  import { itemOpen } from '$lib/components/routes/app/nav';
+  import i18n from '$lib/i18n';
   import { page } from '$app/state';
 
   const sections = ['items', 'outfits'] as const;
@@ -25,14 +25,14 @@
       class={cn(
         'border-border bg-card rounded-lg border px-4 py-1 font-mono transition-all',
         activeSection === 'items' && 'bg-primary text-primary-foreground border-primary'
-      )}>{$t('wardrobe.itemList.items.title')}</button
+      )}>{i18n.t('wardrobe.itemList.items.title')}</button
     >
     <button
       onclick={() => changeSection('outfits')}
       class={cn(
         'border-border bg-card rounded-lg border px-4 py-1 font-mono transition-all',
         activeSection === 'outfits' && 'bg-primary text-primary-foreground border-primary'
-      )}>{$t('wardrobe.itemList.outfits.title')}</button
+      )}>{i18n.t('wardrobe.itemList.outfits.title')}</button
     >
   </div>
 
@@ -72,22 +72,25 @@
                   <Empty.Media variant="icon">
                     <Shirt />
                   </Empty.Media>
-                  <Empty.Title>{$t('wardrobe.itemList.items.empty.title')}</Empty.Title>
+                  <Empty.Title>{i18n.t('wardrobe.itemList.items.empty.title')}</Empty.Title>
                   <Empty.Description>
-                    {$t('wardrobe.itemList.items.empty.description')}
+                    {i18n.t('wardrobe.itemList.items.empty.description')}
                   </Empty.Description>
                 </Empty.Header>
                 <Empty.Content>
                   <Button onclick={() => ($itemOpen = true)}
-                    >{$t('wardrobe.itemList.items.empty.createButton')}</Button
+                    >{i18n.t('wardrobe.itemList.items.empty.createButton')}</Button
                   >
                 </Empty.Content>
               </Empty.Root>
             {/each}
           {:else if section === 'outfits'}
             {#each page.data.outfits as outfit}
-              <div class="border-border bg-card flex flex-col gap-2 rounded-lg border p-4">
-                <div class="font-mono text-lg font-semibold">{outfit.id}</div>
+              <div
+                class="border-border bg-card overflow-hidden rounded-lg border transition-transform grid grid-cols-2"
+              >
+                <!-- TODO: Add all outfit item's images -->
+                {outfit.id}
               </div>
             {:else}
               <Empty.Root>
@@ -95,14 +98,14 @@
                   <Empty.Media variant="icon">
                     <Shirt />
                   </Empty.Media>
-                  <Empty.Title>{$t('wardrobe.itemList.outfits.empty.title')}</Empty.Title>
+                  <Empty.Title>{i18n.t('wardrobe.itemList.outfits.empty.title')}</Empty.Title>
                   <Empty.Description>
-                    {$t('wardrobe.itemList.outfits.empty.description')}
+                    {i18n.t('wardrobe.itemList.outfits.empty.description')}
                   </Empty.Description>
                 </Empty.Header>
                 <Empty.Content>
-                  <Button onclick={() => ($outfitOpen = true)}
-                    >{$t('wardrobe.itemList.outfits.empty.createButton')}</Button
+                  <Button href="/app"
+                    >{i18n.t('wardrobe.itemList.outfits.empty.createButton')}</Button
                   >
                 </Empty.Content>
               </Empty.Root>

@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/private';
-import type { User } from '$lib/types';
+import type { User, UUID } from '$lib/types';
 import jwt from 'jsonwebtoken';
 import { UserDAO } from './db/user';
 import { logger } from '$lib/utils/logger';
@@ -14,7 +14,7 @@ async function auth(token: string): Promise<User | null> {
       jwt.verify(token, env.JWT_SECRET as string, async (err, decoded: unknown) => {
         if (err) return reject(err);
         try {
-          const user = await UserDAO.getUserById(decoded as string);
+          const user = await UserDAO.getUserById(decoded as UUID);
           resolve(user);
         } catch (error) {
           logger.error('User not found:', error);

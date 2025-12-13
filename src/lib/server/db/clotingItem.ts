@@ -1,8 +1,7 @@
 import type { ClothingItem, UUID } from '$lib/types';
 import pool from '.';
-import { unlink } from 'fs/promises';
+import { unlink, writeFile } from 'node:fs/promises';
 import { getEnv } from '../utils';
-import { writeFile } from 'fs/promises';
 
 export interface ClothingItemTable {
   id: UUID;
@@ -17,13 +16,13 @@ export interface ClothingItemTable {
 export class ClothingItemDAO {
   static convertToClothingItem(row: ClothingItemTable): ClothingItem {
     return {
-      id: row.id as UUID,
-      imageUrl: `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/clothing_item/${row.id}.png`,
-      type: row.type,
-      color: row.color,
-      description: row.description,
-      name: row.name,
-      createdAt: new Date(),
+      id: row.id,
+      imageUrl: `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/clothing_item/${String(row.id)}.png`,
+      type: row.type as ClothingItem['type'],
+      color: row.color as ClothingItem['color'],
+      description: String(row.description ?? ''),
+      name: String(row.name ?? ''),
+      createdAt: new Date(row.created_at),
       lastWornAt: null,
     };
   }

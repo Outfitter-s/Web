@@ -7,7 +7,7 @@ export async function resetPasswordRequest(email: User['email'], location: URL, 
 
   await sendMail({
     to: email,
-    subject: 'Reset your password',
+    subject: 'Reset your password', // TODO: i18n
     body: replacePlaceholders(await getEmailBody('resetPassword'), {
       email: email,
       url: url.href,

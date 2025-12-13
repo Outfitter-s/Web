@@ -5,17 +5,17 @@ services:
     container_name: outfiter_web
     restart: unless-stopped
     volumes:
-       - ./assets:/app/assets:Z
+      - ./assets:/app/assets:Z
     depends_on:
       - db
-      - redis
+      - valkey
       - image_processing
     env_file:
       - .env
     environment:
       - ORIGIN=http://localhost:4173
       - POSTGRES_HOST=db
-      - REDIS_HOST=redis
+      - VALKEY_HOST=valkey
     ports:
       - '4173:3000'
 
@@ -41,15 +41,15 @@ services:
       - pg_data:/var/lib/postgresql
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:Z
 
-  redis:
-    container_name: outfiter_redis
-    image: redis:alpine
+  valkey:
+    container_name: valkey
+    image: valkey/valkey
+    command: valkey-server --save 60 1 --loglevel debug
     ports:
-      - '6379:6379'
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
+      - '${VALKEY_PORT:-6379}:6379'
+    volumes:
+      - valkey-data:/data
 
 volumes:
   pg_data:
+  valkey-data:

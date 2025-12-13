@@ -1,6 +1,6 @@
 import type { Passkey, User, UUID } from '$lib/types';
 import pool from '.';
-import { Redis } from './caching';
+import { Caching } from './caching';
 import { PasskeyDAO } from './passkey';
 
 export interface UserTable {
@@ -43,21 +43,21 @@ export class UserDAO {
   }
 
   static async userExists(username: User['username']): Promise<boolean> {
-    const cachedValue = await Redis.get<boolean>(`userExists:${username}`);
+    const cachedValue = await Caching.get<boolean>(`userExists:${username}`);
     if (cachedValue) return cachedValue;
     const result = await pool.query('SELECT 1 FROM users WHERE username = $1', [username]);
     return result.rows.length > 0;
   }
 
   static async isEmailTaken(email: User['email']) {
-    const cachedValue = await Redis.get<boolean>(`emailTaken:${email}`);
+    const cachedValue = await Caching.get<boolean>(`emailTaken:${email}`);
     if (cachedValue) return cachedValue;
     const result = await pool.query('SELECT 1 FROM users WHERE email = $1', [email]);
     return result.rows.length > 0;
   }
 
   static async getUserById(id: User['id']): Promise<User> {
-    const cachedUser = await Redis.get<User>(`user:${id}`);
+    const cachedUser = await Caching.get<User>(`user:${id}`);
     if (cachedUser) return cachedUser;
 
     const userResult = await pool.query<UserTable>('SELECT * FROM users WHERE id = $1', [id]);
@@ -68,12 +68,12 @@ export class UserDAO {
       userResult.rows[0],
       await PasskeyDAO.getUserPasskey(userResult.rows[0].id)
     );
-    await Redis.set(`user:${user.id}`, user);
+    await Caching.set(`user:${user.id}`, user);
     return user;
   }
 
   static async getUserByUsername(username: User['username']): Promise<User> {
-    // const cachedUser = await Redis.get<User>(`user:${username}`);
+    // const cachedUser = await Caching.get<User>(`user:${username}`);
     // if (cachedUser) return cachedUser;
 
     const userResult = await pool.query<UserTable>('SELECT * FROM users WHERE username = $1', [
@@ -86,7 +86,7 @@ export class UserDAO {
       userResult.rows[0],
       await PasskeyDAO.getUserPasskey(userResult.rows[0].id)
     );
-    await Redis.set(`user:${username}`, user);
+    await Caching.set(`user:${username}`, user);
     return user;
   }
 
@@ -124,7 +124,7 @@ export class UserDAO {
     if (result.rowCount === 0) {
       throw new Error('errors.auth.setTOTPSecret');
     }
-    await Redis.del(`user:${userId}`);
+    await Caching.del(`user:${userId}`);
   }
 
   static async unlinkTOTP(userId: User['id']): Promise<void> {
@@ -132,14 +132,14 @@ export class UserDAO {
     if (result.rowCount === 0) {
       throw new Error('errors.auth.unlinkTOTP');
     }
-    await Redis.del(`user:${userId}`);
+    await Caching.del(`user:${userId}`);
   }
 
   static async requestPasswordReset(email: User['email']): Promise<string> {
     const exists = await UserDAO.isEmailTaken(email);
     if (!exists) throw new Error('errors.auth.passwordReset.noAccountWithEmail');
     const id = crypto.randomUUID();
-    await Redis.set(`passwordReset:${id}`, email, { ttl: 60 * 5 }); // 5 min expiry
+    await Caching.set(`passwordReset:${id}`, email, { ttl: 60 * 5 }); // 5 min expiry
 
     return id;
   }
@@ -175,10 +175,10 @@ export class UserDAO {
     if (result.rowCount === 0) {
       throw new Error('errors.auth.updateUser');
     }
-    await Redis.del(`user:${id}`);
+    await Caching.del(`user:${id}`);
     if (updates.username) {
-      await Redis.del(`user:${updates.username}`);
-      await Redis.del(`userExists:${updates.username}`);
+      await Caching.del(`user:${updates.username}`);
+      await Caching.del(`userExists:${updates.username}`);
     }
   }
 }

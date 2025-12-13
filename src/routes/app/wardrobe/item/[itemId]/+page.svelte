@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { locale } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import { page } from '$app/state';
   import type { ClothingItem } from '$lib/types';
   import { capitalize } from '$lib/utils';
@@ -19,7 +19,7 @@
   });
 
   const formatDate = (date: Date) => {
-    return new DateFormatter(locale, { day: '2-digit', month: 'short' }).format(date);
+    return new DateFormatter(i18n.locale, { day: '2-digit', month: 'short' }).format(date);
   };
 </script>
 

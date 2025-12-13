@@ -7,5 +7,4 @@ export { colorForUVScore } from './colorForUV';
 export { tempScore } from './temp';
 export { rainScore } from './rain';
 
-export * from './consts';
 export * from './utils';

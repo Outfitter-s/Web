@@ -6,7 +6,7 @@
   import { Checkbox } from '$lib/components/ui/checkbox';
   import { Input } from '$lib/components/ui/input';
   import { Label } from '$lib/components/ui/label';
-  import { t } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import { logger } from '$lib/utils/logger';
   import FormWrapper from '../formWrapper.svelte';
   import type { PageProps } from './$types';
@@ -22,7 +22,7 @@
   });
 </script>
 
-<SEO title={"Sign up"} />
+<SEO title={'Sign up'} />
 
 <FormWrapper>
   <form
@@ -38,34 +38,34 @@
     }}
   >
     <img src="/logo.png" class="size-8 object-contain" alt="" />
-    <h1 class="mb-2 text-2xl font-semibold">{$t('auth.signIn.title')}</h1>
+    <h1 class="mb-2 text-2xl font-semibold">{i18n.t('auth.signIn.title')}</h1>
     <p class="text-muted-foreground text-base">
-      {$t('auth.signIn.alreadyHaveAnAccount.text')}
+      {i18n.t('auth.signIn.alreadyHaveAnAccount.text')}
       <a href="/auth/log-in" class="text-primary font-medium"
-        >{$t('auth.signIn.alreadyHaveAnAccount.cta')}</a
+        >{i18n.t('auth.signIn.alreadyHaveAnAccount.cta')}</a
       >
     </p>
     <div class="space-y-2">
-      <Label for="email">{$t('auth.email')}</Label>
+      <Label for="email">{i18n.t('auth.email')}</Label>
       <Input name="email" />
     </div>
     <div class="space-y-2">
-      <Label for="username">{$t('auth.username')}</Label>
+      <Label for="username">{i18n.t('auth.username')}</Label>
       <Input name="username" />
     </div>
     <div class="space-y-2">
-      <Label>{$t('auth.password')}</Label>
+      <Label>{i18n.t('auth.password')}</Label>
       <Input name="password" type="password" />
     </div>
     <div class="flex flex-row items-center justify-between">
       <div class="flex flex-row items-center gap-1">
         <Checkbox id="rememberMe" name="rememberMe" checked />
-        <Label for="rememberMe">{$t('auth.rememberMe')}</Label>
+        <Label for="rememberMe">{i18n.t('auth.rememberMe')}</Label>
       </div>
       <a href="/auth/forgot-password" class="text-primary text-sm font-medium"
-        >{$t('auth.forgotPasswordKeyword')}</a
+        >{i18n.t('auth.forgotPasswordKeyword')}</a
       >
     </div>
-    <Button type="submit" {loading}>{$t('auth.submit')}</Button>
+    <Button type="submit" {loading}>{i18n.t('auth.submit')}</Button>
   </form>
 </FormWrapper>

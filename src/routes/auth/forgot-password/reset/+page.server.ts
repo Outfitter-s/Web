@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import { Redis } from '$lib/server/db/caching';
+import { Caching } from '$lib/server/db/caching';
 import { logger } from '$lib/utils/logger';
 import { UserDAO } from '$lib/server/db/user';
 import bcrypt from 'bcryptjs';
@@ -14,7 +14,7 @@ export const load = (async ({ url }) => {
 
     const token = searchParams.get('token') as string;
 
-    const email = await Redis.get<string>(`passwordReset:${token}`);
+    const email = await Caching.get<string>(`passwordReset:${token}`);
     if (!email) throw new Error('errors.auth.passwordReset.expiredToken');
     return { email, token };
   } catch (e) {
@@ -37,7 +37,7 @@ export const actions: Actions = {
       if (!form.success) throw new Error(form.error.issues[0].message);
 
       const { password, confirmPassword, token } = form.data;
-      const email = await Redis.get<string>(`passwordReset:${token}`);
+      const email = await Caching.get<string>(`passwordReset:${token}`);
       if (!email) throw new Error('errors.auth.passwordReset.expiredToken');
 
       if (password !== confirmPassword)

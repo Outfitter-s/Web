@@ -1,10 +1,9 @@
 <script lang="ts">
   import { page } from '$app/state';
   import { Button } from '$lib/components/ui/button';
-  import { t } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import { Home, Plus, Shirt, User } from '@lucide/svelte';
-  import AddButton from '$lib/components/routes/app/nav/addButton.svelte';
-  import { openState } from '$lib/components/routes/app/nav';
+  import { itemOpen } from '$lib/components/routes/app/nav';
   import { slide } from 'svelte/transition';
 
   interface Link {
@@ -35,13 +34,11 @@
   // };
 </script>
 
-<AddButton />
-
 {#snippet entry(link: Link)}
   {#if link.href == 'add-item'}
     <Button
       variant="none"
-      onclick={() => ($openState = !$openState)}
+      onclick={() => ($itemOpen = !$itemOpen)}
       class=" border-border bg-card z-10 mx-auto -mt-6 size-14 rounded-full border p-2 shadow-xl"
     >
       <Plus class="size-full" />
@@ -57,7 +54,7 @@
         <svelte:component this={link.icon} class="z-10 size-5" />
       {:else}
         <span class="z-10 ltr:ml-2 rtl:mr-2" transition:slide={{ duration: 300, axis: 'x' }}
-          >{$t(link.text)}</span
+          >{i18n.t(link.text)}</span
         >
       {/if}
     </Button>

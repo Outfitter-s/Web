@@ -3,7 +3,7 @@
   import * as Card from '$lib/components/ui/card';
   import Passkey from './passkey.svelte';
   import Totp from './totp.svelte';
-  import { t } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import Password from './password.svelte';
   import General from './general.svelte';
 
@@ -38,15 +38,15 @@
 <Tabs.Root value={entries[0].name} class="mx-auto flex w-full max-w-[1000px] flex-col gap-4 p-2">
   <Tabs.List class="mx-auto">
     {#each entries as e (e.name)}
-      <Tabs.Trigger value={e.name}>{$t(e.title)}</Tabs.Trigger>
+      <Tabs.Trigger value={e.name}>{i18n.t(e.title)}</Tabs.Trigger>
     {/each}
   </Tabs.List>
   {#each entries as e (e.name)}
     <Tabs.Content value={e.name}>
       <Card.Root>
         <Card.Header>
-          <Card.Title>{$t(e.title)}</Card.Title>
-          <Card.Description>{$t(e.description)}</Card.Description>
+          <Card.Title>{i18n.t(e.title)}</Card.Title>
+          <Card.Description>{i18n.t(e.description)}</Card.Description>
         </Card.Header>
         <Card.Content class="grid gap-6">
           <svelte:component this={e.component} />

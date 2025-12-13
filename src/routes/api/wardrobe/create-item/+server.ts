@@ -10,7 +10,9 @@ const schema = z.object({
   description: z.string().max(500).optional(),
   type: z.enum(clothingItemTypes),
   color: z.enum(clothingItemColors),
-  image: z.instanceof(File).refine((file) => file.size > 0, { message: 'Image file is required' }),
+  image: z
+    .instanceof(File)
+    .refine((file) => file.size > 0, { message: 'errors.clothing.item.missingImage' }),
 });
 
 export const POST: RequestHandler = async ({ locals, request }) => {
@@ -18,7 +20,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     const user = locals.user!;
     const formData = Object.fromEntries(await request.formData());
     const form = schema.safeParse(formData);
-    if (!form.success) throw new Error(form.error.issues.map((i) => i.path[0]).join(', '));
+    if (!form.success) throw new Error(form.error.issues[0].message);
 
     const { name, description, type, color, image } = form.data;
 

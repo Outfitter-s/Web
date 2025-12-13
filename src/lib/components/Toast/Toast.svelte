@@ -6,7 +6,7 @@
   import { onMount } from 'svelte';
   import type { ToastType } from './toast';
   import { Toaster, type Toast } from './toast';
-  import { t as translate } from '$lib/i18n';
+  import i18n from '$lib/i18n';
   import { Button } from '$lib/components/ui/button';
 
   interface Props {
@@ -64,7 +64,7 @@
 
       <!-- Message -->
       <p class="font-base mt-0.5 grow text-sm text-wrap">
-        {$translate(t.message)}
+        {i18n.t(t.message)}
       </p>
 
       <!-- Close button -->
@@ -87,7 +87,7 @@
               variant={action.variant || 'default'}
               onclick={() => Toaster.remove(t.id)}
             >
-              {$translate(action.label)}
+              {i18n.t(action.label)}
             </Button>
           {:else if action.type === 'button'}
             <Button
@@ -98,7 +98,7 @@
                 Toaster.remove(t.id);
               }}
             >
-              {$translate(action.label)}
+              {i18n.t(action.label)}
             </Button>
           {/if}
         {/each}
