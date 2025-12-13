@@ -28,6 +28,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: | 
+          tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/outfitter_web:latest
             ${{ vars.DOCKERHUB_USERNAME }}/outfitter_web:${{ github.ref_name }}

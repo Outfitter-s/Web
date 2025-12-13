@@ -86,8 +86,11 @@
             {/each}
           {:else if section === 'outfits'}
             {#each page.data.outfits as outfit}
-              <div class="border-border bg-card flex flex-col gap-2 rounded-lg border p-4">
-                <div class="font-mono text-lg font-semibold">{outfit.id}</div>
+              <div
+                class="border-border bg-card overflow-hidden rounded-lg border transition-transform grid grid-cols-2"
+              >
+                <!-- TODO: Add all outfit item's images -->
+                {outfit.id}
               </div>
             {:else}
               <Empty.Root>

@@ -5,7 +5,7 @@ services:
     container_name: outfiter_web
     restart: unless-stopped
     volumes:
-       - ./assets:/app/assets:Z
+      - ./assets:/app/assets:Z
     depends_on:
       - db
       - valkey

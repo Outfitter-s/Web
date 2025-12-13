@@ -1,6 +1,12 @@
-import type { ClothingItemColor, ScoredClothingItem, ClothingItemType } from '$lib/types';
-import { TEMP_IDEALS, type ByType } from './consts';
-import { COLOR_WHEEL, NEUTRAL_COLORS } from './consts';
+import {
+  type ClothingItemColor,
+  type ScoredClothingItem,
+  type ClothingItemType,
+  TEMP_IDEALS,
+  type ByType,
+  COLOR_WHEEL,
+  NEUTRAL_COLORS,
+} from '$lib/types';
 
 export function randIntInclusive(min: number, max: number): number {
   min = Math.ceil(min);

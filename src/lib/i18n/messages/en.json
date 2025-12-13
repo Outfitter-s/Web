@@ -295,11 +295,24 @@
       }
     },
     "outfitGeneration": {
+      "initialQuestions": {
+        "style": {
+          "question": "What style are you going for today?",
+          "options": {
+            "default": "Let us choose",
+            "comfort": "Comfort",
+            "new": "New",
+            "style": "Stylish",
+            "formal": "Formal"
+          }
+        }
+      },
       "swiper": {
         "loadingText": "Generating your outfits...",
         "noMoreCards": {
           "title": "No more outfits",
-          "subTitle": "Please come back later."
+          "subTitle": "Please come back later.",
+          "retryButton": "Retry generation"
         }
       },
       "chooseOutfitModal": {

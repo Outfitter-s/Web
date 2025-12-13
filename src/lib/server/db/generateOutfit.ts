@@ -1,4 +1,13 @@
-import type { Outfit, ClothingItemType, UUID, ScoredClothingItem, Weather } from '$lib/types';
+import {
+  type Outfit,
+  type ClothingItemType,
+  type UUID,
+  type ScoredClothingItem,
+  type Weather,
+  CLOTHING_STYLES,
+  PROFILE_WEIGHTS,
+  type ClothingStyles,
+} from '$lib/types';
 import { ClothingItemDAO } from './clotingItem';
 import { selectRandomAccessories } from './outfitStrategies/utils';
 import {
@@ -12,24 +21,27 @@ import {
   triadicScore,
 } from './outfitStrategies';
 
-import { PROFILE_WEIGHTS } from './outfitStrategies/consts';
-
 type OutfitWithoutId = Omit<Outfit, 'id'>;
 
 export async function generateOutfits(
   userId: UUID,
   weather: Weather,
-  count: number
+  count: number,
+  { style = CLOTHING_STYLES[0] }: { style?: ClothingStyles } = {}
 ): Promise<OutfitWithoutId[]> {
   const outfits: OutfitWithoutId[] = [];
   for (let i = 0; i < count; i++) {
-    const outfit = await generateOutfit(userId, weather);
+    const outfit = await generateOutfit(userId, weather, { style });
     outfits.push(outfit);
   }
   return outfits;
 }
 
-export async function generateOutfit(userId: UUID, weather: Weather): Promise<OutfitWithoutId> {
+export async function generateOutfit(
+  userId: UUID,
+  weather: Weather,
+  { style = CLOTHING_STYLES[0] }: { style: ClothingStyles }
+): Promise<OutfitWithoutId> {
   const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
   const chooseBetween = 3;
 
@@ -54,7 +66,7 @@ export async function generateOutfit(userId: UUID, weather: Weather): Promise<Ou
     top.push(tops[randomIndex]);
   }
 
-  const weights = PROFILE_WEIGHTS['default'];
+  const weights = PROFILE_WEIGHTS[style];
 
   // For loop over each item
   for (const item of scored) {
