@@ -70,7 +70,7 @@ export async function generateOutfit(
 
   // For loop over each item
   for (const item of scored) {
-    // Use scoring functions between chosen top and actuel item
+    // Use scoring functions between choosen top and actuel item
     item.score += lastWornScore(item) * weights.lastWorn;
     item.score += monochromeScore(top[0], item);
     item.score += complementaryScore(top[0], item);

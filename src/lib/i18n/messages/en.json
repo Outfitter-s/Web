@@ -51,7 +51,7 @@
         "expiredToken": "The request expired!",
         "passwordsDontMatch": "Passwords does not match!",
         "noAccountWithEmail": "No account associated with this e-mail!",
-        "samePassword": "Wrong current password!"
+        "wrongCurrentPassword": "Wrong current password!"
       }
     },
     "server": {

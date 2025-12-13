@@ -72,7 +72,7 @@ export const actions: Actions = {
 
       // Check if the password is the same as the current one
       if (!(await bcrypt.compare(currentPassword, user.passwordHash)))
-        throw new Error('errors.auth.passwordReset.samePassword');
+        throw new Error('errors.auth.passwordReset.wrongCurrentPassword');
 
       // Hash password
       const salt = await bcrypt.genSalt(10);

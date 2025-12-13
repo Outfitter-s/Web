@@ -10,7 +10,7 @@ const config = {
       $conf: './config.json',
     },
   },
-  exexperimental: {
+  experimental: {
     async: true,
   },
 };

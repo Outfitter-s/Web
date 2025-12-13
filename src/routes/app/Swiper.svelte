@@ -81,7 +81,7 @@
     style: {
       options: [...CLOTHING_STYLES],
     },
-  }
+  };
   let multiStageAnswers = $state<{ open: boolean; currentIndex: number; answers: Record<keyof typeof multistageQuestions, string | null>}>({ open: false, currentIndex: 0, answers: {
     style: null,
   } });
