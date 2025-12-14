@@ -1,9 +1,12 @@
 <script lang="ts">
   import { page } from '$app/state';
+  import { SEO } from '$lib/components';
   import Button from '$lib/components/ui/button/button.svelte';
   import ArrowRight from '@lucide/svelte/icons/arrow-right';
   import ChevronRight from '@lucide/svelte/icons/chevron-right';
 </script>
+
+<SEO title="seo.homePage.title" description="seo.homePage.description" />
 
 <main class="overflow-hidden">
   <div class="absolute inset-0 isolate hidden opacity-65 contain-strict lg:block">

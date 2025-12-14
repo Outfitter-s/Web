@@ -68,8 +68,7 @@
   }
 </script>
 
-<SEO title="Log in" />
-<!-- TODO: i18n -->
+<SEO title="seo.auth.logIn.title" description="seo.auth.logIn.description" />
 
 <Dialog.Root bind:open={totpModalOpen}>
   <Dialog.Content>

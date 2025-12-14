@@ -7,6 +7,7 @@
   import { Calendar, Palette, Shirt, Pencil } from '@lucide/svelte';
   import ColorDot from '$lib/components/colorDot.svelte';
   import { Button } from '$lib/components/ui/button';
+  import { SEO } from '$lib/components';
 
   let itemId = $derived<string>(page.params.itemId as string);
   let items = $derived<ClothingItem[]>(page.data.items);
@@ -23,13 +24,15 @@
   };
 </script>
 
+<SEO title="seo.wardrobe.item.title" description="seo.wardrobe.item.description" />
+
 {#if item}
   <div class="p-2">
     <div class="bg-card border-border flex flex-col overflow-hidden rounded-lg border lg:flex-row">
       <!-- Image -->
       <img
         src={item.imageUrl}
-        class="aspect-square max-h-[800px] w-full object-cover object-center lg:w-1/2"
+        class="aspect-square max-h-200 w-full object-cover object-center lg:w-1/2"
         alt=""
       />
 

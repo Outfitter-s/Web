@@ -1,36 +1,32 @@
 <script lang="ts">
   import { page } from '$app/state';
   import i18n from '$lib/i18n';
-  import { pageTitle } from '.';
 
   interface Props {
-    title?: string;
-    description?: string;
+    title: Parameters<typeof i18n.t>[0];
+    description?: Parameters<typeof i18n.t>[0];
     image?: string;
   }
 
   let {
-    title = '',
-    description = i18n.t('seo.defaults.description'),
+    title = 'seo.defaults.title',
+    description = 'seo.defaults.description',
     image = '/favicon.ico',
   }: Props = $props();
-  let derivedTitle = $derived(title + ' | ' + i18n.t('seo.titleSuffix'));
-
-  $effect(() => {
-    pageTitle.set(title);
-  });
+  let derivedTitle = $derived(i18n.t(title as any) + ' | ' + i18n.t('seo.titleSuffix'));
+  let derivedDescription = $derived(i18n.t(description as any));
 </script>
 
 <svelte:head>
   <!-- Title -->
-  <title>{title}</title>
+  <title>{derivedTitle}</title>
   <meta property="og:title" content={derivedTitle} />
   <meta name="twitter:title" content={derivedTitle} />
 
   <!-- Description -->
-  <meta name="description" content={description} />
-  <meta property="og:description" content={description} />
-  <meta name="twitter:description" content={description} />
+  <meta name="description" content={derivedDescription} />
+  <meta property="og:description" content={derivedDescription} />
+  <meta name="twitter:description" content={derivedDescription} />
 
   <!-- Image -->
   <meta property="og:image" content={image} />

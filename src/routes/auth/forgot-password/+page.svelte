@@ -22,8 +22,7 @@
   });
 </script>
 
-<SEO title="Forgot password" />
-<!-- TODO: i18n -->
+<SEO title="seo.auth.forgotPassword.title" description="seo.auth.forgotPassword.description" />
 
 <FormWrapper reverse={true} back="/auth/log-in">
   <div class="flex w-full flex-col space-y-8">

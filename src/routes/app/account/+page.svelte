@@ -6,8 +6,17 @@
   import i18n from '$lib/i18n';
   import Password from './password.svelte';
   import General from './general.svelte';
+  import { SEO } from '$lib/components';
+  import type { Component } from 'svelte';
 
-  const entries = [
+  interface Entry {
+    name: string;
+    component: Component;
+    title: Parameters<typeof i18n.t>[0];
+    description: Parameters<typeof i18n.t>[0];
+  }
+
+  const entries: Entry[] = [
     {
       name: 'General',
       component: General,
@@ -35,7 +44,9 @@
   ];
 </script>
 
-<Tabs.Root value={entries[0].name} class="mx-auto flex w-full max-w-[1000px] flex-col gap-4 p-2">
+<SEO title={'seo.account.settings.title'} description="seo.account.settings.description" />
+
+<Tabs.Root value={entries[0].name} class="mx-auto flex w-full max-w-250 flex-col gap-4 p-2">
   <Tabs.List class="mx-auto">
     {#each entries as e (e.name)}
       <Tabs.Trigger value={e.name}>{i18n.t(e.title)}</Tabs.Trigger>

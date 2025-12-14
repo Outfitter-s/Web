@@ -2,7 +2,6 @@
   import { SEO } from '$lib/components';
   import Swiper from './Swiper.svelte';
   import Timeline from './Timeline.svelte';
-  import i18n from '$lib/i18n';
   import type { Outfit } from '$lib/types';
   import { DateUtils } from '$lib/utils';
   import { page } from '$app/state';
@@ -12,7 +11,7 @@
   );
 </script>
 
-<SEO title={i18n.t('seo.homePage.title')} />
+<SEO title="seo.homePage.title" description="seo.homePage.description" />
 
 <!-- If the user has not chosen an outfit for today, make it choose on before showing the timeline -->
 {#if !chosenOutfit}

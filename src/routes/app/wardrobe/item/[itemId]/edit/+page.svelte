@@ -1,4 +1,5 @@
 <script lang="ts">
+  // TODO: Re-do all of this sh*te
   import { enhance } from '$app/forms';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
@@ -6,7 +7,7 @@
   import Input from '$lib/components/ui/input/input.svelte';
   import * as Select from '$lib/components/ui/select';
   import { Button } from '$lib/components/ui/button';
-  import * as Field from '$lib/components/ui/field/index.js';
+  import * as Field from '$lib/components/ui/field';
   import i18n from '$lib/i18n';
   import {
     clothingItemColors,
@@ -17,6 +18,7 @@
   } from '$lib/types';
   import { logger } from '$lib/utils/logger';
   import type { PageProps } from './$types';
+  import { SEO } from '$lib/components';
 
   let { form }: PageProps = $props();
   let itemId = $derived<string>(page.params.itemId as string);
@@ -59,6 +61,8 @@
 
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 </script>
+
+<SEO title="seo.wardrobe.item.edit.title" description="seo.wardrobe.item.edit.description" />
 
 {#if item}
   <div class="mx-auto w-full max-w-[650px] p-2">

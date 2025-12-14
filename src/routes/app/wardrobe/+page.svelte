@@ -6,6 +6,7 @@
   import { itemOpen } from '$lib/components/routes/app/nav';
   import i18n from '$lib/i18n';
   import { page } from '$app/state';
+  import { SEO } from '$lib/components';
 
   const sections = ['items', 'outfits'] as const;
   type Section = (typeof sections)[number];
@@ -16,6 +17,8 @@
     activeSection = section;
   };
 </script>
+
+<SEO title="seo.wardrobe.title" description="seo.wardrobe.description" />
 
 <div class="flex grow flex-col">
   <!-- Header -->
