@@ -12,14 +12,6 @@
 
   let { card, onSwiped, index }: Props = $props();
 
-  const outfitParts = $derived(
-    [
-      card.outfit.top && card.outfit.top.length > 0,
-      !!card.outfit.bottom,
-      !!card.outfit.shoes,
-      card.outfit.accessories && card.outfit.accessories.length > 0,
-    ].filter(Boolean).length
-  );
   let move = $state({
     startX: 0,
     startY: 0,
@@ -118,8 +110,9 @@
   onmouseup={onMouseUp}
   onmouseleave={onMouseLeave}
   style="transform: translate(calc(-50% + {move.currentX}px), calc(-50% + {move.currentY}px)) rotate({move.currentX /
-    20}deg); transition: {move.isDragging ? 'none' : 'transform 0.3s ease'}; z-index: {100 -
-    index}; transition: {move.isSwiped ? 'transform 0.3s ease-out' : ''};"
+    20}deg); transition: {move.isDragging || !move.isSwiped
+    ? 'none'
+    : 'transform 0.3s ease'}; z-index: {100 - index};"
 >
   <div
     class={cn(
@@ -131,73 +124,14 @@
       {#if !imageLoaded}
         <div class="bg-accent absolute inset-0 -z-10 aspect-square animate-pulse"></div>
       {/if}
-      <div
-        class="bg-card grid h-[700px] min-h-[500px] gap-2 overflow-hidden p-4"
-        style="grid-template-rows: repeat({outfitParts}, 1fr);"
-      >
-        {#if card.outfit.top && card.outfit.top.length > 0}
-          <div class="flex h-full flex-col gap-1 overflow-hidden">
-            <div
-              class="grid h-full"
-              style="grid-template-columns: repeat({card.outfit.top.length}, 1fr); gap: 0.5rem;"
-            >
-              {#each card.outfit.top as topItem}
-                <div class="flex h-full w-full flex-col items-center overflow-hidden">
-                  <img
-                    src={topItem.imageUrl}
-                    alt={topItem.name}
-                    class="h-full w-auto rounded-lg object-contain"
-                    style="max-height: 100%; max-width: 100%;"
-                  />
-                  <!-- <span>{topItem.name}</span> -->
-                </div>
-              {/each}
-            </div>
-          </div>
-        {/if}
-        {#if card.outfit.bottom}
-          <div class="flex h-full w-full flex-col items-center overflow-hidden">
-            <img
-              src={card.outfit.bottom.imageUrl}
-              alt={card.outfit.bottom.name}
-              class="h-full w-auto rounded-lg object-contain"
-              style="max-height: 100%;"
-            />
-            <!-- <span>{card.outfit.bottom.name}</span> -->
-          </div>
-        {/if}
-        {#if card.outfit.accessories && card.outfit.accessories.length > 0}
-          <div class="flex h-full flex-col gap-1 overflow-hidden">
-            <div
-              class="grid h-full"
-              style="grid-template-columns: repeat({card.outfit.accessories
-                .length}, 1fr); gap: 0.5rem;"
-            >
-              {#each card.outfit.accessories as accessory}
-                <div class="flex h-full w-full flex-col items-center overflow-hidden">
-                  <img
-                    src={accessory.imageUrl}
-                    alt={accessory.name}
-                    class="h-full w-auto rounded-lg object-contain"
-                    style="max-height: 100%; max-width: 100%;"
-                  />
-                  <!-- <span class="text-xs">{accessory.name}</span> -->
-                </div>
-              {/each}
-            </div>
-          </div>
-        {/if}
-        {#if card.outfit.shoes}
-          <div class="flex h-full w-full flex-col items-center overflow-hidden">
-            <img
-              src={card.outfit.shoes.imageUrl}
-              alt={card.outfit.shoes.name}
-              class="h-full w-auto rounded-lg object-contain"
-              style="max-height: 100%;"
-            />
-            <!-- <span>{card.outfit.shoes.name}</span> -->
-          </div>
-        {/if}
+      <div class="bg-card grid gap-2 overflow-hidden p-4 grid-cols-2">
+        {#each card.outfit.items as items}
+          <img
+            src={items.imageUrl}
+            alt={items.name}
+            class="h-full w-auto rounded-lg object-contain size-full"
+          />
+        {/each}
       </div>
     </div>
     <div

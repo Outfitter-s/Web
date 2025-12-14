@@ -14,7 +14,7 @@
   });
 </script>
 
-<SEO title={i18n.t('seo.defaults.title')} description={i18n.t('seo.defaults.description')} />
+<SEO title="seo.defaults.title" description="seo.defaults.description" />
 
 <Toaster />
 

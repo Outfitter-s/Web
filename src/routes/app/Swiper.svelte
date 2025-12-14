@@ -13,6 +13,7 @@
   import { cn } from '$lib/utils';
   import { fade } from 'svelte/transition';
   import { onMount } from 'svelte';
+  import { invalidateAll } from '$app/navigation';
 
   const cId = $props.id(); // Deterministic client ID for outfit generation
 
@@ -158,6 +159,7 @@
         startVelocity: 45,
       });
       acceptedCard = { open: false, card: null };
+      await invalidateAll();
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       logger.error('Error saving outfit:', msg);

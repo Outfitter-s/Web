@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types';
 import { logger } from '$lib/utils/logger';
-import { ClothingItemDAO } from '$lib/server/db/clotingItem';
+import { ClothingItemDAO } from '$lib/server/db/clothingItem';
 import { clothingItemColors, clothingItemTypes } from '$lib/types';
 import z from 'zod';
 import { json } from '@sveltejs/kit';

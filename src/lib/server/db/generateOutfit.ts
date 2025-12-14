@@ -1,14 +1,14 @@
 import {
-  type Outfit,
-  type ClothingItemType,
   type UUID,
   type ScoredClothingItem,
   type Weather,
   CLOTHING_STYLES,
   PROFILE_WEIGHTS,
   type ClothingStyles,
+  type OutfitPreview,
+  type ClothingItemType,
 } from '$lib/types';
-import { ClothingItemDAO } from './clotingItem';
+import { ClothingItemDAO } from './clothingItem';
 import { selectRandomAccessories } from './outfitStrategies/utils';
 import {
   lastWornScore,
@@ -21,15 +21,52 @@ import {
   triadicScore,
 } from './outfitStrategies';
 
-type OutfitWithoutId = Omit<Outfit, 'id'>;
+export class OutfitGenerator {
+  static getItemsOfType(items: ScoredClothingItem[], type: ClothingItemType): ScoredClothingItem[] {
+    return items.filter((item) => item.type === type);
+  }
+
+  static selectRandomFromTop(
+    items: ScoredClothingItem[],
+    count: number = 3
+  ): ScoredClothingItem | null {
+    if (items.length === 0) return null;
+    const topItems = items.slice(0, Math.min(count, items.length));
+    return topItems[Math.floor(Math.random() * topItems.length)];
+  }
+
+  static scoreItems(
+    scored: ScoredClothingItem[],
+    baseItem: ScoredClothingItem | null,
+    weather: Weather,
+    weights: (typeof PROFILE_WEIGHTS)[ClothingStyles]
+  ): void {
+    for (const item of scored) {
+      item.score += lastWornScore(item) * weights.lastWorn;
+
+      if (baseItem) {
+        item.score += monochromeScore(baseItem, item);
+        item.score += complementaryScore(baseItem, item);
+        item.score += analogousScore(baseItem, item);
+        item.score += triadicScore(baseItem, item);
+      }
+
+      if (!('error' in weather)) {
+        item.score += colorForUVScore(item, weather) * weights.uv;
+        item.score += tempScore(item, weather) * weights.temp;
+        item.score += rainScore(item, weather) * weights.rain;
+      }
+    }
+  }
+}
 
 export async function generateOutfits(
   userId: UUID,
   weather: Weather,
   count: number,
   { style = CLOTHING_STYLES[0] }: { style?: ClothingStyles } = {}
-): Promise<OutfitWithoutId[]> {
-  const outfits: OutfitWithoutId[] = [];
+): Promise<OutfitPreview[]> {
+  const outfits: OutfitPreview[] = [];
   for (let i = 0; i < count; i++) {
     const outfit = await generateOutfit(userId, weather, { style });
     outfits.push(outfit);
@@ -41,118 +78,82 @@ export async function generateOutfit(
   userId: UUID,
   weather: Weather,
   { style = CLOTHING_STYLES[0] }: { style: ClothingStyles }
-): Promise<OutfitWithoutId> {
-  const items = await ClothingItemDAO.getClothingItemsByUserId(userId);
+): Promise<OutfitPreview> {
+  const wardrobe = await ClothingItemDAO.getClothingItemsByUserId(userId);
   const chooseBetween = 3;
 
-  if (!items || items.length === 0) {
+  if (!wardrobe || wardrobe.length === 0) {
     throw new Error('errors.outfitGeneration.notEnoughItems');
   }
 
-  // Add temp score to items
-  const scored: ScoredClothingItem[] = items.map((item) => ({
+  // Add score to items
+  const scored: ScoredClothingItem[] = wardrobe.map((item) => ({
     ...item,
     score: 0,
   }));
 
-  // Get a random top
-  const tops: ScoredClothingItem[] = scored.filter(
-    (item) => item.type === 'dress' || item.type === 'shirt'
+  // Get a random top (shirt or dress)
+  const tops = OutfitGenerator.getItemsOfType(scored, 'shirt').concat(
+    OutfitGenerator.getItemsOfType(scored, 'dress')
   );
-
-  const top: ScoredClothingItem[] = [];
-  if (tops.length > 0) {
-    const randomIndex = Math.floor(Math.random() * tops.length);
-    top.push(tops[randomIndex]);
-  }
+  const selectedTop = tops.length > 0 ? tops[Math.floor(Math.random() * tops.length)] : null;
 
   const weights = PROFILE_WEIGHTS[style];
 
-  // For loop over each item
-  for (const item of scored) {
-    // Use scoring functions between choosen top and actuel item
-    item.score += lastWornScore(item) * weights.lastWorn;
-    item.score += monochromeScore(top[0], item);
-    item.score += complementaryScore(top[0], item);
-    item.score += analogousScore(top[0], item);
-    item.score += triadicScore(top[0], item);
-
-    if ('error' in weather) break;
-    item.score += colorForUVScore(item, weather) * weights.uv;
-    item.score += tempScore(item, weather) * weights.temp;
-    item.score += rainScore(item, weather) * weights.rain;
-  }
+  // Score all items based on selected top and weather
+  OutfitGenerator.scoreItems(scored, selectedTop ?? null, weather, weights);
 
   // Sort by score
   scored.sort((a, b) => b.score - a.score);
 
-  // Sort items by types
-  const grouped: Record<ClothingItemType, ScoredClothingItem[]> = {
-    pants: [],
-    sweater: [],
-    dress: [],
-    jacket: [],
-    shirt: [],
-    shoes: [],
-    accessory: [],
-  };
+  // Build outfit
+  const outfitItems: ScoredClothingItem[] = [];
 
-  for (const item of scored) {
-    if (item.type !== 'shirt' && item.type !== 'dress') {
-      grouped[item.type].push(item);
+  // Add selected top
+  if (selectedTop) {
+    outfitItems.push(selectedTop);
+  }
+
+  // Add bottom (pants) if wearing a shirt
+  if (selectedTop?.type === 'shirt') {
+    const pants = OutfitGenerator.getItemsOfType(scored, 'pants');
+    const selectedPants = OutfitGenerator.selectRandomFromTop(pants, chooseBetween);
+    if (selectedPants) {
+      outfitItems.push(selectedPants);
     }
   }
 
-  // Choose for each type the item
-
-  // Pants (bottom)
-  let bottom: ScoredClothingItem | null = null;
-  if (top[0]?.type === 'shirt' && grouped.pants.length > 0) {
-    // Take random pant from top 10 scored pants, same for the next one
-    const randomIndex = Math.floor(Math.random() * Math.min(chooseBetween, grouped.pants.length));
-    bottom = grouped.pants[randomIndex];
-  } else if (top[0]?.type === 'dress') {
-    bottom = null; // Une robe n'a pas de pantalon
+  // Add shoes
+  const shoes = OutfitGenerator.getItemsOfType(scored, 'shoes');
+  const selectedShoes = OutfitGenerator.selectRandomFromTop(shoes, chooseBetween);
+  if (selectedShoes) {
+    outfitItems.push(selectedShoes);
   }
 
-  // Shoes
-  let shoes: ScoredClothingItem | null = null;
-  if (grouped.shoes.length > 0) {
-    const randomIndex = Math.floor(Math.random() * Math.min(chooseBetween, grouped.shoes.length));
-    shoes = grouped.shoes[randomIndex];
-  }
+  // Add accessories
+  const accessories = OutfitGenerator.getItemsOfType(scored, 'accessory');
+  const selectedAccessories = selectRandomAccessories(accessories, 3);
+  outfitItems.push(...selectedAccessories);
 
-  // Accessories
-  let accessories: ScoredClothingItem[] = [];
-  if (grouped.accessory.length > 0) {
-    accessories = selectRandomAccessories(grouped.accessory, 3);
-  }
-
+  // Add extra layer if cold or rainy
   const tempThreshold = 20;
-
   if (weather.temp < tempThreshold || weather.rain > 1) {
-    let extraTop: ScoredClothingItem | undefined;
-    if (grouped.jacket.length > 0) {
-      const randomIndex = Math.floor(
-        Math.random() * Math.min(chooseBetween, grouped.jacket.length)
-      );
-      extraTop = grouped.jacket[randomIndex];
-    } else if (grouped.sweater.length > 0) {
-      const randomIndex = Math.floor(
-        Math.random() * Math.min(chooseBetween, grouped.sweater.length)
-      );
-      extraTop = grouped.sweater[randomIndex];
+    const jackets = OutfitGenerator.getItemsOfType(scored, 'jacket');
+    const sweaters = OutfitGenerator.getItemsOfType(scored, 'sweater');
+
+    let extraTop: ScoredClothingItem | null = null;
+    if (jackets.length > 0) {
+      extraTop = OutfitGenerator.selectRandomFromTop(jackets, chooseBetween);
+    } else if (sweaters.length > 0) {
+      extraTop = OutfitGenerator.selectRandomFromTop(sweaters, chooseBetween);
     }
+
     if (extraTop) {
-      top.push(extraTop);
+      outfitItems.push(extraTop);
     }
   }
 
   return {
-    top,
-    bottom,
-    shoes,
-    accessories,
-    createdAt: new Date(),
+    items: outfitItems,
   };
 }

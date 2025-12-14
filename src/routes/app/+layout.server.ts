@@ -1,4 +1,4 @@
-import { ClothingItemDAO } from '$lib/server/db/clotingItem';
+import { ClothingItemDAO } from '$lib/server/db/clothingItem';
 import type { LayoutServerLoad } from './$types';
 import { OutfitDAO } from '$lib/server/db/outfit';
 

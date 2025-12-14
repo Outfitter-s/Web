@@ -1,4 +1,4 @@
-import { ClothingItemDAO } from '$lib/server/db/clotingItem';
+import { ClothingItemDAO } from '$lib/server/db/clothingItem';
 import type { ClothingItemColor, ClothingItemType } from '$lib/types';
 import { fail, redirect, error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';

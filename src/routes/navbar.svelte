@@ -5,11 +5,12 @@
   import { Home, Plus, Shirt, User } from '@lucide/svelte';
   import { itemOpen } from '$lib/components/routes/app/nav';
   import { slide } from 'svelte/transition';
+  import type { Component } from 'svelte';
 
   interface Link {
     href: string;
     text: string;
-    icon?: typeof Home;
+    icon?: Component;
   }
 
   let links = $derived<Link[]>([

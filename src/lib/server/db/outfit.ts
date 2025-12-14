@@ -1,6 +1,6 @@
 import type { ClothingItem, ClothingItemType, Outfit, OutfitPreview, UUID } from '$lib/types';
 import pool from '.';
-import { ClothingItemDAO } from './clotingItem';
+import { ClothingItemDAO } from './clothingItem';
 
 export interface OutfitTable {
   id: UUID;
@@ -15,25 +15,9 @@ export interface OutfitItemTable {
 
 export class OutfitDAO {
   static convertToOutfit(row: OutfitTable, items: ClothingItem[]): Outfit {
-    const byType: Record<ClothingItemType, ClothingItem[]> = {
-      pants: [],
-      sweater: [],
-      dress: [],
-      jacket: [],
-      shirt: [],
-      shoes: [],
-      accessory: [],
-    };
-    for (const item of items) {
-      byType[item.type].push(item);
-    }
-
     return {
       id: row.id,
-      top: [...byType.shirt, ...byType.dress],
-      bottom: byType.pants[0] || null,
-      shoes: byType.shoes[0] || null,
-      accessories: byType.accessory,
+      items,
       createdAt: new Date(row.created_at),
     };
   }
@@ -96,18 +80,11 @@ export class OutfitDAO {
     }
     const outfitRow = res.rows[0];
 
-    for (const item of [
-      ...(outfit.top || []),
-      outfit.bottom,
-      outfit.shoes,
-      ...(outfit.accessories || []),
-    ]) {
-      if (item) {
-        await pool.query(
-          'INSERT INTO outfit_clothing_items (outfit_id, clothing_item_id, position) VALUES ($1, $2, $3)',
-          [outfitRow.id, item.id, item.type]
-        );
-      }
+    for (const item of outfit.items) {
+      await pool.query(
+        'INSERT INTO outfit_clothing_items (outfit_id, clothing_item_id, position) VALUES ($1, $2, $3)',
+        [outfitRow.id, item.id, item.type]
+      );
     }
 
     return this.getOutfitById(outfitRow.id) as Promise<Outfit>;
