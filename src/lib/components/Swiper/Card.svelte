@@ -22,7 +22,6 @@
   });
 
   let MOVE_ACCEPT_THRESHOLD = $state(100);
-  let imageLoaded = $state(false);
 
   onMount(() => {
     MOVE_ACCEPT_THRESHOLD = Math.min(window.innerWidth / 4, 150);
@@ -110,9 +109,9 @@
   onmouseup={onMouseUp}
   onmouseleave={onMouseLeave}
   style="transform: translate(calc(-50% + {move.currentX}px), calc(-50% + {move.currentY}px)) rotate({move.currentX /
-    20}deg); transition: {move.isDragging || !move.isSwiped
-    ? 'none'
-    : 'transform 0.3s ease'}; z-index: {100 - index};"
+    20}deg); transition: {!move.isDragging || move.isSwiped
+    ? 'transform 0.3s ease'
+    : 'none'}; z-index: {100 - index};"
 >
   <div
     class={cn(
@@ -121,9 +120,6 @@
     )}
   >
     <div class="relative z-0 aspect-square w-full">
-      {#if !imageLoaded}
-        <div class="bg-accent absolute inset-0 -z-10 aspect-square animate-pulse"></div>
-      {/if}
       <div class="bg-card grid gap-2 overflow-hidden p-4 grid-cols-2">
         {#each card.outfit.items as items}
           <img
