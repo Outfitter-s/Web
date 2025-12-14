@@ -78,21 +78,19 @@ export const OutfitZ = z.object({
   shoes: ClothingItemZ.nullable(),
   accessories: z.array(ClothingItemZ),
   createdAt: DateZ,
-  wornAt: z.array(DateZ),
 });
 export type Outfit = z.infer<typeof OutfitZ>;
-export const OutfitPreviewZ = OutfitZ.omit({ wornAt: true, createdAt: true, id: true });
+export const OutfitPreviewZ = OutfitZ.omit({ createdAt: true, id: true });
 export type OutfitPreview = z.infer<typeof OutfitPreviewZ>;
 
 export interface SwiperCard {
   id: number;
-  outfit: OutfitPreview;
+  outfit: OutfitPreview | Outfit;
 }
 
 export const WeatherZ = z.object({
   temp: z.number(),
   rain: z.number(),
-  desc: z.string(),
   uv: z.number(),
 });
 export type Weather = z.infer<typeof WeatherZ>;

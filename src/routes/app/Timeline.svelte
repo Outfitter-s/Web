@@ -37,7 +37,7 @@
   });
 </script>
 
-<section class="flex h-full w-full grow flex-col items-center justify-center p-4 text-center">
+<!-- <section class="flex h-full w-full grow flex-col items-center justify-center p-4 text-center">
   <div
     bind:this={scrollContainer}
     class="no-scrollbar grid h-fit max-h-[400px] w-full snap-x snap-mandatory snap-always overflow-x-auto"
@@ -45,7 +45,6 @@
   >
     {#each outfits as outfit}
       <div class="relative flex w-[80dvw] snap-center flex-col items-center gap-2 px-2 pb-10">
-        <!-- svelte-ignore a11y_img_redundant_alt -->
         <img
           src={outfit.imageUrl}
           alt="Outfit Image"
@@ -61,4 +60,4 @@
       </div>
     {/each}
   </div>
-</section>
+</section> -->

@@ -35,7 +35,6 @@ export class OutfitDAO {
       shoes: byType.shoes[0] || null,
       accessories: byType.accessory,
       createdAt: new Date(row.created_at),
-      wornAt: [],
     };
   }
 

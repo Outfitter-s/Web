@@ -154,6 +154,5 @@ export async function generateOutfit(
     shoes,
     accessories,
     createdAt: new Date(),
-    wornAt: [],
   };
 }

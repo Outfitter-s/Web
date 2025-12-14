@@ -45,6 +45,6 @@ export const actions: Actions = {
       });
     }
 
-    redirect(303, '/app');
+    redirect(303, '/app/account');
   },
 };

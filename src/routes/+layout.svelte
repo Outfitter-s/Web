@@ -23,7 +23,7 @@
 <!-- The API is restricted to authenticated users so there is not issue -->
 <AddItem />
 
-<div class="flex min-h-dvh flex-col">
+<div class="flex min-h-dvh flex-col pb-16">
   <div class="flex grow flex-col">
     <svelte:boundary>{@render children()}</svelte:boundary>
   </div>

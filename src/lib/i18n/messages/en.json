@@ -305,6 +305,15 @@
             "style": "Stylish",
             "formal": "Formal"
           }
+        },
+        "weather": {
+          "question": "What's the weather like?",
+          "options": {
+            "sunny": "Sunny",
+            "rainy": "Rainy",
+            "cold": "Cold",
+            "snowy": "Snowy"
+          }
         }
       },
       "swiper": {

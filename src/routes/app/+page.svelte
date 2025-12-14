@@ -3,16 +3,23 @@
   import Swiper from './Swiper.svelte';
   import Timeline from './Timeline.svelte';
   import i18n from '$lib/i18n';
-  import type { SwiperCard } from '$lib/types';
+  import type { Outfit } from '$lib/types';
+  import { DateUtils } from '$lib/utils';
+  import { page } from '$app/state';
 
-  let chosenOutfit = $state<SwiperCard | null>(null);
+  let chosenOutfit = $derived(
+    (page.data.outfits as Outfit[]).find((o) => DateUtils.isToday(o.createdAt)) ?? null
+  );
 </script>
 
 <SEO title={i18n.t('seo.homePage.title')} />
 
 <!-- If the user has not chosen an outfit for today, make it choose on before showing the timeline -->
 {#if !chosenOutfit}
-  <Swiper bind:chosenOutfit />
+  <Swiper />
 {:else}
+  <p>
+    You're wearing outfit id {chosenOutfit.id} today!
+  </p>
   <Timeline />
 {/if}

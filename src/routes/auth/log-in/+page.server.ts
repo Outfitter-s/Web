@@ -69,6 +69,6 @@ export const actions: Actions = {
         message: msg || 'errors.server.connectionRefused',
       });
     }
-    redirect(303, '/app');
+    redirect(303, '/app/account');
   },
 };

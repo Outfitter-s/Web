@@ -47,7 +47,7 @@
 <div role="alert" class={baseToastClasses} transition:fade={{ duration: 300 }}>
   <!-- Progress -->
   {#if t.options.timeout}
-    <div class="absolute top-0 right-2 left-0 h-[3px]">
+    <div class="absolute top-0 right-2 left-0 h-0.75">
       <div class="bg-border h-full" style="width: {progress.current}%;"></div>
     </div>
   {/if}

@@ -22,7 +22,8 @@
   });
 </script>
 
-<SEO title={'Sign up'} />
+<SEO title="Sign up" />
+<!-- TODO: i18n -->
 
 <FormWrapper>
   <form
