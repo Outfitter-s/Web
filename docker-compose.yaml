@@ -13,7 +13,6 @@ services:
     env_file:
       - .env
     environment:
-      - ORIGIN=http://localhost:4173
       - POSTGRES_HOST=db
       - VALKEY_HOST=valkey
     ports:
@@ -26,11 +25,11 @@ services:
     ports:
       - '5000:5000'
     environment:
-      - FRONTEND_ORIGIN=http://localhost:4173
+      - FRONTEND_ORIGIN=${ORIGIN}
       - API_KEY=${IMAGE_PROCESSING_API_KEY}
 
   db:
-    image: postgres
+    image: postgres:18.1
     container_name: outfiter_db
     ports:
       - '5432:5432'
@@ -43,7 +42,7 @@ services:
 
   valkey:
     container_name: valkey
-    image: valkey/valkey
+    image: valkey/valkey:9.0.1
     command: valkey-server --save 60 1 --loglevel debug
     ports:
       - '${VALKEY_PORT:-6379}:6379'

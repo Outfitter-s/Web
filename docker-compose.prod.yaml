@@ -13,7 +13,6 @@ services:
     env_file:
       - .env
     environment:
-      - ORIGIN=http://localhost:4173
       - POSTGRES_HOST=db
       - VALKEY_HOST=valkey
     ports:
@@ -24,11 +23,11 @@ services:
     container_name: outfitter_image_processing
     restart: unless-stopped
     environment:
-      - FRONTEND_ORIGIN=http://localhost:4173
+      - FRONTEND_ORIGIN=${ORIGIN}
       - API_KEY=${IMAGE_PROCESSING_API_KEY}
 
   db:
-    image: postgres
+    image: postgres:18.1
     container_name: outfiter_db
     restart: unless-stopped
     env_file:
@@ -38,8 +37,8 @@ services:
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:Z
 
   valkey:
-    container_name: valkey
-    image: valkey/valkey
+    container_name: outfiter_valkey
+    image: valkey/valkey:9.0.1
     command: valkey-server --save 60 1 --loglevel debug
     volumes:
       - valkey-data:/data
