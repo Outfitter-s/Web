@@ -2,15 +2,13 @@
   import { Spinner, Swiper } from '$lib/components';
   import * as Dialog from '$lib/components/ui/dialog';
   import { Button } from '$lib/components/ui/button';
+  import { Toaster } from '$lib/components/Toast/toast';
   import { CLOTHING_STYLES, OutfitPreviewZ, type SwiperCard, type Weather } from '$lib/types';
   import { ArrowRight } from '@lucide/svelte';
   import confetti from 'canvas-confetti';
   import z from 'zod';
   import i18n from '$lib/i18n';
-  import { getWeather } from '$lib/utils/weather';
-  import { logger } from '$lib/utils/logger';
-  import { Toaster } from '$lib/components/Toast/toast';
-  import { cn } from '$lib/utils';
+  import { cn, hashStringToNumber, getWeather, logger } from '$lib/utils';
   import { fade } from 'svelte/transition';
   import { onMount } from 'svelte';
   import { invalidateAll } from '$app/navigation';
@@ -58,16 +56,6 @@
       Toaster.error((msg as any) || 'errors.outfitGeneration.apiError');
     }
     return [];
-  }
-
-  // Deterministically generate a number from the input string using a hash function
-  function hashStringToNumber(str: string): number {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = (hash << 5) - hash + str.charCodeAt(i);
-      hash |= 0;
-    }
-    return Math.abs(hash);
   }
 
   let chosenOutfit = $state<SwiperCard | null>(null);

@@ -1,7 +1,6 @@
 <script lang="ts">
-  import i18n from '$lib/i18n';
-  import { DateFormatter } from '@internationalized/date';
   import { onMount } from 'svelte';
+  // import { DateUtils } from '$lib/utils';
 
   let scrollContainer = $state<HTMLDivElement>();
 
@@ -16,10 +15,6 @@
     { imageUrl: 'https://placehold.co/400x400', date: new Date('2025-10-08') },
     { imageUrl: 'https://placehold.co/400x400', date: new Date('2025-10-09') },
   ]; // This represents the last outfits/2 outfits, today, and the next outfits/2 outfits
-
-  const formatDate = (date: Date) => {
-    return new DateFormatter(i18n.locale, { day: '2-digit', month: 'short' }).format(date);
-  };
 
   onMount(() => {
     if (scrollContainer) {
@@ -53,7 +48,7 @@
         <div class="absolute right-0 bottom-0 left-0 flex flex-row items-center">
           <div class="border-border grow border-b-2"></div>
           <div class="text-primary bg-border shrink-0 rounded-full p-2 font-mono text-sm">
-            {formatDate(outfit.date)}
+            {DateUtils.formatDate(outfit.date)}
           </div>
           <div class="border-border grow border-b-2"></div>
         </div>

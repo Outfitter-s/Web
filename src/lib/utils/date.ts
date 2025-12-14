@@ -1,3 +1,6 @@
+import i18n from '$lib/i18n';
+import { DateFormatter } from '@internationalized/date';
+
 export class DateUtils {
   static isSameDay(date1: Date, date2: Date): boolean {
     return (
@@ -30,4 +33,11 @@ export class DateUtils {
         throw new Error('Invalid unit for distance calculation');
     }
   }
+
+  static formatDate = (date: Date, { allowDistance = true }: { allowDistance?: boolean } = {}) => {
+    if (allowDistance && DateUtils.distance(new Date(), date, 'days') < 6) {
+      return new DateFormatter(i18n.locale, { weekday: 'long' }).format(date);
+    }
+    return new DateFormatter(i18n.locale, { day: '2-digit', month: 'short' }).format(date);
+  };
 }

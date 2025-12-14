@@ -1,13 +1,11 @@
 <script lang="ts">
   import type { ClothingItem, Outfit } from '$lib/types';
-  import { cn, DateUtils } from '$lib/utils';
+  import { cn, DateUtils, hashStringToNumber } from '$lib/utils';
   import type { SvelteHTMLElements } from 'svelte/elements';
-  import i18n from '$lib/i18n';
-  import { DateFormatter } from '@internationalized/date';
 
   interface Props {
     outfit: Outfit;
-    href?: string;
+    href?: SvelteHTMLElements['a']['href'];
     showDate?: boolean;
   }
 
@@ -18,22 +16,6 @@
     class: className,
     ...restProps
   }: Props & SvelteHTMLElements['a'] & SvelteHTMLElements['div'] = $props();
-
-  const formatDate = (date: Date) => {
-    if (DateUtils.distance(new Date(), date, 'days') < 6) {
-      return new DateFormatter(i18n.locale, { weekday: 'long' }).format(date);
-    }
-    return new DateFormatter(i18n.locale, { day: '2-digit', month: 'short' }).format(date);
-  };
-
-  function hashStringToNumber(str: string): number {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = (hash << 5) - hash + str.charCodeAt(i);
-      hash |= 0;
-    }
-    return Math.abs(hash);
-  }
 
   const generateOutfitItemCss = (item: ClothingItem, index: number, total: number) => {
     const seed = hashStringToNumber(item.id) / (item.id.length * 1000);
@@ -92,7 +74,7 @@
   {#if showDate}
     <div class="border-border relative w-fit bg-card rounded-lg border px-2 py-1">
       <p class="font-medium text-base">
-        {formatDate(outfit.createdAt)}
+        {DateUtils.formatDate(outfit.createdAt)}
       </p>
     </div>
   {/if}

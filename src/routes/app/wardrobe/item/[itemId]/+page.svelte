@@ -1,9 +1,7 @@
 <script lang="ts">
-  import i18n from '$lib/i18n';
   import { page } from '$app/state';
   import type { ClothingItem } from '$lib/types';
-  import { capitalize } from '$lib/utils';
-  import { DateFormatter } from '@internationalized/date';
+  import { capitalize, DateUtils } from '$lib/utils';
   import { Calendar, Palette, Shirt, Pencil } from '@lucide/svelte';
   import ColorDot from '$lib/components/colorDot.svelte';
   import { Button } from '$lib/components/ui/button';
@@ -18,23 +16,23 @@
       throw new Error('Item not found');
     }
   });
-
-  const formatDate = (date: Date) => {
-    return new DateFormatter(i18n.locale, { day: '2-digit', month: 'short' }).format(date);
-  };
 </script>
 
 <SEO title="seo.wardrobe.item.title" description="seo.wardrobe.item.description" />
 
 {#if item}
-  <div class="p-2">
-    <div class="bg-card border-border flex flex-col overflow-hidden rounded-lg border lg:flex-row">
+  <div class="p-4">
+    <div class="bg-card relative border-border flex flex-col rounded-lg border lg:flex-row">
       <!-- Image -->
-      <img
-        src={item.imageUrl}
-        class="aspect-square max-h-200 w-full object-cover object-center lg:w-1/2"
-        alt=""
-      />
+      <div
+        class="-ml-2 bg-card -mt-2 lg:-mb-2 max-lg:-mr-2 max-h-[70vh] lg:max-h-200 aspect-10/14 lg:aspect-square inline-block"
+      >
+        <img
+          src={item.imageUrl}
+          alt={item.name}
+          class="size-full object-cover object-center rounded-lg"
+        />
+      </div>
 
       <!-- Details -->
       <div class="flex w-full flex-col gap-4 p-2 lg:w-1/2 lg:p-4">
@@ -68,13 +66,14 @@
             </div>
             <div>{capitalize(item.type)}</div>
           </div>
+
           {#if item.lastWornAt}
             <div class="flex flex-col gap-1">
               <div class="text-lg font-medium">
                 <Calendar class="mr-2 mb-1 inline size-5" />
                 Last Worn
               </div>
-              <div>{formatDate(item.lastWornAt)}</div>
+              <div>{DateUtils.formatDate(item.lastWornAt)}</div>
             </div>
           {/if}
         </div>

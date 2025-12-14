@@ -14,7 +14,10 @@ export interface ClothingItemTable {
 }
 
 export class ClothingItemDAO {
-  static convertToClothingItem(row: ClothingItemTable): ClothingItem {
+  static convertToClothingItem(
+    row: ClothingItemTable,
+    lastWornAt: Date | null = null
+  ): ClothingItem {
     return {
       id: row.id,
       imageUrl: `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/clothing_item/${String(row.id)}.png`,
@@ -23,7 +26,7 @@ export class ClothingItemDAO {
       description: String(row.description ?? ''),
       name: String(row.name ?? ''),
       createdAt: new Date(row.created_at),
-      lastWornAt: null,
+      lastWornAt,
     };
   }
 
@@ -57,7 +60,9 @@ export class ClothingItemDAO {
     if (res.rows.length === 0) {
       return null;
     }
-    return ClothingItemDAO.convertToClothingItem(res.rows[0]);
+    const item = res.rows[0];
+    const lastWornAt = await ClothingItemDAO.getLastWornAt(item.id);
+    return ClothingItemDAO.convertToClothingItem(item, lastWornAt);
   }
 
   static async getClothingItemsByUserId(userId: UUID): Promise<ClothingItem[]> {
@@ -65,11 +70,27 @@ export class ClothingItemDAO {
       'SELECT * FROM clothing_item WHERE user_id = $1 ORDER BY created_at DESC',
       [userId]
     );
-    return res.rows.map(ClothingItemDAO.convertToClothingItem);
+    const clothingItems: ClothingItem[] = [];
+    for (const row of res.rows) {
+      const lastWornAt = await ClothingItemDAO.getLastWornAt(row.id);
+      clothingItems.push(ClothingItemDAO.convertToClothingItem(row, lastWornAt));
+    }
+    return clothingItems;
   }
 
   static async deleteClothingItem(id: UUID): Promise<void> {
     await pool.query('DELETE FROM clothing_item WHERE id = $1', [id]);
     await unlink(`assets/clothing_item/${id}.png`);
+  }
+
+  static async getLastWornAt(item: UUID): Promise<Date | null> {
+    interface LastWornAtResult {
+      last_worn_at: Date | null;
+    }
+    const res = await pool.query<LastWornAtResult>(
+      'SELECT MAX(outfit.created_at) as last_worn_at FROM outfit INNER JOIN outfit_clothing_items ON outfit.id = outfit_clothing_items.outfit_id WHERE outfit_clothing_items.clothing_item_id = $1',
+      [item]
+    );
+    return res.rows[0].last_worn_at;
   }
 }

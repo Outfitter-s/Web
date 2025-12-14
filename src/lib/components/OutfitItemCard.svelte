@@ -5,7 +5,7 @@
 
   interface Props {
     item: ClothingItem;
-    href?: string;
+    href?: SvelteHTMLElements['a']['href'];
   }
 
   let {
@@ -17,7 +17,7 @@
 </script>
 
 {#snippet content()}
-  <div class="-ml-2 -mt-2 -mr-2 inline-block">
+  <div class="-ml-2 bg-card -mt-2 -mr-2 inline-block">
     <img src={item.imageUrl} alt={item.name} class="size-full object-contain rounded-lg" />
   </div>
   <div class="p-2 w-full text-center">

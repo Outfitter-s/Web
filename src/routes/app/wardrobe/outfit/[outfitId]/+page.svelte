@@ -2,8 +2,7 @@
   import i18n from '$lib/i18n';
   import { page } from '$app/state';
   import type { Outfit } from '$lib/types';
-  import { capitalize, DateUtils } from '$lib/utils';
-  import { DateFormatter } from '@internationalized/date';
+  import { DateUtils } from '$lib/utils';
   import { OutfitItemCard, SEO } from '$lib/components';
   import Button from '$lib/components/ui/button/button.svelte';
   import { ChevronLeft } from '@lucide/svelte';
@@ -17,13 +16,6 @@
       throw new Error('Outfit not found');
     }
   });
-
-  const formatDate = (date: Date) => {
-    if (DateUtils.distance(new Date(), date, 'days') < 6) {
-      return new DateFormatter(i18n.locale, { weekday: 'long' }).format(date);
-    }
-    return new DateFormatter(i18n.locale, { day: '2-digit', month: 'short' }).format(date);
-  };
 </script>
 
 <SEO title="seo.wardrobe.item.title" description="seo.wardrobe.item.description" />
@@ -37,7 +29,9 @@
         <ChevronLeft class="size-5" />
       </Button>
       <p class="font-medium text-lg">
-        {i18n.t('wardrobe.outfitDetails.lastWornOn', { date: formatDate(outfit.createdAt) })}
+        {i18n.t('wardrobe.outfitDetails.lastWornOn', {
+          date: DateUtils.formatDate(outfit.createdAt),
+        })}
       </p>
     </div>
     <div
