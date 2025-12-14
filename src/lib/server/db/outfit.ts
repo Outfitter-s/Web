@@ -46,7 +46,10 @@ export class OutfitDAO {
   }
 
   static async getAllUserOutfits(userId: UUID): Promise<Outfit[]> {
-    const res = await pool.query<OutfitTable>('SELECT * FROM outfit WHERE user_id = $1', [userId]);
+    const res = await pool.query<OutfitTable>(
+      'SELECT * FROM outfit WHERE user_id = $1 ORDER BY created_at DESC',
+      [userId]
+    );
     const outfits: Outfit[] = [];
 
     for (const row of res.rows) {
@@ -88,5 +91,18 @@ export class OutfitDAO {
     }
 
     return this.getOutfitById(outfitRow.id) as Promise<Outfit>;
+  }
+
+  static async deleteOutfit(outfitId: UUID): Promise<void> {
+    await pool.query('DELETE FROM outfit_clothing_items WHERE outfit_id = $1', [outfitId]);
+    await pool.query('DELETE FROM outfit WHERE id = $1', [outfitId]);
+  }
+
+  static async outfitBelongsToUser(userId: UUID, outfitId: UUID): Promise<void> {
+    const res = await pool.query<OutfitTable>(
+      'SELECT * FROM outfit WHERE id = $1 AND user_id = $2',
+      [outfitId, userId]
+    );
+    if (res.rows.length === 0) throw new Error('errors.clothing.outfit.notAuthorized');
   }
 }

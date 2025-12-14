@@ -102,6 +102,10 @@
         "requiredField": "The following field{{s}} {{is}} required: {{field}}",
         "classificationFailed": "Failed to classify the clothing item. Please enter values manually.",
         "missingImage": "Image file is required"
+      },
+      "outfit": {
+        "delete": "Failed to delete outfit. Please try again later.",
+        "notAuthorized": "This outfit does not belong to you."
       }
     },
     "outfitGeneration": {
@@ -362,7 +366,21 @@
         "description": "This will be the outfit you will be rocking today!",
         "confirmButton": "Choose",
         "cancelButton": "I changed my mind"
+      },
+      "choosen": {
+        "title": "Today's Outfit",
+        "description": "You're all set for today! Here's your chosen outfit.",
+        "change": {
+          "cta": "Change outfit",
+          "title": "Change Outfit",
+          "description": "Are you sure you want to change your outfit for today? This action cannot be undone.",
+          "confirm": "Yes, change it",
+          "cancel": "No, keep it"
+        }
       }
+    },
+    "outfitDetails": {
+      "lastWornOn": "Last worn on {{date}}"
     }
   },
   "transactional": {

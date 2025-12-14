@@ -1,0 +1,52 @@
+<script lang="ts">
+  import i18n from '$lib/i18n';
+  import { page } from '$app/state';
+  import type { Outfit } from '$lib/types';
+  import { capitalize, DateUtils } from '$lib/utils';
+  import { DateFormatter } from '@internationalized/date';
+  import { OutfitItemCard, SEO } from '$lib/components';
+  import Button from '$lib/components/ui/button/button.svelte';
+  import { ChevronLeft } from '@lucide/svelte';
+
+  let outfitId = $derived<string>(page.params.outfitId as string);
+  let outfits = $derived<Outfit[]>(page.data.outfits);
+  let outfit = $derived(outfits.find((it) => it.id === outfitId));
+
+  $effect(() => {
+    if (!outfit) {
+      throw new Error('Outfit not found');
+    }
+  });
+
+  const formatDate = (date: Date) => {
+    if (DateUtils.distance(new Date(), date, 'days') < 6) {
+      return new DateFormatter(i18n.locale, { weekday: 'long' }).format(date);
+    }
+    return new DateFormatter(i18n.locale, { day: '2-digit', month: 'short' }).format(date);
+  };
+</script>
+
+<SEO title="seo.wardrobe.item.title" description="seo.wardrobe.item.description" />
+
+{#if outfit}
+  <div class="p-2 flex flex-col gap-4">
+    <div
+      class="bg-card border border-border flex flex-row gap-4 items-center p-2 rounded-lg w-full"
+    >
+      <Button variant="outline" size="icon" class="size-8" onclick={() => history.back()}>
+        <ChevronLeft class="size-5" />
+      </Button>
+      <p class="font-medium text-lg">
+        {i18n.t('wardrobe.outfitDetails.lastWornOn', { date: formatDate(outfit.createdAt) })}
+      </p>
+    </div>
+    <div
+      class="grid gap-x-6 gap-y-4 px-2"
+      style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));"
+    >
+      {#each outfit.items as item}
+        <OutfitItemCard {item} href="/app/wardrobe/item/{item.id}" />
+      {/each}
+    </div>
+  </div>
+{/if}

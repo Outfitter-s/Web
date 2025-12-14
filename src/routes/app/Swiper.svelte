@@ -31,7 +31,7 @@
         style: multiStageAnswers.answers.style,
       };
       const cards: SwiperCard[] = [];
-      const res = await fetch('/api/wardrobe/generate-outfit', {
+      const res = await fetch('/api/wardrobe/outfit/generate', {
         method: 'POST',
         body: JSON.stringify({ count, weather, ...options }),
       });
@@ -55,7 +55,7 @@
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       logger.error('Error generating outfits:', msg);
-      Toaster.error(msg || 'errors.outfitGeneration.apiError');
+      Toaster.error((msg as any) || 'errors.outfitGeneration.apiError');
     }
     return [];
   }
@@ -115,7 +115,7 @@
 
   async function handleConfirm() {
     try {
-      const res = await fetch('/api/wardrobe/save-outfit', {
+      const res = await fetch('/api/wardrobe/outfit/save', {
         method: 'POST',
         body: JSON.stringify({ outfit: acceptedCard.card?.outfit }),
       });
@@ -163,7 +163,7 @@
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       logger.error('Error saving outfit:', msg);
-      Toaster.error(msg);
+      Toaster.error((msg as any) || 'errors.outfitGeneration.saveOutfitError');
     }
   }
 

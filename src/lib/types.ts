@@ -15,7 +15,7 @@ export const DateZ = z.date().or(
 
 // Domain Entities
 export const UserZ = z.object({
-  id: z.uuidv4(),
+  id: UUID,
   username: z.string().min(3).max(30),
   email: z.email(),
   passwordHash: z.string(),
@@ -64,7 +64,7 @@ export const clothingItemColors = [
 export type ClothingItemColor = (typeof clothingItemColors)[number];
 
 export const ClothingItemZ = z.object({
-  id: z.uuidv4().or(z.string()),
+  id: UUID.or(z.string()),
   imageUrl: z.url(),
   type: z.enum(clothingItemTypes),
   color: z.enum(clothingItemColors),
@@ -80,7 +80,7 @@ export type ScoredClothingItem = ClothingItem & { score: number };
 
 // Outfit
 export const OutfitZ = z.object({
-  id: z.uuidv4(),
+  id: UUID,
   items: z.array(ClothingItemZ),
   createdAt: DateZ,
 });

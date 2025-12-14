@@ -1,7 +1,6 @@
 <script lang="ts">
   import '../app.css';
   import { SEO, Toaster } from '$lib/components';
-  import i18n from '$lib/i18n';
   import Navbar from './navbar.svelte';
   import Globals from '$lib/globals.svelte';
   import { onMount } from 'svelte';
