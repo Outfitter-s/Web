@@ -111,6 +111,9 @@
     "outfitGeneration": {
       "notEnoughItems": "Not enough clothing items to generate an outfit. Please add more items to your wardrobe.",
       "apiError": "Failed to generate outfit due to an internal error. Please try again later."
+    },
+    "social": {
+      "cannotFollowYourself": "You cannot follow yourself."
     }
   },
   "successes": {
@@ -125,6 +128,12 @@
     "clothing": {
       "item": {
         "created": "Clothing item created successfully."
+      }
+    },
+    "social": {
+      "follow": {
+        "followed": "You are now following {{username}}.",
+        "unfollowed": "You have unfollowed {{username}}."
       }
     }
   },
@@ -392,6 +401,18 @@
         "resetLinkText": "Reset Password",
         "footer": "If you did not request a password reset, please ignore this email. Your password will remain unchanged."
       }
+    }
+  },
+  "social": {
+    "profile": {
+      "follow": {
+        "follow": "Follow",
+        "unfollow": "Unfollow"
+      },
+      "nbFollowers": "<b>{{count}}</b> follower{{s}}",
+      "nbFollowing": "<b>{{count}}</b> following{{s}}",
+      "isFollowing": "User is following you",
+      "notFollowing": "User is not following you"
     }
   }
 }
