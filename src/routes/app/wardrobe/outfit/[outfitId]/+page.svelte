@@ -6,6 +6,7 @@
   import { OutfitItemCard, SEO } from '$lib/components';
   import Button from '$lib/components/ui/button/button.svelte';
   import { ChevronLeft } from '@lucide/svelte';
+  import { resolve } from '$app/paths';
 
   let outfitId = $derived<string>(page.params.outfitId as string);
   let outfits = $derived<Outfit[]>(page.data.outfits);
@@ -39,7 +40,7 @@
       style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));"
     >
       {#each outfit.items as item}
-        <OutfitItemCard {item} href="/app/wardrobe/item/{item.id}" />
+        <OutfitItemCard {item} href={resolve('/app/wardrobe/item/{item.id}')} />
       {/each}
     </div>
   </div>

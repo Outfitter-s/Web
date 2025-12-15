@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { SEO } from '$lib/components';
   import Button from '$lib/components/ui/button/button.svelte';
@@ -29,7 +30,7 @@
         <div class="text-center sm:mx-auto lg:mr-auto lg:mt-0">
           {#if page.data.release}
             <a
-              href="/"
+              href={resolve('/')}
               class="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 transition-colors duration-300 dark:border-t-white/5"
             >
               <span class="text-foreground text-sm">Introducing Outfitter v{page.data.release}</span
@@ -63,10 +64,10 @@
           </p>
 
           <div class="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
-            <Button size="lg" variant="default" href="/auth">
+            <Button size="lg" variant="default" href={resolve('/auth')}>
               <span class="text-nowrap">Get started</span>
             </Button>
-            <Button size="lg" variant="ghost" href="#about">Learn more</Button>
+            <Button size="lg" variant="ghost" href="/#about">Learn more</Button>
           </div>
         </div>
       </div>
@@ -101,7 +102,7 @@
       <div
         class="absolute inset-0 z-10 flex scale-95 items-center justify-center opacity-0 duration-500 group-hover:scale-100 group-hover:opacity-100"
       >
-        <a href="/" class="block text-sm duration-150 hover:opacity-75">
+        <a href={resolve('/')} class="block text-sm duration-150 hover:opacity-75">
           <span> Meet Our Customers</span>
 
           <ChevronRight class="ml-1 inline-block size-3" />

@@ -10,6 +10,7 @@
   import { logger } from '$lib/utils/logger';
   import FormWrapper from '../formWrapper.svelte';
   import type { PageProps } from './$types';
+  import { resolve } from '$app/paths';
 
   let { form }: PageProps = $props();
   let loading = $state(false);
@@ -17,7 +18,7 @@
   $effect(() => {
     if (form?.error && form?.action === 'signUp') {
       logger.error('Sig-up error:', form.message);
-      Toaster.error(form.message);
+      Toaster.error(form.message as any);
     }
   });
 </script>
@@ -41,7 +42,7 @@
     <h1 class="mb-2 text-2xl font-semibold">{i18n.t('auth.signIn.title')}</h1>
     <p class="text-muted-foreground text-base">
       {i18n.t('auth.signIn.alreadyHaveAnAccount.text')}
-      <a href="/auth/log-in" class="text-primary font-medium"
+      <a href={resolve('/auth/log-in')} class="text-primary font-medium"
         >{i18n.t('auth.signIn.alreadyHaveAnAccount.cta')}</a
       >
     </p>
@@ -62,7 +63,7 @@
         <Checkbox id="rememberMe" name="rememberMe" checked />
         <Label for="rememberMe">{i18n.t('auth.rememberMe')}</Label>
       </div>
-      <a href="/auth/forgot-password" class="text-primary text-sm font-medium"
+      <a href={resolve('/auth/forgot-password')} class="text-primary text-sm font-medium"
         >{i18n.t('auth.forgotPasswordKeyword')}</a
       >
     </div>

@@ -14,6 +14,7 @@
   import { capitalize } from '$lib/utils';
   import { Hr } from '$lib/components';
   import ProfilePicture from '$lib/components/ProfilePicture.svelte';
+  import { resolve } from '$app/paths';
 
   let currentTheme = $state(page.data.theme);
   let currentLocale = $state(i18n.locale);
@@ -272,7 +273,7 @@
 <Hr class={{ container: 'mb-0' }} text={i18n.t('account.tabs.general.danger.title')} />
 
 <div class="grid grid-cols-3 gap-4">
-  <Button variant="destructive" href="/auth/log-out" class="gap-2">
+  <Button variant="destructive" href={resolve('/auth/log-out')} class="gap-2">
     <LogOut class="size-4" />
     {i18n.t('account.tabs.general.logout')}
   </Button>
