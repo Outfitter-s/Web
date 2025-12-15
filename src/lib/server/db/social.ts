@@ -61,4 +61,15 @@ export class SocialDAO {
     );
     return result.rows.map((row) => row.following_id);
   }
+
+  static async searchUsers(query: string): Promise<User[]> {
+    const result = await pool.query(
+      `SELECT id, username, email FROM users
+       WHERE username ILIKE $1
+       LIMIT 10`,
+      [`%${query}%`]
+    );
+
+    return result.rows;
+  }
 }

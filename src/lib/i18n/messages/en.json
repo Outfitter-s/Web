@@ -113,7 +113,8 @@
       "apiError": "Failed to generate outfit due to an internal error. Please try again later."
     },
     "social": {
-      "cannotFollowYourself": "You cannot follow yourself."
+      "cannotFollowYourself": "You cannot follow yourself.",
+      "searchFailed": "Failed to search users. Please try again later."
     }
   },
   "successes": {
@@ -297,6 +298,7 @@
     "outfits": "Outfits",
     "account": "Account",
     "settings": "Settings",
+    "feed": "Feed",
     "logIn": "Login",
     "signUp": "Sign Up",
     "wardrobe": "Wardrobe",
@@ -413,6 +415,11 @@
       "nbFollowing": "<b>{{count}}</b> following{{s}}",
       "isFollowing": "User is following you",
       "notFollowing": "User is not following you"
+    },
+    "feed": {
+      "search": {
+        "placeholder": "Search users..."
+      }
     }
   }
 }

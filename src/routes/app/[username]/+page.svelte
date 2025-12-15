@@ -37,7 +37,6 @@
         user.following.push(pageUser.id);
         nbFollowers += 1;
       }
-      // @ts-expect-error i18n.t type issue
       Toaster.success(
         i18n.t(
           youFollow ? 'successes.social.follow.followed' : 'successes.social.follow.unfollowed',

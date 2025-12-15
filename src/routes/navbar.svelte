@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import { Button } from '$lib/components/ui/button';
   import i18n from '$lib/i18n';
-  import { Home, Plus, Shirt, User } from '@lucide/svelte';
+  import { Home, Plus, Rss, Shirt, User } from '@lucide/svelte';
   import { itemOpen } from '$lib/components/routes/app/nav';
   import { slide } from 'svelte/transition';
   import type { Component } from 'svelte';
@@ -17,7 +17,7 @@
     ...(page.data?.user
       ? [
           { href: '/app', text: 'nav.home', icon: Home },
-          { href: '', text: '' },
+          { href: '/app/feed', text: 'nav.feed', icon: Rss },
           { href: 'add-item', text: 'nav.outfits' },
           { href: '/app/wardrobe', text: 'nav.wardrobe', icon: Shirt },
           { href: '/app/account', text: 'nav.account', icon: User },
