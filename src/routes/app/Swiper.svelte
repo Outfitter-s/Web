@@ -12,6 +12,8 @@
   import { fade } from 'svelte/transition';
   import { onMount } from 'svelte';
   import { invalidateAll } from '$app/navigation';
+  import MixAndMatch from './MixAndMatch.svelte';
+  import NavBack from '$lib/components/NavBack.svelte';
 
   const cId = $props.id(); // Deterministic client ID for outfit generation
 
@@ -89,6 +91,7 @@
     },
   });
   let nbQuestions = $derived(Object.keys(multistageQuestions).length);
+  let mixAndMatchOpen = $state(false);
 
   $effect(() => {
     multiStageAnswers.open =
@@ -196,12 +199,17 @@
     return closestPreset;
   }
 
-  onMount(async () => {
+  async function initialWeatherFetch() {
+    if (wether) return;
     try {
       wether = await getWeather();
     } catch (error) {
       logger.error('Error fetching weather:', error);
     }
+  }
+
+  onMount(() => {
+    initialWeatherFetch();
   });
 </script>
 
@@ -229,97 +237,115 @@
   </Dialog.Content>
 </Dialog.Root>
 
-<!-- This markup is a mess of absolute elements over absolute elements -->
-<!-- It needs fixing but rn it works -->
-<!-- If you find yourself updating/adding things in here and have time to spare, -->
-<!-- please try to fix this mess before it becomes too much debt (it already kind of is...) -->
-<section class="relative flex h-full grow flex-col overflow-hidden">
-  <div
-    class={cn(
-      'mx-auto flex absolute inset-0 h-full w-full max-w-125 grow flex-col justify-center p-2'
-    )}
-  >
-    {#if multiStageAnswers.open}
-      <div
-        class="flex flex-col gap-6 overflow-hidden absolute inset-0 justify-center"
-        transition:fade={{ duration: 300 }}
-      >
-        <!-- Steps circles -->
-        <div class="flex items-center justify-center px-2">
-          {#each Array(nbQuestions) as _, index}
-            <button
-              onclick={() => {
-                if (index < multiStageAnswers.currentIndex) multiStageAnswers.currentIndex = index;
-              }}
-              class={cn(
-                'size-8 rounded-full font-mono text-center text-sm flex flex-col items-center justify-center transition-colors duration-500',
-                index === multiStageAnswers.currentIndex
-                  ? 'bg-accent'
-                  : index < multiStageAnswers.currentIndex
-                    ? 'bg-primary text-accent'
-                    : 'bg-transparent border-2 border-border text-primary'
-              )}
-              disabled={index >= multiStageAnswers.currentIndex}>{index + 1}</button
-            >
-            {#if index < nbQuestions - 1}
-              <div class="relative h-1 bg-border flex-1 overflow-hidden">
-                <div
-                  class="absolute h-full bg-primary transition-all duration-500"
-                  style="width: {index < multiStageAnswers.currentIndex ? '100' : '0'}%;"
-                ></div>
-              </div>
-            {/if}
-          {/each}
-        </div>
-
-        <!-- Questions -->
+{#if mixAndMatchOpen}
+  <NavBack
+    title={i18n.t('wardrobe.outfitGeneration.mixAndMatch.title')}
+    onclick={() => (mixAndMatchOpen = false)}
+  />
+  <MixAndMatch {onSwiped} />
+{:else}
+  <!-- This markup is a mess of absolute elements over absolute elements -->
+  <!-- It needs fixing but rn it works -->
+  <!-- If you find yourself updating/adding things in here and have time to spare, -->
+  <!-- please try to fix this mess before it becomes too much debt (it already kind of is...) -->
+  <section class="relative flex h-full grow flex-col overflow-hidden">
+    <div
+      class={cn(
+        'mx-auto flex absolute inset-0 h-full w-full max-w-125 grow flex-col justify-center p-2'
+      )}
+    >
+      {#if multiStageAnswers.open}
         <div
-          class="grid transition-transform duration-500"
-          style="grid-template-columns: repeat({nbQuestions}, minmax(250px, 1fr)); width: {nbQuestions *
-            100}%; transform: translateX(-{multiStageAnswers.currentIndex * (100 / nbQuestions)}%);"
-        >
-          {#each Object.entries(multistageQuestions) as [id, question]}
-            <div class="flex flex-col gap-2 w-full items-center p-2">
-              <h1 class="text-lg mb-4 font-semibold">
-                {i18n.t(`wardrobe.outfitGeneration.initialQuestions.${id}.question` as any)}
-              </h1>
-              <div class="grid gap-2 grid-cols-2 w-full">
-                {#each question.options as opt}
-                  <Button
-                    onclick={() => completeQuestion(id as keyof typeof multistageQuestions, opt)}
-                    variant={'hint' in question && question.hint === opt ? 'default' : 'outline'}
-                  >
-                    {i18n.t(
-                      `wardrobe.outfitGeneration.initialQuestions.${id}.options.${opt}` as any
-                    )}
-                  </Button>
-                {/each}
-              </div>
-            </div>
-          {/each}
-        </div>
-      </div>
-    {:else if !chosenOutfit}
-      {#if loadingCards}
-        <div
-          class="text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center"
-        >
-          <Spinner class="size-12" />
-          <p class="text-sm">{i18n.t('wardrobe.outfitGeneration.swiper.loadingText')}</p>
-        </div>
-      {:else}
-        <div
-          class="text-muted-foreground absolute inset-0 flex flex-col items-center justify-center p-4 text-center"
+          class="flex flex-col gap-6 overflow-hidden absolute inset-0 justify-center"
           transition:fade={{ duration: 300 }}
         >
-          <p class="mb-2 text-lg">{i18n.t('wardrobe.outfitGeneration.swiper.noMoreCards.title')}</p>
-          <p class="text-sm">{i18n.t('wardrobe.outfitGeneration.swiper.noMoreCards.subTitle')}</p>
-          <Button class="mt-4" onclick={retryGenerate}>
-            {i18n.t('wardrobe.outfitGeneration.swiper.noMoreCards.retryButton')}
-          </Button>
+          <!-- Steps circles -->
+          <div class="flex items-center justify-center px-2">
+            {#each Array(nbQuestions) as _, index}
+              <button
+                onclick={() => {
+                  if (index < multiStageAnswers.currentIndex)
+                    multiStageAnswers.currentIndex = index;
+                }}
+                class={cn(
+                  'size-8 rounded-full font-mono text-center text-sm flex flex-col items-center justify-center transition-colors duration-500',
+                  index === multiStageAnswers.currentIndex
+                    ? 'bg-accent'
+                    : index < multiStageAnswers.currentIndex
+                      ? 'bg-primary text-accent'
+                      : 'bg-transparent border-2 border-border text-primary'
+                )}
+                disabled={index >= multiStageAnswers.currentIndex}>{index + 1}</button
+              >
+              {#if index < nbQuestions - 1}
+                <div class="relative h-1 bg-border flex-1 overflow-hidden">
+                  <div
+                    class="absolute h-full bg-primary transition-all duration-500"
+                    style="width: {index < multiStageAnswers.currentIndex ? '100' : '0'}%;"
+                  ></div>
+                </div>
+              {/if}
+            {/each}
+          </div>
+
+          <!-- Questions -->
+          <div
+            class="grid transition-transform duration-500"
+            style="grid-template-columns: repeat({nbQuestions}, minmax(250px, 1fr)); width: {nbQuestions *
+              100}%; transform: translateX(-{multiStageAnswers.currentIndex *
+              (100 / nbQuestions)}%);"
+          >
+            {#each Object.entries(multistageQuestions) as [id, question]}
+              <div class="flex flex-col gap-2 w-full items-center p-2">
+                <h1 class="text-lg mb-4 font-semibold">
+                  {i18n.t(`wardrobe.outfitGeneration.initialQuestions.${id}.question` as any)}
+                </h1>
+                <div class="grid gap-2 grid-cols-2 w-full">
+                  {#each question.options as opt}
+                    <Button
+                      onclick={() => completeQuestion(id as keyof typeof multistageQuestions, opt)}
+                      variant={'hint' in question && question.hint === opt ? 'default' : 'outline'}
+                    >
+                      {i18n.t(
+                        `wardrobe.outfitGeneration.initialQuestions.${id}.options.${opt}` as any
+                      )}
+                    </Button>
+                  {/each}
+                </div>
+              </div>
+            {/each}
+          </div>
+
+          <div class="px-2 w-full">
+            <Button class="w-full" onclick={() => (mixAndMatchOpen = true)}>
+              {i18n.t('wardrobe.outfitGeneration.mixAndMatch.button')}
+            </Button>
+          </div>
         </div>
-        <Swiper bind:cards {onSwiped} />
+      {:else if !chosenOutfit}
+        {#if loadingCards}
+          <div
+            class="text-muted-foreground absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center"
+          >
+            <Spinner class="size-12" />
+            <p class="text-sm">{i18n.t('wardrobe.outfitGeneration.swiper.loadingText')}</p>
+          </div>
+        {:else}
+          <div
+            class="text-muted-foreground absolute inset-0 flex flex-col items-center justify-center p-4 text-center"
+            transition:fade={{ duration: 300 }}
+          >
+            <p class="mb-2 text-lg">
+              {i18n.t('wardrobe.outfitGeneration.swiper.noMoreCards.title')}
+            </p>
+            <p class="text-sm">{i18n.t('wardrobe.outfitGeneration.swiper.noMoreCards.subTitle')}</p>
+            <Button class="mt-4" onclick={retryGenerate}>
+              {i18n.t('wardrobe.outfitGeneration.swiper.noMoreCards.retryButton')}
+            </Button>
+          </div>
+          <Swiper bind:cards {onSwiped} />
+        {/if}
       {/if}
-    {/if}
-  </div>
-</section>
+    </div>
+  </section>
+{/if}

@@ -3,9 +3,7 @@
   import { page } from '$app/state';
   import type { Outfit } from '$lib/types';
   import { DateUtils } from '$lib/utils';
-  import { OutfitItemCard, SEO } from '$lib/components';
-  import Button from '$lib/components/ui/button/button.svelte';
-  import { ChevronLeft } from '@lucide/svelte';
+  import { NavBack, OutfitItemCard, SEO } from '$lib/components';
   import { resolve } from '$app/paths';
 
   let outfitId = $derived<string>(page.params.outfitId as string);
@@ -22,25 +20,22 @@
 <SEO title="seo.wardrobe.item.title" description="seo.wardrobe.item.description" />
 
 {#if outfit}
+  <NavBack
+    title={i18n.t('wardrobe.outfitDetails.lastWornOn', {
+      date: DateUtils.formatDate(outfit.createdAt),
+    })}
+  />
   <div class="p-2 flex flex-col gap-4">
-    <div
-      class="bg-card border border-border flex flex-row gap-4 items-center p-2 rounded-lg w-full"
-    >
-      <Button variant="outline" size="icon" class="size-8" onclick={() => history.back()}>
-        <ChevronLeft class="size-5" />
-      </Button>
-      <p class="font-medium text-lg">
-        {i18n.t('wardrobe.outfitDetails.lastWornOn', {
-          date: DateUtils.formatDate(outfit.createdAt),
-        })}
-      </p>
-    </div>
     <div
       class="grid gap-x-6 gap-y-4 px-2"
       style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));"
     >
       {#each outfit.items as item}
-        <OutfitItemCard {item} href={resolve('/app/wardrobe/item/{item.id}')} />
+        <OutfitItemCard
+          element="a"
+          {item}
+          href={resolve('/app/wardrobe/item/[itemId]', { itemId: item.id })}
+        />
       {/each}
     </div>
   </div>

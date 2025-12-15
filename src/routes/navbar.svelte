@@ -6,17 +6,33 @@
   import { itemOpen } from '$lib/components/routes/app/nav';
   import { slide } from 'svelte/transition';
   import type { Component } from 'svelte';
+  import { DateUtils } from '$lib/utils';
+  import type { Outfit } from '$lib/types';
 
   interface Link {
     href: string;
     text: string;
     icon?: Component;
+    alert?: () => boolean;
   }
+  let user = $derived<User | undefined>(page.data.user);
 
   let links = $derived<Link[]>([
-    ...(page.data?.user
+    ...(user
       ? [
-          { href: '/app', text: 'nav.home', icon: Home },
+          {
+            href: '/app',
+            text: 'nav.home',
+            icon: Home,
+            alert: () => {
+              if (!user) return false;
+              const today = new Date();
+              const hasTodayOutfit = (page.data.outfits as Outfit[]).some((outfit) =>
+                DateUtils.isSameDay(outfit.createdAt, today)
+              );
+              return !hasTodayOutfit;
+            },
+          },
           { href: '/app/feed', text: 'nav.feed', icon: Rss },
           { href: 'add-item', text: 'nav.outfits' },
           { href: '/app/wardrobe', text: 'nav.wardrobe', icon: Shirt },
@@ -29,11 +45,13 @@
           { href: '/auth/log-in', text: 'nav.logIn' },
         ]),
   ]);
-
-  // const pathMatches = (path: string) => {
-  //   return page.url.pathname === path;
-  // };
 </script>
+
+{#snippet alertDot()}
+  <div
+    class="absolute top-0 right-0 bg-destructive rounded-full size-2 translate-x-1/2 -translate-y-1/2"
+  ></div>
+{/snippet}
 
 {#snippet entry(link: Link)}
   {#if link.href == 'add-item'}
@@ -50,14 +68,19 @@
       href={link.href}
       class="dark:before:bg-accent before:bg-border px-4 font-mono before:absolute before:inset-0 before:z-0 before:scale-0 before:rounded-xs before:transition-all hover:before:scale-100 active:before:scale-100"
     >
-      {#if link.icon}
-        <!-- svelte-ignore svelte_component_deprecated -->
-        <svelte:component this={link.icon} class="z-10 size-5" />
-      {:else}
-        <span class="z-10 ltr:ml-2 rtl:mr-2" transition:slide={{ duration: 300, axis: 'x' }}
-          >{i18n.t(link.text as any)}</span
-        >
-      {/if}
+      <div class="relative">
+        {#if link.icon}
+          <!-- svelte-ignore svelte_component_deprecated -->
+          <svelte:component this={link.icon} class="z-10 size-5" />
+        {:else}
+          <span class="z-10 ltr:ml-2 rtl:mr-2" transition:slide={{ duration: 300, axis: 'x' }}
+            >{i18n.t(link.text as any)}</span
+          >
+        {/if}
+        {#if link.alert && link.alert()}
+          {@render alertDot()}
+        {/if}
+      </div>
     </Button>
   {/if}
 {/snippet}

@@ -151,13 +151,11 @@ export const actions: Actions = {
     const { updateProfilePictureInput: image } = formData as {
       updateProfilePictureInput: File;
     };
-    console.log(image.type);
     try {
       if (image.type.split('/')[0] !== 'image') {
         throw new Error('errors.account.settings.invalidProfilePicture');
       }
       const imageBuffer = Buffer.from(await image.arrayBuffer());
-      console.log(imageBuffer);
 
       await UserDAO.updateProfilePicture(user.id, imageBuffer);
       return { success: true, action: 'general', message: 'successes.profilePictureUpdated' };

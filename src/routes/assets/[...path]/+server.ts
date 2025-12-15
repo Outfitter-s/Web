@@ -3,6 +3,8 @@ import fs from 'node:fs/promises';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
+const CACHE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+
 // This route serves static assets from the assets folder because adding it to the fs allow list only works in development mode
 export const GET: RequestHandler = async ({ params }) => {
   const parts = params.path.split('/');
@@ -13,7 +15,12 @@ export const GET: RequestHandler = async ({ params }) => {
 
   try {
     const file = await fs.readFile(pathName);
-    return new Response(file);
+    return new Response(file, {
+      status: 200,
+      headers: {
+        'Cache-Control': `public, max-age=${CACHE_MAX_AGE}, immutable`,
+      },
+    });
   } catch {
     throw error(404);
   }

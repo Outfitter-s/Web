@@ -102,7 +102,12 @@
       "item": {
         "requiredField": "The following field{{s}} {{is}} required: {{field}}",
         "classificationFailed": "Failed to classify the clothing item. Please enter values manually.",
-        "missingImage": "Image file is required"
+        "missingImage": "Image file is required",
+        "name": "Please a name for this item (max 100 characters).",
+        "description": "Please provide a description for this item (max 500 characters).",
+        "type": "Please select a type for this item.",
+        "color": "Please select a color for this item.",
+        "image": "Please take an image of this item."
       },
       "outfit": {
         "delete": "Failed to delete outfit. Please try again later.",
@@ -266,7 +271,7 @@
         "danger": {
           "title": "Danger Zone"
         },
-        "profilePicture": "Change Profile Picture"
+        "profilePicture": "Profile Picture"
       },
       "password": {
         "title": "Password",
@@ -391,6 +396,11 @@
           "confirm": "Yes, change it",
           "cancel": "No, keep it"
         }
+      },
+      "mixAndMatch": {
+        "button": "I have some inspiration!",
+        "title": "Mix and Match",
+        "createButton": "Create outfit"
       }
     },
     "reminder": {

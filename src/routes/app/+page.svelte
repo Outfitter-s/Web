@@ -45,7 +45,7 @@
 
 <SEO title="seo.homePage.title" description="seo.homePage.description" />
 
-<Dialog.Root bind:open={changeOutfitConfirmModal.open} dismissible={false}>
+<Dialog.Root bind:open={changeOutfitConfirmModal.open}>
   <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title>{i18n.t('wardrobe.outfitGeneration.choosen.change.title')}</Dialog.Title>
