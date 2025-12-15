@@ -13,13 +13,14 @@
   import * as Field from '$lib/components/ui/field';
   import { Button } from '$lib/components/ui/button';
   import * as Dialog from '$lib/components/ui/dialog';
-  import { capitalize } from '$lib/utils';
+  import { capitalize, cn } from '$lib/utils';
   import { itemOpen } from '.';
   import { Camera } from '@lucide/svelte';
   import Spinner from '$lib/components/Spinner/Spinner.svelte';
   import { fade, slide } from 'svelte/transition';
   import { invalidateAll } from '$app/navigation';
   import ColorDot from '$lib/components/colorDot.svelte';
+  import { Textarea } from '$lib/components/ui/textarea';
 
   let takePictureStates = $state({
     open: false,
@@ -34,6 +35,7 @@
   let height = 0; // This will be computed based on the input stream
   let loading = $state(false);
   let processingImage = $state(false);
+  let fieldsErrors = $state<string[]>([]);
 
   $effect(() => {
     if (!$itemOpen) {
@@ -113,22 +115,18 @@
     });
     const result = await res.json();
     if (!res.ok) {
-      const fields = result.message.split(', ');
-      const multiple = fields.length > 1;
-      const msg = i18n.t('errors.clothing.item.requiredField', {
-        field: result.message,
-        s: multiple ? 's' : '',
-        is: multiple ? 'are' : 'is',
-      });
-      logger.error('Creation error:', msg);
-      Toaster.error(msg);
+      fieldsErrors = result.message.split(',');
     } else {
-      Toaster.success(i18n.t('successes.clothing.item.created'));
+      Toaster.success('successes.clothing.item.created');
       (event.target as HTMLFormElement).reset();
       $itemOpen = false;
       await invalidateAll();
     }
     loading = false;
+  }
+
+  function resetFormError(name: string) {
+    fieldsErrors = fieldsErrors.filter((field) => field !== name);
   }
 
   function resetForm() {
@@ -266,16 +264,22 @@
           <button
             type="button"
             onclick={openCamera}
-            class="border-muted hover:border-input hover:bg-input/30 relative flex min-h-[100px] grow cursor-pointer flex-col items-center justify-center gap-4 rounded-md border-2 border-dashed text-center text-sm transition-colors"
+            class={cn(
+              'border-muted hover:border-input hover:bg-input/30 relative flex min-h-25 grow cursor-pointer flex-col items-center justify-center gap-4 rounded-md border-2 border-dashed text-center text-sm transition-colors',
+              fieldsErrors.includes('image') ? 'border-destructive hover:border-destructive' : ''
+            )}
           >
             <Camera class="size-6" />
             <span class="text-muted-foreground">
               {i18n.t('wardrobe.createItem.fields.image.label')}
             </span>
           </button>
+          {#if fieldsErrors.includes('image')}
+            <Field.Error>{i18n.t('errors.clothing.item.image')}</Field.Error>
+          {/if}
         {:else}
           <div
-            class="border-border relative mx-auto h-[200px] shrink-0 overflow-hidden rounded border"
+            class="border-border relative mx-auto min-h-25 w-full shrink-0 overflow-hidden rounded border"
           >
             {#if processingImage}
               <div
@@ -288,34 +292,54 @@
             <img
               src={takePictureStates.capturedImage}
               alt=""
-              class="h-[200px]"
+              class="h-50"
               transition:slide={{ axis: 'y', duration: 200 }}
             />
           </div>
         {/if}
       </div>
 
-      <Field.Field>
+      <Field.Field data-invalid={fieldsErrors.includes('name')}>
         <Field.Label for="name">{i18n.t('wardrobe.createItem.fields.name')}</Field.Label>
-        <Input id="name" name="name" type="text" bind:value={formValues.name} />
+        <Input
+          id="name"
+          name="name"
+          type="text"
+          onkeydown={() => resetFormError('name')}
+          bind:value={formValues.name}
+          aria-invalid={fieldsErrors.includes('name')}
+        />
+        {#if fieldsErrors.includes('name')}
+          <Field.Error>{i18n.t('errors.clothing.item.name')}</Field.Error>
+        {/if}
       </Field.Field>
 
-      <Field.Field>
+      <Field.Field data-invalid={fieldsErrors.includes('description')}>
         <Field.Label for="description"
           >{i18n.t('wardrobe.createItem.fields.description')}</Field.Label
         >
-        <Input
+        <Textarea
           id="description"
           name="description"
-          type="text"
+          rows={2}
+          onkeydown={() => resetFormError('description')}
           bind:value={formValues.description}
+          aria-invalid={fieldsErrors.includes('description')}
         />
+        {#if fieldsErrors.includes('description')}
+          <Field.Error>{i18n.t('errors.clothing.item.description')}</Field.Error>
+        {/if}
       </Field.Field>
 
       <div class="grid grid-cols-2 gap-2">
-        <Field.Field>
+        <Field.Field data-invalid={fieldsErrors.includes('type')}>
           <Field.Label for="type">{i18n.t('wardrobe.createItem.fields.type')}</Field.Label>
-          <Select.Root type="single" name="type" bind:value={formValues.type}>
+          <Select.Root
+            type="single"
+            name="type"
+            bind:value={formValues.type}
+            onValueChange={() => resetFormError('type')}
+          >
             <Select.Trigger>{capitalize(formValues.type)}</Select.Trigger>
             <Select.Content>
               {#each clothingItemTypes as type}
@@ -323,11 +347,19 @@
               {/each}
             </Select.Content>
           </Select.Root>
+          {#if fieldsErrors.includes('type')}
+            <Field.Error>{i18n.t('errors.clothing.item.type')}</Field.Error>
+          {/if}
         </Field.Field>
 
-        <Field.Field>
+        <Field.Field data-invalid={fieldsErrors.includes('color')}>
           <Field.Label for="color">{i18n.t('wardrobe.createItem.fields.color')}</Field.Label>
-          <Select.Root type="single" name="color" bind:value={formValues.color}>
+          <Select.Root
+            type="single"
+            name="color"
+            bind:value={formValues.color}
+            onValueChange={() => resetFormError('color')}
+          >
             <Select.Trigger>
               <div class="flex flex-row items-center gap-2">
                 <ColorDot color={formValues.color} />
@@ -343,6 +375,9 @@
               {/each}
             </Select.Content>
           </Select.Root>
+          {#if fieldsErrors.includes('color')}
+            <Field.Error>{i18n.t('errors.clothing.item.color')}</Field.Error>
+          {/if}
         </Field.Field>
       </div>
 

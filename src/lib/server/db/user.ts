@@ -191,7 +191,6 @@ export class UserDAO {
 
   static async updateProfilePicture(userId: User['id'], imageBuffer: Buffer): Promise<void> {
     const outputPath = 'assets/profile_pictures/' + String(userId) + '.png';
-    console.log('Writing profile picture to', outputPath);
     await writeFile(outputPath, imageBuffer);
   }
 }
