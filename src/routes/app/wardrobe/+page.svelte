@@ -23,7 +23,7 @@
 
 <div class="flex grow flex-col">
   <!-- Header -->
-  <div class="flex shrink-0 flex-row flex-nowrap gap-4 overflow-x-scroll p-2 pb-0">
+  <div class="flex shrink-0 flex-row flex-nowrap gap-4 p-2 pb-0">
     <button
       onclick={() => changeSection('items')}
       class={cn(
@@ -43,15 +43,16 @@
   <!-- Content -->
   <div class="size-full grow">
     {#if activeSection === 'items'}
-      <div
-        class="grid gap-x-6 gap-y-4 p-4"
-        style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"
-      >
-        {#each page.data.items as item}
-          <OutfitItemCard {item} href="/app/wardrobe/item/{item.id}" />
-        {/each}
-      </div>
-      {#if page.data.items.length === 0}
+      {#if page.data.items.length > 0}
+        <div
+          class="grid gap-x-6 gap-y-4 p-4"
+          style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"
+        >
+          {#each page.data.items as item}
+            <OutfitItemCard {item} href="/app/wardrobe/item/{item.id}" />
+          {/each}
+        </div>
+      {:else}
         <Empty.Root>
           <Empty.Header>
             <Empty.Media variant="icon">
@@ -70,15 +71,16 @@
         </Empty.Root>
       {/if}
     {:else if activeSection === 'outfits'}
-      <div
-        class="grid gap-8 p-2 h-full overflow-hidden"
-        style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));"
-      >
-        {#each page.data.outfits as outfit}
-          <OutfitCard {outfit} href="/app/wardrobe/outfit/{outfit.id}" />
-        {/each}
-      </div>
-      {#if page.data.items.length === 0}
+      {#if page.data.items.length > 0}
+        <div
+          class="grid gap-8 p-2 h-full overflow-hidden"
+          style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));"
+        >
+          {#each page.data.outfits as outfit}
+            <OutfitCard {outfit} href="/app/wardrobe/outfit/{outfit.id}" />
+          {/each}
+        </div>
+      {:else}
         <Empty.Root>
           <Empty.Header>
             <Empty.Media variant="icon">
