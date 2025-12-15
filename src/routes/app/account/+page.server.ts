@@ -71,7 +71,7 @@ export const actions: Actions = {
         throw new Error('errors.auth.passwordReset.passwordsDontMatch');
 
       // Check if the password is the same as the current one
-      if (!(await bcrypt.compare(currentPassword, user.passwordHash)))
+      if (!(await bcrypt.compare(currentPassword, user.passwordHash!)))
         throw new Error('errors.auth.passwordReset.wrongCurrentPassword');
 
       // Hash password

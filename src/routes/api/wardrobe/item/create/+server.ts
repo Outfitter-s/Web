@@ -45,6 +45,4 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       { status: 400 }
     );
   }
-
-  return json({ success: true });
 };

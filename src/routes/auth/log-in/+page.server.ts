@@ -34,7 +34,7 @@ export const actions: Actions = {
           mustUsePasskey: true,
         });
       }
-      const compare = await bcrypt.compare(password, user.passwordHash);
+      const compare = await bcrypt.compare(password, user.passwordHash!);
 
       if (!compare) throw new Error('errors.auth.invalidCredentials');
 
