@@ -4,6 +4,7 @@
   import type { PageProps } from './$types';
   import { Button } from '$lib/components/ui/button';
   import { User } from '@lucide/svelte';
+  import { ProfilePicture } from '$lib/components';
 
   let { data }: PageProps = $props();
   // svelte-ignore state_referenced_locally
@@ -56,7 +57,7 @@
 <div class="mx-auto flex w-full max-w-250 flex-col gap-4 p-2 items-start">
   <div class="flex flex-row gap-6 items-center">
     <div class="rounded-full border-border border overflow-hidden size-24 bg-card">
-      <User class="size-full" />
+      <ProfilePicture userId={pageUser.id} class="size-full" />
     </div>
     <div class="flex flex-col gap-2">
       <h1 class="text-xl font-medium">{pageUser.username}</h1>

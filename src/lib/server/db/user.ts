@@ -3,6 +3,7 @@ import pool from '.';
 import { Caching } from './caching';
 import { PasskeyDAO } from './passkey';
 import { SocialDAO } from './social';
+import { writeFile } from 'node:fs/promises';
 
 export interface UserTable {
   id: UUID;
@@ -186,5 +187,11 @@ export class UserDAO {
       await Caching.del(`user:${updates.username}`);
       await Caching.del(`userExists:${updates.username}`);
     }
+  }
+
+  static async updateProfilePicture(userId: User['id'], imageBuffer: Buffer): Promise<void> {
+    const outputPath = 'assets/profile_pictures/' + String(userId) + '.png';
+    console.log('Writing profile picture to', outputPath);
+    await writeFile(outputPath, imageBuffer);
   }
 }

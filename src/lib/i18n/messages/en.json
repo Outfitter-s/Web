@@ -94,7 +94,8 @@
     },
     "account": {
       "settings": {
-        "cannotChangeUsername": "Cannot change username."
+        "cannotChangeUsername": "Cannot change username.",
+        "invalidProfilePicture": "Invalid profile picture. Please upload a valid image file."
       }
     },
     "clothing": {
@@ -126,6 +127,7 @@
     "resetPassword": "Your password has been reset successfully!",
     "usernameUpdated": "Username updated successfully.",
     "emailUpdated": "Email updated successfully.",
+    "profilePictureUpdated": "Profile picture updated successfully.",
     "clothing": {
       "item": {
         "created": "Clothing item created successfully."
@@ -263,7 +265,8 @@
         "logout": "Log out",
         "danger": {
           "title": "Danger Zone"
-        }
+        },
+        "profilePicture": "Change Profile Picture"
       },
       "password": {
         "title": "Password",

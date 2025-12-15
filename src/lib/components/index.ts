@@ -6,3 +6,4 @@ export { default as Spinner } from './Spinner';
 export { default as Hr } from './Hr.svelte';
 export { default as OutfitItemCard } from './OutfitItemCard.svelte';
 export { default as OutfitCard } from './OutfitCard.svelte';
+export { default as ProfilePicture } from './ProfilePicture.svelte';
