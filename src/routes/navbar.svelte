@@ -63,10 +63,14 @@
 {/snippet}
 
 <nav
-  class="fixed right-0 bottom-0 left-0 z-10 h-14 shrink-0 flex-row justify-center border-border bg-card grid w-full max-w-250 items-center gap-2 border-t px-2"
-  style="grid-template-columns: repeat({links.length}, 1fr);"
+  class="fixed right-0 bottom-0 left-0 z-10 h-14 shrink-0 border-border bg-card grid w-full border-t px-2"
 >
-  {#each links as l}
-    {@render entry(l)}
-  {/each}
+  <div
+    class="max-w-250 grid w-full justify-center items-center gap-2 mx-auto"
+    style="grid-template-columns: repeat({links.length}, 1fr);"
+  >
+    {#each links as l}
+      {@render entry(l)}
+    {/each}
+  </div>
 </nav>

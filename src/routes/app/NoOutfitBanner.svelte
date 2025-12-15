@@ -24,7 +24,7 @@
 {#if visible && page.url.pathname !== '/app'}
   <div transition:slide={{ axis: 'y', duration: 300 }}>
     <div
-      class="flex items-center justify-center border-y border-destructive/50 bg-destructive/20 p-4 text-destructive text-center gap-10 leading-6 flex-row"
+      class="flex items-center justify-center border-y border-destructive/50 bg-destructive/15 py-3 px-4 text-destructive text-center gap-10 flex-row"
     >
       <TriangleAlert class="size-5" />
       <span class="text-start text-wrap">
