@@ -18,6 +18,7 @@ if [[ ! -f "$bootstrap_zip" ]]; then
   exit 1
 fi
 mkdir -p "$images_dir"
+mkdir "$root/assets/profile_pictures"
 unzip -q "$bootstrap_zip" -d "$unzip_dir"
 if [[ $? -ne 0 ]]; then
   echo "Error: Failed to unzip $bootstrap_zip"

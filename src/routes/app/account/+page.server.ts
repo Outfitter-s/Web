@@ -145,4 +145,28 @@ export const actions: Actions = {
       });
     }
   },
+  updateProfilePicture: async ({ locals, request }) => {
+    const user = locals.user!;
+    const formData = Object.fromEntries(await request.formData());
+    const { updateProfilePictureInput: image } = formData as {
+      updateProfilePictureInput: File;
+    };
+    console.log(image.type);
+    try {
+      if (image.type.split('/')[0] !== 'image') {
+        throw new Error('errors.account.settings.invalidProfilePicture');
+      }
+      const imageBuffer = Buffer.from(await image.arrayBuffer());
+      console.log(imageBuffer);
+
+      await UserDAO.updateProfilePicture(user.id, imageBuffer);
+      return { success: true, action: 'general', message: 'successes.profilePictureUpdated' };
+    } catch (error) {
+      return fail(500, {
+        action: 'general',
+        error: true,
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  },
 };

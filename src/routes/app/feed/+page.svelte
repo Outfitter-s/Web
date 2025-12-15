@@ -8,6 +8,7 @@
   import { Toaster } from '$lib/components/Toast/toast';
   import { flip } from 'svelte/animate';
   import { slide } from 'svelte/transition';
+  import { ProfilePicture } from '$lib/components';
 
   let { data }: PageProps = $props();
   let searchResults = $state<User[]>([]);
@@ -35,7 +36,7 @@
 <div class="mx-auto flex w-full max-w-250 flex-col gap-4 items-start">
   {#if searchResults.length > 0}
     <!-- svelte-ignore a11y_consider_explicit_label -->
-    <button class="fixed z-9 appearance-none inset-0" onclick={() => (searchResults = [])}></button>
+    <button class="fixed z-0 appearance-none inset-0" onclick={() => (searchResults = [])}></button>
   {/if}
   <div class="sticky top-0 left-0 right-0 w-full">
     <div class="relative w-full p-2">
@@ -60,7 +61,7 @@
               animate:flip={{ duration: 300 }}
             >
               <div class="size-6 bg-card rounded-full border border-border overflow-hidden">
-                <UserIcon class="size-full" />
+                <ProfilePicture userId={user.id} class="size-full" />
               </div>
               {user.username}
             </a>

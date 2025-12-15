@@ -13,6 +13,7 @@
   import Theming, { availableModes, availableThemes, type Mode } from '$lib/theming/index.svelte';
   import { capitalize } from '$lib/utils';
   import { Hr } from '$lib/components';
+  import ProfilePicture from '$lib/components/ProfilePicture.svelte';
 
   let currentTheme = $state(page.data.theme);
   let currentLocale = $state(i18n.locale);
@@ -26,6 +27,7 @@
     controller: new AbortController(),
   });
   let updateEmailLoading = $state(false);
+  let isUpdatingProfilePicture = $state(false);
 
   async function onUsernameInput() {
     const newUsername = formValues.username.trim();
@@ -161,6 +163,35 @@
   >
     {i18n.t('account.tabs.general.changeEmail.title')}
   </Button>
+</form>
+
+<form
+  action="?/updateProfilePicture"
+  enctype="multipart/form-data"
+  class="space-y-4"
+  method="POST"
+  use:enhance={() => {
+    isUpdatingProfilePicture = true;
+    return async ({ update }) => {
+      update({ reset: false });
+      isUpdatingProfilePicture = false;
+    };
+  }}
+>
+  <Label>{i18n.t('account.tabs.general.profilePicture')}</Label>
+  <label for="updateProfilePictureInput" class="size-20 block">
+    <ProfilePicture userId={page.data.user.id} class="size-full" />
+    <input
+      type="file"
+      name="updateProfilePictureInput"
+      id="updateProfilePictureInput"
+      class="hidden"
+      accept="image/*"
+      onchange={(e) => {
+        (e.target as HTMLInputElement).closest('form')?.submit();
+      }}
+    />
+  </label>
 </form>
 
 <div class="grid md:grid-cols-3 grid-cols-2 gap-4">

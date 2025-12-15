@@ -7,7 +7,7 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ params }) => {
   const parts = params.path.split('/');
   if (parts.length !== 2) throw error(404);
-  const allowedDirs = ['clothing_item', 'outfits'];
+  const allowedDirs = ['clothing_item', 'outfits', 'profile_pictures'];
   if (!allowedDirs.includes(parts[0])) throw error(404);
   const pathName = path.resolve('assets', params.path);
 
