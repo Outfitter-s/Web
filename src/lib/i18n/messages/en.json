@@ -379,6 +379,17 @@
         }
       }
     },
+    "reminder": {
+      "title": "Reminder",
+      "noTodayOutfit": "You don't have an outfit for today — create one!",
+      "createButton": "Create Outfit"
+    },
+    "reminder": {
+      "title": "Reminder",
+      "noTodayOutfit": "You don't have an outfit for today — create one!",
+      "createButton": "Create Outfit",
+      "close": "Close"
+    },
     "outfitDetails": {
       "lastWornOn": "Last worn on {{date}}"
     }

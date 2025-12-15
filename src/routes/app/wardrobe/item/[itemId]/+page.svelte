@@ -2,10 +2,11 @@
   import { page } from '$app/state';
   import type { ClothingItem } from '$lib/types';
   import { capitalize, DateUtils } from '$lib/utils';
-  import { Calendar, Palette, Shirt, Pencil } from '@lucide/svelte';
+  import { Calendar, Palette, Shirt, Pencil, ArrowLeftIcon } from '@lucide/svelte';
   import ColorDot from '$lib/components/colorDot.svelte';
   import { Button } from '$lib/components/ui/button';
   import { SEO } from '$lib/components';
+  import { Backdrop } from '$lib/components/ui/dialog';
 
   let itemId = $derived<string>(page.params.itemId as string);
   let items = $derived<ClothingItem[]>(page.data.items);
@@ -38,9 +39,14 @@
       <div class="flex w-full flex-col gap-4 p-2 lg:w-1/2 lg:p-4">
         <div class="flex items-start justify-between">
           <h1 class="font-sans text-2xl font-bold">{item.name}</h1>
-          <Button variant="outline" size="icon" href="/app/wardrobe/item/{itemId}/edit">
-            <Pencil class="size-4" />
-          </Button>
+          <div class="flex gap-2">
+            <Button variant="outline" size="icon" href="/app/wardrobe/item/{itemId}/edit">
+              <Pencil class="size-4" />
+            </Button>
+            <Button variant="outline" size="icon" href="/app/wardrobe/">
+              <ArrowLeftIcon class="size-4" />
+            </Button>
+          </div>
         </div>
 
         <p class="font-mono text-base font-normal wrap-normal">{item.description}</p>

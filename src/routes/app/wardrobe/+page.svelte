@@ -23,7 +23,7 @@
 
 <div class="flex grow flex-col">
   <!-- Header -->
-  <div class="flex shrink-0 flex-row flex-nowrap gap-4 overflow-x-scroll p-2 pb-0">
+  <div class="flex shrink-0 flex-row flex-nowrap gap-4 p-2 pb-0">
     <button
       onclick={() => changeSection('items')}
       class={cn(
