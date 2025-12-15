@@ -9,6 +9,7 @@
   import { flip } from 'svelte/animate';
   import { slide } from 'svelte/transition';
   import { ProfilePicture } from '$lib/components';
+  import { resolve } from '$app/paths';
 
   let { data }: PageProps = $props();
   let searchResults = $state<User[]>([]);
@@ -56,7 +57,7 @@
         >
           {#each searchResults as user (user.id)}
             <a
-              href="/app/@{user.username}"
+              href={resolve('/app/[username]', { username: `@${user.username}` })}
               class="px-4 py-2 cursor-pointer flex flex-row gap-4"
               animate:flip={{ duration: 300 }}
             >

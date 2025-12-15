@@ -8,6 +8,7 @@
   import { page } from '$app/state';
   import { OutfitItemCard, SEO } from '$lib/components';
   import OutfitCard from '$lib/components/OutfitCard.svelte';
+  import { resolve } from '$app/paths';
 
   const sections = ['items', 'outfits'] as const;
   type Section = (typeof sections)[number];
@@ -49,7 +50,7 @@
           style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"
         >
           {#each page.data.items as item}
-            <OutfitItemCard {item} href="/app/wardrobe/item/{item.id}" />
+            <OutfitItemCard {item} href={resolve('/app/wardrobe/item/{item.id}')} />
           {/each}
         </div>
       {:else}
@@ -77,7 +78,7 @@
           style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));"
         >
           {#each page.data.outfits as outfit}
-            <OutfitCard {outfit} href="/app/wardrobe/outfit/{outfit.id}" />
+            <OutfitCard {outfit} href={resolve('/app/wardrobe/outfit/{outfit.id}')} />
           {/each}
         </div>
       {:else}
@@ -92,7 +93,9 @@
             </Empty.Description>
           </Empty.Header>
           <Empty.Content>
-            <Button href="/app">{i18n.t('wardrobe.itemList.outfits.empty.createButton')}</Button>
+            <Button href={resolve('/app')}
+              >{i18n.t('wardrobe.itemList.outfits.empty.createButton')}</Button
+            >
           </Empty.Content>
         </Empty.Root>
       {/if}

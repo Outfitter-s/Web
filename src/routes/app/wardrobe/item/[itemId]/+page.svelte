@@ -7,6 +7,7 @@
   import { Button } from '$lib/components/ui/button';
   import { SEO } from '$lib/components';
   import { Backdrop } from '$lib/components/ui/dialog';
+  import { resolve } from '$app/paths';
 
   let itemId = $derived<string>(page.params.itemId as string);
   let items = $derived<ClothingItem[]>(page.data.items);
@@ -40,10 +41,14 @@
         <div class="flex items-start justify-between">
           <h1 class="font-sans text-2xl font-bold">{item.name}</h1>
           <div class="flex gap-2">
-            <Button variant="outline" size="icon" href="/app/wardrobe/item/{itemId}/edit">
+            <Button
+              variant="outline"
+              size="icon"
+              href={resolve('/app/wardrobe/item/{itemId}/edit')}
+            >
               <Pencil class="size-4" />
             </Button>
-            <Button variant="outline" size="icon" href="/app/wardrobe/">
+            <Button variant="outline" size="icon" href={resolve('/app/wardrobe/')}>
               <ArrowLeftIcon class="size-4" />
             </Button>
           </div>

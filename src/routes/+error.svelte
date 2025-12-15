@@ -4,6 +4,7 @@
   import { Button } from '$lib/components/ui/button';
   import i18n from '$lib/i18n';
   import { SEO } from '$lib/components';
+  import { resolve } from '$app/paths';
 </script>
 
 <SEO
@@ -24,6 +25,6 @@
       }}>{i18n.t('errorPage.cta.goBack')}</Button
     >
   {:else}
-    <Button href="/">{i18n.t('errorPage.cta.goHome')}</Button>
+    <Button href={resolve('/')}>{i18n.t('errorPage.cta.goHome')}</Button>
   {/if}
 </div>

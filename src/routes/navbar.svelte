@@ -40,7 +40,7 @@
     <Button
       variant="none"
       onclick={() => ($itemOpen = !$itemOpen)}
-      class=" border-border bg-card z-10 mx-auto -mt-6 size-14 rounded-full border p-2 shadow-xl"
+      class=" border-border bg-card z-10 mx-auto -translate-y-5 size-14 rounded-full border p-2 shadow-xl"
     >
       <Plus class="size-full" />
     </Button>
@@ -63,14 +63,10 @@
 {/snippet}
 
 <nav
-  class="fixed right-0 bottom-0 left-0 z-10 flex h-16 w-full shrink-0 flex-row items-center justify-center p-2"
+  class="fixed right-0 bottom-0 left-0 z-10 h-14 shrink-0 flex-row justify-center border-border bg-card grid w-full max-w-250 items-center gap-2 border-t px-2"
+  style="grid-template-columns: repeat({links.length}, 1fr);"
 >
-  <div
-    class="border-border bg-card grid h-full w-full max-w-250 items-center gap-2 rounded-lg border px-2"
-    style="grid-template-columns: repeat({links.length}, 1fr);"
-  >
-    {#each links as l}
-      {@render entry(l)}
-    {/each}
-  </div>
+  {#each links as l}
+    {@render entry(l)}
+  {/each}
 </nav>

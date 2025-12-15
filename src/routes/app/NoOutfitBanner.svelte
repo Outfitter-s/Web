@@ -6,6 +6,7 @@
   import { page } from '$app/state';
   import { TriangleAlert } from '@lucide/svelte';
   import type { Outfit, User } from '$lib/types';
+  import { resolve } from '$app/paths';
 
   let user = $derived<User>(page.data.user);
   let outfits = $derived<Outfit[]>(page.data.outfits);
@@ -23,14 +24,14 @@
 {#if visible && page.url.pathname !== '/app'}
   <div transition:slide={{ axis: 'y', duration: 300 }}>
     <div
-      class="mb-4 flex items-center justify-center border-y border-destructive/50 bg-destructive/20 p-4 text-destructive text-center gap-10 leading-6 flex-row"
+      class="flex items-center justify-center border-y border-destructive/50 bg-destructive/20 p-4 text-destructive text-center gap-10 leading-6 flex-row"
     >
       <TriangleAlert class="size-5" />
       <span class="text-start text-wrap">
         {i18n.t('wardrobe.reminder.noTodayOutfit')}
       </span>
 
-      <Button href="/app" variant="default" size="sm"
+      <Button href={resolve('/app')} variant="default" size="sm"
         >{i18n.t('wardrobe.reminder.createButton')}</Button
       >
     </div>
