@@ -6,3 +6,5 @@ export { default as Spinner } from './Spinner';
 export { default as Hr } from './Hr.svelte';
 export { default as OutfitItemCard } from './OutfitItemCard.svelte';
 export { default as OutfitCard } from './OutfitCard.svelte';
+export { default as IPhone15Pro } from './IPhone15Pro.svelte';
+export { default as Features } from './Features.svelte';

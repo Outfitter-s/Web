@@ -3,7 +3,38 @@
   import { SEO } from '$lib/components';
   import Button from '$lib/components/ui/button/button.svelte';
   import ArrowRight from '@lucide/svelte/icons/arrow-right';
-  import ChevronRight from '@lucide/svelte/icons/chevron-right';
+  import PackageSearch from '@lucide/svelte/icons/package-search';
+  import Settings from '@lucide/svelte/icons/settings';
+  import Eye from '@lucide/svelte/icons/eye';
+  import IPhone15Pro from '$lib/components/IPhone15Pro.svelte';
+  import Features from '$lib/components/Features.svelte';
+
+  let data = [
+    {
+      id: 1,
+      title: '1. blabla',
+      content:
+        'lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum.',
+      image: '',
+      icon: PackageSearch,
+    },
+    {
+      id: 2,
+      title: '2. blablabl',
+      content:
+        'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      image: '',
+      icon: Settings,
+    },
+    {
+      id: 3,
+      title: '3. blablabla',
+      content:
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      image: '',
+      icon: Eye,
+    },
+  ];
 </script>
 
 <SEO title="seo.homePage.title" description="seo.homePage.description" />
@@ -62,128 +93,27 @@
             and connect with a style-driven community. Fashion made effortless.
           </p>
 
-          <div class="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
+          <div class="mt-12 flex items-center justify-center gap-2 md:flex-row">
             <Button size="lg" variant="default" href="/auth">
-              <span class="text-nowrap">Get started</span>
+              <span class="text-nowrap">Find my look</span>
             </Button>
             <Button size="lg" variant="ghost" href="#about">Learn more</Button>
           </div>
         </div>
       </div>
 
-      <div class="relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
-        <div
-          class="bg-linear-to-b to-background absolute inset-0 z-10 from-transparent from-35%"
-        ></div>
-        <div
-          class="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4"
-        >
-          <img
-            class="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
-            src="/hero.png"
-            alt="app screen"
-            width="2700"
-            height="1440"
-          />
-          <img
-            class="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
-            src="/hero-light.png"
-            alt="app screen"
-            width="2700"
-            height="1440"
-          />
+      <div class="relative mt-8 overflow-visible px-2 sm:mr-0 sm:mt-12 md:mt-20">
+        <div class="relative mx-auto flex max-w-6xl justify-center">
+          <div class="relative origin-center rotate-15">
+            <IPhone15Pro src="/hero.png" scale={0.8} />
+          </div>
         </div>
       </div>
     </div>
   </section>
   <section class="bg-background pb-16 pt-16 md:pb-32">
-    <div class="group relative m-auto max-w-5xl px-6">
-      <div
-        class="absolute inset-0 z-10 flex scale-95 items-center justify-center opacity-0 duration-500 group-hover:scale-100 group-hover:opacity-100"
-      >
-        <a href="/" class="block text-sm duration-150 hover:opacity-75">
-          <span> Meet Our Customers</span>
-
-          <ChevronRight class="ml-1 inline-block size-3" />
-        </a>
-      </div>
-      <div
-        class="group-hover:blur-xs mx-auto mt-12 grid max-w-2xl grid-cols-4 gap-x-12 gap-y-8 transition-all duration-500 group-hover:opacity-50 sm:gap-x-16 sm:gap-y-14"
-      >
-        <div class="flex">
-          <img
-            class="mx-auto h-5 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/nvidia.svg"
-            alt="Nvidia Logo"
-            height="20"
-            width="auto"
-          />
-        </div>
-
-        <div class="flex">
-          <img
-            class="mx-auto h-4 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/column.svg"
-            alt="Column Logo"
-            height="16"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-4 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/github.svg"
-            alt="GitHub Logo"
-            height="16"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-5 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/nike.svg"
-            alt="Nike Logo"
-            height="20"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-5 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/lemonsqueezy.svg"
-            alt="Lemon Squeezy Logo"
-            height="20"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-4 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/laravel.svg"
-            alt="Laravel Logo"
-            height="16"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-7 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/lilly.svg"
-            alt="Lilly Logo"
-            height="28"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-6 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/openai.svg"
-            alt="OpenAI Logo"
-            height="24"
-            width="auto"
-          />
-        </div>
-      </div>
+    <div id="about" class="mx-auto max-w-7xl px-6">
+      <Features {data} />
     </div>
   </section>
 </main>
