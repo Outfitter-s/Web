@@ -6,6 +6,7 @@
   import FormWrapper from '../../formWrapper.svelte';
   import i18n from '$lib/i18n';
   import { Label } from '$lib/components/ui/label';
+  import { SEO } from '$lib/components';
 
   let { form, data } = $props();
   let loading = $state(false);
@@ -24,6 +25,8 @@
     }
   });
 </script>
+
+<SEO title="seo.auth.resetPassword.title" description="seo.auth.resetPassword.description" />
 
 <FormWrapper reverse={true}>
   <div class="flex w-full flex-col space-y-8">

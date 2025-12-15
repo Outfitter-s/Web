@@ -32,6 +32,15 @@ export function copyToClipboard(value: string) {
   }
 }
 
+export function hashStringToNumber(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
 export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export const isMobile = new MediaQuery('(max-width: 768px)');
@@ -44,3 +53,7 @@ export type WithoutChild<T> = T extends { child?: any } ? Omit<T, 'child'> : T;
 export type WithoutChildren<T> = T extends { children?: any } ? Omit<T, 'children'> : T;
 export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
 export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
+
+export * from './date';
+export * from './weather';
+export * from './logger';

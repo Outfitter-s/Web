@@ -24,5 +24,7 @@ done
 # Run database migrations
 bun run db:migrate
 
+echo "Running outfitter version $(cat ./VERSION)"
+
 # Launch prod server
 bun --bun run build/index.js

@@ -22,7 +22,7 @@
   });
 </script>
 
-<SEO title={'Sign up'} />
+<SEO title="seo.auth.signUp.title" description="seo.auth.signUp.description" />
 
 <FormWrapper>
   <form

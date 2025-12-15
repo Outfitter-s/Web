@@ -65,7 +65,7 @@
     const formData = new FormData();
     formData.append('image', file);
     try {
-      const res = await fetch('/api/wardrobe/classify-item', {
+      const res = await fetch('/api/wardrobe/item/classify', {
         method: 'POST',
         body: formData,
       });
@@ -107,7 +107,7 @@
       const file = new File([blob], 'uploaded_image.png', { type: blob.type });
       formData.append('image', file);
     }
-    const res = await fetch('/api/wardrobe/create-item', {
+    const res = await fetch('/api/wardrobe/item/create', {
       method: 'POST',
       body: formData,
     });

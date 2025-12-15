@@ -1,6 +1,6 @@
 import type { ClothingItem, ClothingItemType, Outfit, OutfitPreview, UUID } from '$lib/types';
 import pool from '.';
-import { ClothingItemDAO } from './clotingItem';
+import { ClothingItemDAO } from './clothingItem';
 
 export interface OutfitTable {
   id: UUID;
@@ -15,27 +15,10 @@ export interface OutfitItemTable {
 
 export class OutfitDAO {
   static convertToOutfit(row: OutfitTable, items: ClothingItem[]): Outfit {
-    const byType: Record<ClothingItemType, ClothingItem[]> = {
-      pants: [],
-      sweater: [],
-      dress: [],
-      jacket: [],
-      shirt: [],
-      shoes: [],
-      accessory: [],
-    };
-    for (const item of items) {
-      byType[item.type].push(item);
-    }
-
     return {
       id: row.id,
-      top: [...byType.shirt, ...byType.dress],
-      bottom: byType.pants[0] || null,
-      shoes: byType.shoes[0] || null,
-      accessories: byType.accessory,
+      items,
       createdAt: new Date(row.created_at),
-      wornAt: [],
     };
   }
 
@@ -63,7 +46,10 @@ export class OutfitDAO {
   }
 
   static async getAllUserOutfits(userId: UUID): Promise<Outfit[]> {
-    const res = await pool.query<OutfitTable>('SELECT * FROM outfit WHERE user_id = $1', [userId]);
+    const res = await pool.query<OutfitTable>(
+      'SELECT * FROM outfit WHERE user_id = $1 ORDER BY created_at DESC',
+      [userId]
+    );
     const outfits: Outfit[] = [];
 
     for (const row of res.rows) {
@@ -97,20 +83,26 @@ export class OutfitDAO {
     }
     const outfitRow = res.rows[0];
 
-    for (const item of [
-      ...(outfit.top || []),
-      outfit.bottom,
-      outfit.shoes,
-      ...(outfit.accessories || []),
-    ]) {
-      if (item) {
-        await pool.query(
-          'INSERT INTO outfit_clothing_items (outfit_id, clothing_item_id, position) VALUES ($1, $2, $3)',
-          [outfitRow.id, item.id, item.type]
-        );
-      }
+    for (const item of outfit.items) {
+      await pool.query(
+        'INSERT INTO outfit_clothing_items (outfit_id, clothing_item_id, position) VALUES ($1, $2, $3)',
+        [outfitRow.id, item.id, item.type]
+      );
     }
 
     return this.getOutfitById(outfitRow.id) as Promise<Outfit>;
+  }
+
+  static async deleteOutfit(outfitId: UUID): Promise<void> {
+    await pool.query('DELETE FROM outfit_clothing_items WHERE outfit_id = $1', [outfitId]);
+    await pool.query('DELETE FROM outfit WHERE id = $1', [outfitId]);
+  }
+
+  static async outfitBelongsToUser(userId: UUID, outfitId: UUID): Promise<void> {
+    const res = await pool.query<OutfitTable>(
+      'SELECT * FROM outfit WHERE id = $1 AND user_id = $2',
+      [outfitId, userId]
+    );
+    if (res.rows.length === 0) throw new Error('errors.clothing.outfit.notAuthorized');
   }
 }

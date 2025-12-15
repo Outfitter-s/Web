@@ -31,6 +31,7 @@ COPY --from=prerelease /app/build build/
 COPY --from=prerelease /app/entrypoint.sh .
 COPY --from=prerelease /app/scripts scripts/
 COPY --from=prerelease /app/sql sql/
+COPY --from=prerelease /app/VERSION .
 # USER bun
 EXPOSE 4173
 CMD [ "sh", "./entrypoint.sh" ]

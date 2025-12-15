@@ -163,7 +163,7 @@
   </Button>
 </form>
 
-<div class="grid grid-cols-3 gap-4">
+<div class="grid md:grid-cols-3 grid-cols-2 gap-4">
   <div class="flex flex-col gap-2">
     <Label for="modeSelect">{i18n.t('account.tabs.general.theme.mode')}</Label>
     <Select.Root
@@ -172,7 +172,7 @@
       bind:value={currentTheme.mode.mode}
       onValueChange={() => Theming.setMode(currentTheme.mode.mode, currentTheme.theme)}
     >
-      <Select.Trigger class="w-[180px]">
+      <Select.Trigger class="w-full max:w-45">
         <div class="flex items-center gap-2">
           <span class="size-4">
             {@render modeIcon(currentTheme.mode.mode)}
@@ -204,7 +204,7 @@
       bind:value={currentTheme.theme}
       onValueChange={() => Theming.setTheme(currentTheme.theme, currentTheme.mode.mode)}
     >
-      <Select.Trigger class="w-[180px]">
+      <Select.Trigger class="w-full max:w-45">
         {capitalize(currentTheme.theme)}
       </Select.Trigger>
       <Select.Content>
@@ -224,7 +224,7 @@
       bind:value={currentLocale}
       onValueChange={(val) => i18n.setLocale(val)}
     >
-      <Select.Trigger class="w-[180px]">
+      <Select.Trigger class="w-full max:w-45">
         {capitalize(i18n.getLocaleName(currentLocale))}
       </Select.Trigger>
       <Select.Content>

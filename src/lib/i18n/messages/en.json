@@ -3,17 +3,50 @@
     "titleSuffix": "Outfitter",
     "defaults": {
       "title": "Outfitter",
-      "description": "DEFAULT_DESCRIPTION"
+      "description": "Welcome to Outfitter, your personal outfit generator and wardrobe manager. Create stylish outfits based on your clothing items.",
+      "error": {
+        "title": "An error occurred",
+        "description": "Sorry, an unexpected error has occurred. Please try again later."
+      }
     },
     "homePage": {
-      "title": "Home"
+      "title": "Home",
+      "description": "Welcome to Outfitter, your personal outfit generator and wardrobe manager. Create stylish outfits based on your clothing items."
     },
     "auth": {
       "logIn": {
-        "title": "Log In"
+        "title": "Log In",
+        "description": "Log in to your Outfitter account to manage your wardrobe and generate stylish outfits tailored to your clothing items."
       },
       "signUp": {
-        "title": "Sign Up"
+        "title": "Sign Up",
+        "description": "Create an account on Outfitter to start managing your wardrobe and generating stylish outfits tailored to your clothing items."
+      },
+      "forgotPassword": {
+        "title": "Forgot Password",
+        "description": "Reset your Outfitter account password to regain access to your wardrobe and outfit generation features."
+      },
+      "resetPassword": {
+        "title": "Reset Password",
+        "description": "Set a new password for your Outfitter account and regain access to your wardrobe and outfit generation features."
+      }
+    },
+    "account": {
+      "settings": {
+        "title": "Account Settings",
+        "description": "Manage your Outfitter account settings, including username, email, password, and security options like TOTP and passkeys."
+      }
+    },
+    "wardrobe": {
+      "title": "Wardrobe",
+      "description": "Manage your wardrobe by adding clothing items and generating stylish outfits based on your collection.",
+      "item": {
+        "title": "Clothing Item",
+        "description": "View and manage your clothing item details in your Outfitter wardrobe.",
+        "edit": {
+          "title": "Edit Clothing Item",
+          "description": "Edit the details of your clothing item in your Outfitter wardrobe."
+        }
       }
     }
   },
@@ -69,6 +102,10 @@
         "requiredField": "The following field{{s}} {{is}} required: {{field}}",
         "classificationFailed": "Failed to classify the clothing item. Please enter values manually.",
         "missingImage": "Image file is required"
+      },
+      "outfit": {
+        "delete": "Failed to delete outfit. Please try again later.",
+        "notAuthorized": "This outfit does not belong to you."
       }
     },
     "outfitGeneration": {
@@ -305,6 +342,15 @@
             "style": "Stylish",
             "formal": "Formal"
           }
+        },
+        "weather": {
+          "question": "What's the weather like?",
+          "options": {
+            "sunny": "Sunny",
+            "rainy": "Rainy",
+            "cold": "Cold",
+            "snowy": "Snowy"
+          }
         }
       },
       "swiper": {
@@ -320,6 +366,31 @@
         "description": "This will be the outfit you will be rocking today!",
         "confirmButton": "Choose",
         "cancelButton": "I changed my mind"
+      },
+      "choosen": {
+        "title": "Today's Outfit",
+        "description": "You're all set for today! Here's your chosen outfit.",
+        "change": {
+          "cta": "Change outfit",
+          "title": "Change Outfit",
+          "description": "Are you sure you want to change your outfit for today? This action cannot be undone.",
+          "confirm": "Yes, change it",
+          "cancel": "No, keep it"
+        }
+      }
+    },
+    "outfitDetails": {
+      "lastWornOn": "Last worn on {{date}}"
+    }
+  },
+  "transactional": {
+    "emails": {
+      "passwordReset": {
+        "subject": "Outfitter Password Reset",
+        "greeting": "Hello {{username}},",
+        "body": "We received a request to reset your password for your Outfitter account. Click the link below to reset your password:",
+        "resetLinkText": "Reset Password",
+        "footer": "If you did not request a password reset, please ignore this email. Your password will remain unchanged."
       }
     }
   }

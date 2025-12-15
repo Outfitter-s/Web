@@ -73,9 +73,6 @@ export class UserDAO {
   }
 
   static async getUserByUsername(username: User['username']): Promise<User> {
-    // const cachedUser = await Caching.get<User>(`user:${username}`);
-    // if (cachedUser) return cachedUser;
-
     const userResult = await pool.query<UserTable>('SELECT * FROM users WHERE username = $1', [
       username,
     ]);
@@ -86,7 +83,6 @@ export class UserDAO {
       userResult.rows[0],
       await PasskeyDAO.getUserPasskey(userResult.rows[0].id)
     );
-    await Caching.set(`user:${username}`, user);
     return user;
   }
 

@@ -1,6 +1,7 @@
 import type { AuthenticatorTransportFuture, CredentialDeviceType } from '@simplewebauthn/browser';
 import z from 'zod';
 
+// Generics
 export const UUID = z.uuidv4();
 export type UUID = z.infer<typeof UUID>;
 export const DateZ = z.date().or(
@@ -11,6 +12,31 @@ export const DateZ = z.date().or(
     })
     .transform((date) => new Date(date))
 );
+
+// Domain Entities
+export const UserZ = z.object({
+  id: UUID,
+  username: z.string().min(3).max(30),
+  email: z.email(),
+  passwordHash: z.string(),
+  createdAt: DateZ,
+  totpSecret: z.string().optional(),
+  passkey: z.any().nullable(),
+});
+export type User = z.infer<typeof UserZ>;
+export interface Passkey {
+  id: Base64URLString;
+  publicKey: Uint8Array;
+  webauthnUserID: Base64URLString;
+  counter: number;
+  deviceType: CredentialDeviceType;
+  backedUp: boolean;
+  transports?: AuthenticatorTransportFuture[];
+}
+export const roles = ['user', 'admin'] as const; // Keep the roles in order of power (used by `isRoleBelow` in `./roles/index.ts`)
+export type Role = (typeof roles)[number];
+
+// Clothing Item
 export const clothingItemTypes = [
   'pants',
   'sweater',
@@ -21,6 +47,7 @@ export const clothingItemTypes = [
   'accessory',
 ] as const;
 export type ClothingItemType = (typeof clothingItemTypes)[number];
+
 export const clothingItemColors = [
   'red',
   'blue',
@@ -36,29 +63,8 @@ export const clothingItemColors = [
 ] as const;
 export type ClothingItemColor = (typeof clothingItemColors)[number];
 
-export const UserZ = z.object({
-  id: z.uuidv4(),
-  username: z.string().min(3).max(30),
-  email: z.email(),
-  passwordHash: z.string(),
-  createdAt: DateZ,
-  totpSecret: z.string().optional(),
-  passkey: z.any().nullable(),
-});
-export type User = z.infer<typeof UserZ>;
-
-export interface Passkey {
-  id: Base64URLString;
-  publicKey: Uint8Array;
-  webauthnUserID: Base64URLString;
-  counter: number;
-  deviceType: CredentialDeviceType;
-  backedUp: boolean;
-  transports?: AuthenticatorTransportFuture[];
-}
-
 export const ClothingItemZ = z.object({
-  id: z.uuidv4().or(z.string()),
+  id: UUID.or(z.string()),
   imageUrl: z.url(),
   type: z.enum(clothingItemTypes),
   color: z.enum(clothingItemColors),
@@ -69,67 +75,26 @@ export const ClothingItemZ = z.object({
 });
 export type ClothingItem = z.infer<typeof ClothingItemZ>;
 
+export type ClothingItemsByType = Record<ClothingItemType, ClothingItem[]>;
 export type ScoredClothingItem = ClothingItem & { score: number };
 
+// Outfit
 export const OutfitZ = z.object({
-  id: z.uuidv4(),
-  top: z.array(ClothingItemZ).min(1),
-  bottom: ClothingItemZ.nullable(),
-  shoes: ClothingItemZ.nullable(),
-  accessories: z.array(ClothingItemZ),
+  id: UUID,
+  items: z.array(ClothingItemZ),
   createdAt: DateZ,
-  wornAt: z.array(DateZ),
 });
 export type Outfit = z.infer<typeof OutfitZ>;
-export const OutfitPreviewZ = OutfitZ.omit({ wornAt: true, createdAt: true, id: true });
+export const OutfitPreviewZ = OutfitZ.omit({ createdAt: true, id: true });
 export type OutfitPreview = z.infer<typeof OutfitPreviewZ>;
 
-export interface SwiperCard {
-  id: number;
-  outfit: OutfitPreview;
-}
-
+// Weather
 export const WeatherZ = z.object({
   temp: z.number(),
   rain: z.number(),
-  desc: z.string(),
   uv: z.number(),
 });
 export type Weather = z.infer<typeof WeatherZ>;
-
-export const roles = ['user', 'admin'] as const; // Keep the roles in order of power (used by `isRoleBelow` in `./roles/index.ts`)
-export type Role = (typeof roles)[number];
-
-export type ByType = Record<ClothingItemType, ClothingItem[]>;
-
-export const emptyByType = (): ByType => ({
-  pants: [],
-  sweater: [],
-  dress: [],
-  jacket: [],
-  shirt: [],
-  shoes: [],
-  accessory: [],
-});
-
-export const NEUTRAL_COLORS: ClothingItemColor[] = ['white', 'black', 'gray', 'brown'];
-
-export const COLOR_WHEEL: ClothingItemColor[] = [
-  'red',
-  'orange',
-  'yellow',
-  'green',
-  'blue',
-  'purple',
-  'pink',
-  'white',
-  'black',
-  'gray',
-  'brown',
-];
-
-export const CLOTHING_STYLES = ['default', 'comfort', 'new', 'style', 'formal'] as const;
-export type ClothingStyles = (typeof CLOTHING_STYLES)[number];
 
 export const PROFILE_WEIGHTS: Record<
   ClothingStyles,
@@ -152,3 +117,26 @@ export const TEMP_IDEALS: Record<ClothingItemType | 'default', { ideal: number; 
   accessory: { ideal: 20, tol: 15 },
   default: { ideal: 20, tol: 10 },
 };
+
+// Outfit generation
+export const CLOTHING_STYLES = ['default', 'comfort', 'new', 'style', 'formal'] as const;
+export type ClothingStyles = (typeof CLOTHING_STYLES)[number];
+export const NEUTRAL_COLORS: ClothingItemColor[] = ['white', 'black', 'gray', 'brown'];
+export const COLOR_WHEEL: ClothingItemColor[] = [
+  'red',
+  'orange',
+  'yellow',
+  'green',
+  'blue',
+  'purple',
+  'pink',
+  'white',
+  'black',
+  'gray',
+  'brown',
+];
+
+export interface SwiperCard {
+  id: number;
+  outfit: OutfitPreview | Outfit;
+}

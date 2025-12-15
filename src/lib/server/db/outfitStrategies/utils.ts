@@ -3,7 +3,7 @@ import {
   type ScoredClothingItem,
   type ClothingItemType,
   TEMP_IDEALS,
-  type ByType,
+  type ClothingItemsByType,
   COLOR_WHEEL,
   NEUTRAL_COLORS,
 } from '$lib/types';
@@ -15,23 +15,12 @@ export function randIntInclusive(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function hasTop(bt: ByType): boolean {
+export function hasTop(bt: ClothingItemsByType): boolean {
   return bt.shirt.length + bt.dress.length > 0;
 }
 
-export function hasPants(bt: ByType): boolean {
+export function hasPants(bt: ClothingItemsByType): boolean {
   return bt.pants.length > 0;
-}
-
-export function groupByColor(
-  items: ScoredClothingItem[],
-  emptyByType: () => ByType
-): Record<string, ByType> {
-  const byColor: Record<string, ByType> = {};
-  for (const item of items) {
-    (byColor[item.color] ??= emptyByType())[item.type].push(item);
-  }
-  return byColor;
 }
 
 export function selectRandomAccessories(

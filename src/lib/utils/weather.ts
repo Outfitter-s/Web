@@ -41,8 +41,7 @@ async function fetchWeatherDirect(): Promise<Weather> {
   const current = data.current_condition[0];
 
   const weather: Weather = {
-    temp: parseInt(current.FeelsLikeC),
-    desc: current.weatherDesc[0].value,
+    temp: parseInt(current.temp_C),
     rain: Number(current.precipMM),
     uv: parseInt(current.uvIndex),
   };

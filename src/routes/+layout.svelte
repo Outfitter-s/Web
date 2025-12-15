@@ -1,7 +1,6 @@
 <script lang="ts">
   import '../app.css';
   import { SEO, Toaster } from '$lib/components';
-  import i18n from '$lib/i18n';
   import Navbar from './navbar.svelte';
   import Globals from '$lib/globals.svelte';
   import { onMount } from 'svelte';
@@ -14,7 +13,7 @@
   });
 </script>
 
-<SEO title={i18n.t('seo.defaults.title')} description={i18n.t('seo.defaults.description')} />
+<SEO title="seo.defaults.title" description="seo.defaults.description" />
 
 <Toaster />
 
@@ -23,7 +22,7 @@
 <!-- The API is restricted to authenticated users so there is not issue -->
 <AddItem />
 
-<div class="flex min-h-dvh flex-col">
+<div class="flex min-h-dvh flex-col pb-16">
   <div class="flex grow flex-col">
     <svelte:boundary>{@render children()}</svelte:boundary>
   </div>

@@ -6,6 +6,7 @@
   import FormWrapper from '../formWrapper.svelte';
   import i18n from '$lib/i18n';
   import { Label } from '$lib/components/ui/label';
+  import { SEO } from '$lib/components';
 
   let { form } = $props();
   let loading = $state(false);
@@ -20,6 +21,8 @@
     }
   });
 </script>
+
+<SEO title="seo.auth.forgotPassword.title" description="seo.auth.forgotPassword.description" />
 
 <FormWrapper reverse={true} back="/auth/log-in">
   <div class="flex w-full flex-col space-y-8">

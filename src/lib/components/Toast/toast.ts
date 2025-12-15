@@ -1,5 +1,6 @@
 import { writable, type Writable } from 'svelte/store';
 import type { ButtonVariant } from '$lib/components/ui/button';
+import i18n from '$lib/i18n';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
 type ToastActionButtonVariants = ButtonVariant;
@@ -66,19 +67,19 @@ function removeToast(id: Toast['id']) {
 }
 
 export class Toaster {
-  static success(message: string, options: ToastOptions = {}): string {
+  static success(message: Parameters<typeof i18n.t>[0], options: ToastOptions = {}): string {
     return newToast('success', message, options);
   }
 
-  static warning(message: string, options: ToastOptions = {}): string {
+  static warning(message: Parameters<typeof i18n.t>[0], options: ToastOptions = {}): string {
     return newToast('warning', message, options);
   }
 
-  static error(message: string, options: ToastOptions = {}): string {
+  static error(message: Parameters<typeof i18n.t>[0], options: ToastOptions = {}): string {
     return newToast('error', message, options);
   }
 
-  static info(message: string, options: ToastOptions = {}): string {
+  static info(message: Parameters<typeof i18n.t>[0], options: ToastOptions = {}): string {
     return newToast('info', message, options);
   }
 

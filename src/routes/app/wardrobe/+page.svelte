@@ -6,6 +6,8 @@
   import { itemOpen } from '$lib/components/routes/app/nav';
   import i18n from '$lib/i18n';
   import { page } from '$app/state';
+  import { OutfitItemCard, SEO } from '$lib/components';
+  import OutfitCard from '$lib/components/OutfitCard.svelte';
 
   const sections = ['items', 'outfits'] as const;
   type Section = (typeof sections)[number];
@@ -16,6 +18,8 @@
     activeSection = section;
   };
 </script>
+
+<SEO title="seo.wardrobe.title" description="seo.wardrobe.description" />
 
 <div class="flex grow flex-col">
   <!-- Header -->
@@ -37,82 +41,59 @@
   </div>
 
   <!-- Content -->
-  <div class="size-full grow overflow-x-hidden">
-    <div
-      class="grid grid-rows-1 transition-transform"
-      style="grid-template-columns: repeat({sections.length}, 1fr); width: calc(100% * {sections.length}); transform: translateX(-{sections.indexOf(
-        activeSection
-      ) *
-        (100 / sections.length)}%);"
-    >
-      {#each sections as section}
-        <div
-          class="grid h-fit gap-4 p-2"
-          style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));"
-        >
-          {#if section === 'items'}
-            {#each page.data.items as item}
-              <a
-                href="/app/wardrobe/item/{item.id}"
-                class="border-border bg-card flex flex-col overflow-hidden rounded-lg border transition-transform hover:rotate-2"
-              >
-                <img
-                  src={item.imageUrl}
-                  class="aspect-square w-full object-cover object-center"
-                  alt=""
-                />
-                <div class="flex flex-col p-2">
-                  <div class="font-mono text-lg font-semibold">{item.name}</div>
-                  <div class="text-muted-foreground text-sm">{item.description}</div>
-                </div>
-              </a>
-            {:else}
-              <Empty.Root>
-                <Empty.Header>
-                  <Empty.Media variant="icon">
-                    <Shirt />
-                  </Empty.Media>
-                  <Empty.Title>{i18n.t('wardrobe.itemList.items.empty.title')}</Empty.Title>
-                  <Empty.Description>
-                    {i18n.t('wardrobe.itemList.items.empty.description')}
-                  </Empty.Description>
-                </Empty.Header>
-                <Empty.Content>
-                  <Button onclick={() => ($itemOpen = true)}
-                    >{i18n.t('wardrobe.itemList.items.empty.createButton')}</Button
-                  >
-                </Empty.Content>
-              </Empty.Root>
-            {/each}
-          {:else if section === 'outfits'}
-            {#each page.data.outfits as outfit}
-              <div
-                class="border-border bg-card overflow-hidden rounded-lg border transition-transform grid grid-cols-2"
-              >
-                <!-- TODO: Add all outfit item's images -->
-                {outfit.id}
-              </div>
-            {:else}
-              <Empty.Root>
-                <Empty.Header>
-                  <Empty.Media variant="icon">
-                    <Shirt />
-                  </Empty.Media>
-                  <Empty.Title>{i18n.t('wardrobe.itemList.outfits.empty.title')}</Empty.Title>
-                  <Empty.Description>
-                    {i18n.t('wardrobe.itemList.outfits.empty.description')}
-                  </Empty.Description>
-                </Empty.Header>
-                <Empty.Content>
-                  <Button href="/app"
-                    >{i18n.t('wardrobe.itemList.outfits.empty.createButton')}</Button
-                  >
-                </Empty.Content>
-              </Empty.Root>
-            {/each}
-          {/if}
-        </div>
-      {/each}
-    </div>
+  <div class="size-full grow">
+    {#if activeSection === 'items'}
+      <div
+        class="grid gap-x-6 gap-y-4 p-4"
+        style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"
+      >
+        {#each page.data.items as item}
+          <OutfitItemCard {item} href="/app/wardrobe/item/{item.id}" />
+        {/each}
+      </div>
+      {#if page.data.items.length === 0}
+        <Empty.Root>
+          <Empty.Header>
+            <Empty.Media variant="icon">
+              <Shirt />
+            </Empty.Media>
+            <Empty.Title>{i18n.t('wardrobe.itemList.items.empty.title')}</Empty.Title>
+            <Empty.Description>
+              {i18n.t('wardrobe.itemList.items.empty.description')}
+            </Empty.Description>
+          </Empty.Header>
+          <Empty.Content>
+            <Button onclick={() => ($itemOpen = true)}
+              >{i18n.t('wardrobe.itemList.items.empty.createButton')}</Button
+            >
+          </Empty.Content>
+        </Empty.Root>
+      {/if}
+    {:else if activeSection === 'outfits'}
+      <div
+        class="grid gap-8 p-2 h-full overflow-hidden"
+        style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));"
+      >
+        {#each page.data.outfits as outfit}
+          <OutfitCard {outfit} href="/app/wardrobe/outfit/{outfit.id}" />
+        {/each}
+      </div>
+      {#if page.data.items.length === 0}
+        <Empty.Root>
+          <Empty.Header>
+            <Empty.Media variant="icon">
+              <Shirt />
+            </Empty.Media>
+            <Empty.Title>{i18n.t('wardrobe.itemList.outfits.empty.title')}</Empty.Title>
+            <Empty.Description>
+              {i18n.t('wardrobe.itemList.outfits.empty.description')}
+            </Empty.Description>
+          </Empty.Header>
+          <Empty.Content>
+            <Button href="/app">{i18n.t('wardrobe.itemList.outfits.empty.createButton')}</Button>
+          </Empty.Content>
+        </Empty.Root>
+      {/if}
+    {/if}
   </div>
 </div>

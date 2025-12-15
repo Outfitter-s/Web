@@ -5,11 +5,12 @@
   import { Home, Plus, Shirt, User } from '@lucide/svelte';
   import { itemOpen } from '$lib/components/routes/app/nav';
   import { slide } from 'svelte/transition';
+  import type { Component } from 'svelte';
 
   interface Link {
     href: string;
     text: string;
-    icon?: typeof Home;
+    icon?: Component;
   }
 
   let links = $derived<Link[]>([
@@ -54,7 +55,7 @@
         <svelte:component this={link.icon} class="z-10 size-5" />
       {:else}
         <span class="z-10 ltr:ml-2 rtl:mr-2" transition:slide={{ duration: 300, axis: 'x' }}
-          >{i18n.t(link.text)}</span
+          >{i18n.t(link.text as any)}</span
         >
       {/if}
     </Button>
@@ -65,7 +66,7 @@
   class="fixed right-0 bottom-0 left-0 z-10 flex h-16 w-full shrink-0 flex-row items-center justify-center p-2"
 >
   <div
-    class="border-border bg-card grid h-full w-full max-w-[1000px] items-center gap-2 rounded-lg border px-2"
+    class="border-border bg-card grid h-full w-full max-w-250 items-center gap-2 rounded-lg border px-2"
     style="grid-template-columns: repeat({links.length}, 1fr);"
   >
     {#each links as l}
