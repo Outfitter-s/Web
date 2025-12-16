@@ -62,13 +62,13 @@ export class i18n {
     return this._config.defaultLocale;
   }
 
-  setLocale = (locale: string, hook?: boolean) => {
+  async setLocale(locale: string, hook?: boolean) {
     if (!locale) {
       return;
     }
     console.debug(`Setting locale to "${locale}"`);
     if (this.isLocaleSupported(locale)) {
-      this.loadTranslations(locale);
+      await this.loadTranslations(locale);
       if (locale !== this.locale) {
         this.locale = locale;
         this.dir = loaders.find((l) => l.locale === locale)!.getDir();
@@ -86,9 +86,9 @@ export class i18n {
     document.cookie = `locale=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
     // Then set the new locale cookie
     document.cookie = `locale=${locale}; path=/; max-age=31536000`;
-  };
+  }
 
-  private isLocaleSupported(locale: string): locale is LangCode {
+  isLocaleSupported(locale: string): locale is LangCode {
     return loaders.some((loader) => loader.locale === locale);
   }
 
@@ -113,7 +113,7 @@ export class i18n {
   }
 
   // Load translations for the current locale in memory
-  loadTranslations = async (locale: string) => {
+  async loadTranslations(locale: string) {
     if (locale === this.locale && Object.keys(this._currentPageTranslations).length !== 0) return;
     const loader = loaders.find((l) => l.locale === locale);
     if (loader) {
@@ -126,7 +126,7 @@ export class i18n {
     console.debug(
       `${Object.keys(this._currentPageTranslations).length} "${locale}" translations loaded`
     );
-  };
+  }
 
   // Get the translations for the current page
   get translations() {

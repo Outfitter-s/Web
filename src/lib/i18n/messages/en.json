@@ -153,6 +153,11 @@
         "deleteFailed": "Failed to delete post. Please try again later.",
         "notAuthorized": "You are not authorized to delete this post."
       }
+    },
+    "icsToken": {
+      "creationFailed": "Failed to create calendar link. Please try again later.",
+      "revocationFailed": "Failed to revoke calendar link. Please try again later.",
+      "notFound": "Calendar link not found."
     }
   },
   "successes": {
@@ -165,6 +170,11 @@
     "usernameUpdated": "Username updated successfully.",
     "emailUpdated": "Email updated successfully.",
     "profilePictureUpdated": "Profile picture updated successfully.",
+    "ics": {
+      "created": "Calendar link created successfully.",
+      "revoked": "Calendar link revoked successfully.",
+      "copied": "Calendar link copied to clipboard."
+    },
     "clothing": {
       "item": {
         "created": "Clothing item created successfully."
@@ -311,6 +321,12 @@
       "password": {
         "title": "Password",
         "description": "Change your password to keep your account secure."
+      },
+      "calendars": {
+        "title": "Calendars",
+        "description": "Manage your calendar integrations and settings.",
+        "createButton": "Create a new calendar link",
+        "revokeButton": "Revoke"
       },
       "TOTP": {
         "title": "TOTP",
@@ -532,5 +548,11 @@
     },
     "rights": "© {{year}} Outfitter. All rights reserved.",
     "madeWith": "Made with ❤️"
+  },
+  "ics": {
+    "event": {
+      "title": "Outfit for {{date}}",
+      "description": "Check out the outfit at {{url}}"
+    }
   }
 }
