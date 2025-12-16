@@ -33,7 +33,8 @@ export function copyToClipboard(value: string) {
 }
 
 export function hashStringToNumber(str: string): number {
-  let hash = 0;
+  // Simple hash function (djb2)
+  let hash = 5381;
   for (let i = 0; i < str.length; i++) {
     hash = (hash << 5) - hash + str.charCodeAt(i);
     hash |= 0;

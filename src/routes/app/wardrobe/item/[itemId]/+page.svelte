@@ -1,13 +1,13 @@
 <script lang="ts">
   import { page } from '$app/state';
   import type { ClothingItem } from '$lib/types';
-  import { capitalize, DateUtils } from '$lib/utils';
-  import { Calendar, Palette, Shirt, Pencil, ArrowLeftIcon } from '@lucide/svelte';
+  import { capitalize, cn, DateUtils } from '$lib/utils';
+  import { Calendar, Palette, Shirt, Pencil, ChevronLeft } from '@lucide/svelte';
   import ColorDot from '$lib/components/colorDot.svelte';
   import { Button } from '$lib/components/ui/button';
-  import { SEO } from '$lib/components';
-  import { Backdrop } from '$lib/components/ui/dialog';
+  import { NavBack, SEO } from '$lib/components';
   import { resolve } from '$app/paths';
+  import i18n from '$lib/i18n';
 
   let itemId = $derived<string>(page.params.itemId as string);
   let items = $derived<ClothingItem[]>(page.data.items);
@@ -23,17 +23,14 @@
 <SEO title="seo.wardrobe.item.title" description="seo.wardrobe.item.description" />
 
 {#if item}
-  <div class="p-4">
+  <NavBack title="{item.name} - {i18n.t('seo.wardrobe.item.title')}" />
+  <div class="lg:p-2 max-lg:pt-2 max-lg:p-4 lg:pl-4">
     <div class="bg-card relative border-border flex flex-col rounded-lg border lg:flex-row">
       <!-- Image -->
       <div
-        class="-ml-2 bg-card -mt-2 lg:-mb-2 max-lg:-mr-2 max-h-[70vh] lg:max-h-200 aspect-10/14 lg:aspect-square inline-block"
+        class="-ml-2 border border-border -mt-2 rounded-lg overflow-hidden bg-primary lg:-mb-2 max-lg:-mr-2 max-h-[70vh] lg:max-h-200 aspect-10/14 lg:aspect-square inline-block"
       >
-        <img
-          src={item.imageUrl}
-          alt={item.name}
-          class="size-full object-cover object-center rounded-lg"
-        />
+        <img src={item.imageUrl} alt={item.name} class="size-full object-cover object-center" />
       </div>
 
       <!-- Details -->
@@ -44,12 +41,9 @@
             <Button
               variant="outline"
               size="icon"
-              href={resolve('/app/wardrobe/item/{itemId}/edit')}
+              href={resolve('/app/wardrobe/item/[itemId]/edit', { itemId: item.id })}
             >
               <Pencil class="size-4" />
-            </Button>
-            <Button variant="outline" size="icon" href={resolve('/app/wardrobe/')}>
-              <ArrowLeftIcon class="size-4" />
             </Button>
           </div>
         </div>

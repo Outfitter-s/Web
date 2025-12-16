@@ -62,10 +62,10 @@
   <!-- randomly like a stack of pictures dropped onto the floor -->
   {#key item.id}
     <div
-      class="bg-primary absolute border overflow-hidden border-border rounded-lg aspect-9/12"
+      class="absolute overflow-hidden rounded-lg aspect-9/12"
       style={generateOutfitItemCss(item, index, total)}
     >
-      <img src={item.imageUrl} alt={item.name} class="size-full object-cover" />
+      <img src={item.imageUrl} alt={item.name} class="size-full object-cover select-none" />
     </div>
   {/key}
 {/snippet}
@@ -78,7 +78,7 @@
       </p>
     </div>
   {/if}
-  <div class="relative aspect-square">
+  <div class="relative aspect-square isolate">
     {#each outfit.items as item, index}
       {@render outfitCard(item, index, outfit.items.length)}
     {/each}

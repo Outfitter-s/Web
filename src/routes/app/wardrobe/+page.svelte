@@ -50,7 +50,11 @@
           style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"
         >
           {#each page.data.items as item}
-            <OutfitItemCard {item} href={resolve('/app/wardrobe/item/{item.id}')} />
+            <OutfitItemCard
+              element="a"
+              {item}
+              href={resolve('/app/wardrobe/item/[itemId]', { itemId: item.id })}
+            />
           {/each}
         </div>
       {:else}
@@ -78,7 +82,10 @@
           style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));"
         >
           {#each page.data.outfits as outfit}
-            <OutfitCard {outfit} href={resolve('/app/wardrobe/outfit/{outfit.id}')} />
+            <OutfitCard
+              {outfit}
+              href={resolve('/app/wardrobe/outfit/[outfitId]', { outfitId: outfit.id })}
+            />
           {/each}
         </div>
       {:else}

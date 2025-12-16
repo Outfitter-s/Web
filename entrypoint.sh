@@ -8,6 +8,8 @@ if [ -f .env ]; then
   export $(grep -v '^#' .env | xargs)
 fi
 
+mkdir -p "/app/assets/{profile_pictures,clothing_item,publication}"
+
 port=${POSTGRES_PORT:-5432}
 host=${POSTGRES_HOST:-db}
 retries=0

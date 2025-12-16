@@ -20,7 +20,13 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     const user = locals.user!;
     const formData = Object.fromEntries(await request.formData());
     const form = schema.safeParse(formData);
-    if (!form.success) throw new Error(form.error.issues[0].message);
+    if (!form.success)
+      throw new Error(
+        form.error.issues
+          .map((i) => i.path)
+          .flat()
+          .join(',')
+      );
 
     const { name, description, type, color, image } = form.data;
 

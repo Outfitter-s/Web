@@ -5,39 +5,47 @@
 
   interface Props {
     item: ClothingItem;
-    href?: SvelteHTMLElements['a']['href'];
+    element?: 'a' | 'button' | 'div';
+    class?: {
+      container?: string;
+      image?: string;
+      name?: string;
+    };
   }
 
   let {
     item,
-    href,
+    element = 'div',
     class: className,
     ...restProps
-  }: Props & SvelteHTMLElements['a'] & SvelteHTMLElements['button'] = $props();
+  }: Props &
+    (SvelteHTMLElements['a'] | SvelteHTMLElements['div'] | SvelteHTMLElements['button']) = $props();
 </script>
 
 {#snippet content()}
-  <div class="-ml-2 bg-card -mt-2 -mr-2 inline-block">
-    <img src={item.imageUrl} alt={item.name} class="size-full object-contain rounded-lg" />
+  <div
+    class={cn(
+      '-ml-2 bg-primary -mt-2 -mr-2 inline-block aspect-9/12 rounded-lg border border-border overflow-hidden',
+      className?.image
+    )}
+  >
+    <img src={item.imageUrl} alt={item.name} class="size-full object-contain" draggable="false" />
   </div>
-  <div class="p-2 w-full text-center">
-    <p class="font-medium text-sm font-mono text-wrap">{capitalize(item.name)}</p>
+  <div
+    class={cn('p-2 w-full text-center font-medium text-sm font-mono text-wrap', className?.name)}
+  >
+    <span>{capitalize(item.name)}</span>
   </div>
 {/snippet}
 
-{#if href}
-  <a
-    {href}
-    class={cn('flex flex-col rounded-lg bg-card border border-border items-center', className)}
-    {...restProps}
-  >
-    {@render content()}
-  </a>
-{:else}
-  <div
-    class={cn('flex flex-col rounded-lg bg-card border border-border items-center', className)}
-    {...restProps}
-  >
-    {@render content()}
-  </div>
-{/if}
+<svelte:element
+  this={element}
+  class={cn(
+    'flex flex-col h-fit rounded-lg bg-card border border-border items-center select-none',
+    className?.container
+  )}
+  draggable="false"
+  {...restProps}
+>
+  {@render content()}
+</svelte:element>
