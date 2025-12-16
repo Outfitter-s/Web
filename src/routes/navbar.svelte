@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import { Button } from '$lib/components/ui/button';
   import i18n from '$lib/i18n';
-  import { Home, Plus, Rss, Shirt, User } from '@lucide/svelte';
+  import { House, Plus, Rss, Shirt, User } from '@lucide/svelte';
   import { itemOpen } from '$lib/components/routes/app/nav';
   import { slide } from 'svelte/transition';
   import type { Component } from 'svelte';
@@ -23,7 +23,7 @@
           {
             href: '/app',
             text: 'nav.home',
-            icon: Home,
+            icon: House,
             alert: () => {
               if (!user) return false;
               const today = new Date();

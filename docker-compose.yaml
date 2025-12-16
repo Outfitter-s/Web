@@ -47,8 +47,8 @@ services:
     ports:
       - '${VALKEY_PORT:-6379}:6379'
     volumes:
-      - valkey-data:/data
+      - valkey_data:/data
 
 volumes:
   pg_data:
-  valkey-data:
+  valkey_data:

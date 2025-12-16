@@ -44,9 +44,14 @@ if (lastMigrationDate) {
   console.log('No previous migrations found.');
 }
 
-const availableMigrations = (await readdir(join(HERE, '../sql/migrations'))).filter((f) =>
-  f.match(/migration\.(\d+)\.sql/)
-);
+const availableMigrations = (await readdir(join(HERE, '../sql/migrations')))
+  .filter((f) => f.match(/migration\.(\d+)\.sql/))
+  .sort((a, b) => {
+    const timeA = parseInt(a.match(/migration\.(\d+)\.sql/)![1], 10);
+    const timeB = parseInt(b.match(/migration\.(\d+)\.sql/)![1], 10);
+    return timeA - timeB;
+  });
+
 const newMigrations = availableMigrations.filter((file) => {
   const timeStamp = file.match(/migration\.(\d+)\.sql/);
   if (!timeStamp) return false;
