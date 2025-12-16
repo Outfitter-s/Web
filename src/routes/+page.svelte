@@ -16,7 +16,7 @@
       title: '1. Add your wardrobe',
       content:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-      image: '',
+      image: '/items.webp',
       icon: PackageSearch,
     },
     {
@@ -24,7 +24,7 @@
       title: '2. Generate your outfits',
       content:
         'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      image: '',
+      image: '/add-items.webp',
       icon: Settings,
     },
     {
@@ -134,7 +134,7 @@
       <div class="relative mt-8 overflow-visible px-2 sm:mr-0 sm:mt-12 md:mt-20">
         <div class="relative mx-auto flex max-w-6xl justify-center">
           <div class="relative origin-center rotate-15">
-            <IPhone15Pro src="/hero.png" scale={0.8} />
+            <IPhone15Pro src="/hero.webp" scale={0.8} />
           </div>
         </div>
       </div>
