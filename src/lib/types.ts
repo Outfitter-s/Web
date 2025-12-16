@@ -176,3 +176,9 @@ export const PublicationZ = z.object({
 export type Publication = z.infer<typeof PublicationZ>;
 export const feedTypes = ['forYou', 'followed'];
 export type FeedType = (typeof feedTypes)[number];
+
+export const ICSTokenZ = z.object({
+  id: UUID,
+  userId: UUID,
+});
+export type ICSToken = z.infer<typeof ICSTokenZ>;

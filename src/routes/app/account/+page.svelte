@@ -1,12 +1,13 @@
 <script lang="ts">
   import * as Tabs from '$lib/components/ui/tabs';
   import * as Card from '$lib/components/ui/card';
-  import Passkey from './passkey.svelte';
   import Totp from './totp.svelte';
   import i18n from '$lib/i18n';
+  import { SEO } from '$lib/components';
   import Password from './password.svelte';
   import General from './general.svelte';
-  import { SEO } from '$lib/components';
+  import Passkey from './passkey.svelte';
+  import Calendars from './calendars.svelte';
 
   let entries = $derived([
     {
@@ -20,6 +21,12 @@
       component: Password,
       title: i18n.t('account.tabs.password.title'),
       description: i18n.t('account.tabs.password.description'),
+    },
+    {
+      name: 'Calendars',
+      component: Calendars,
+      title: i18n.t('account.tabs.calendars.title'),
+      description: i18n.t('account.tabs.calendars.description'),
     },
     {
       name: 'TOTP',

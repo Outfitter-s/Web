@@ -6,6 +6,15 @@ import { fail, type Actions } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
 import { defs } from '$lib/utils/form';
 import z from 'zod';
+import { ICSTokenDAO } from '$lib/server/db/ICSToken';
+import type { PageServerLoad } from './$types';
+import { UUID } from '$lib/types';
+
+export const load = (async ({ locals }) => {
+  const user = locals.user!;
+  const rows = await ICSTokenDAO.getAllForUser(user.id);
+  return { rows };
+}) satisfies PageServerLoad;
 
 export const actions: Actions = {
   updateUsername: async ({ locals, request }) => {
@@ -164,6 +173,48 @@ export const actions: Actions = {
         action: 'general',
         error: true,
         message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  },
+  createToken: async ({ locals }) => {
+    const user = locals.user!;
+
+    try {
+      const token = await ICSTokenDAO.createToken(user.id);
+      return { success: true, message: 'successes.ics.created', action: 'createToken', token };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(msg);
+      return fail(400, {
+        action: 'createToken',
+        error: true,
+        message: msg || 'errors.icsToken.creationFailed',
+      });
+    }
+  },
+  revokeToken: async ({ locals, request }) => {
+    const user = locals.user!;
+    const formData = Object.fromEntries(await request.formData());
+    const schema = z.object({
+      tokenId: UUID,
+    });
+
+    try {
+      const form = schema.safeParse(formData);
+      if (!form.success) throw new Error(form.error.issues[0].message);
+      const { tokenId } = form.data;
+      const userTokens = await ICSTokenDAO.getAllForUser(user.id);
+      const token = userTokens.find((t) => t.id === tokenId);
+      if (!token) throw new Error('errors.icsToken.notFound');
+      await ICSTokenDAO.revokeToken(tokenId);
+      return { success: true, message: 'successes.ics.revoked', action: 'revokeToken' };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error(msg);
+      return fail(400, {
+        action: 'revokeToken',
+        error: true,
+        message: msg || 'errors.icsToken.revocationFailed',
       });
     }
   },
