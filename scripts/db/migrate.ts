@@ -17,13 +17,6 @@ const getLastMigrationDate = async (): Promise<Date> => {
   return rows.length > 0 ? new Date(rows[0].created_at) : new Date(0);
 };
 
-const setLastMigrationDate = async (date: Date): Promise<void> => {
-  await pool.query('INSERT INTO migrations (name, created_at) VALUES ($1, $2)', [
-    'last_migration',
-    date.toISOString(),
-  ]);
-};
-
 async function applyMigration(name: string) {
   const migrationPath = join(HERE, `../sql/migrations/${name}`);
   const sql = await readFile(migrationPath, 'utf8');
@@ -31,8 +24,13 @@ async function applyMigration(name: string) {
     throw new Error(`Migration file ${name} not found.`);
   }
   const migrationSQL = await pool.query(sql);
+  const timeStamp = name.match(/migration\.(\d+)\.sql/);
+  const migrationTime = new Date(parseInt(timeStamp![1], 10));
   // Update migrations table
-  await pool.query('INSERT INTO migrations (name, created_at) VALUES ($1, NOW())', [name]);
+  await pool.query('INSERT INTO migrations (name, created_at) VALUES ($1, $2)', [
+    name,
+    migrationTime,
+  ]);
   console.log(`Migration ${name} applied successfully.`);
   return migrationSQL;
 }
@@ -52,12 +50,14 @@ const availableMigrations = (await readdir(join(HERE, '../sql/migrations')))
     return timeA - timeB;
   });
 
-const newMigrations = availableMigrations.filter((file) => {
-  const timeStamp = file.match(/migration\.(\d+)\.sql/);
-  if (!timeStamp) return false;
-  const migrationTime = new Date(parseInt(timeStamp[1], 10));
-  return !lastMigrationDate || migrationTime > lastMigrationDate;
-});
+const newMigrations = availableMigrations
+  .filter((file) => {
+    const timeStamp = file.match(/migration\.(\d+)\.sql/);
+    if (!timeStamp) return false;
+    const migrationTime = new Date(parseInt(timeStamp[1], 10));
+    return !lastMigrationDate || migrationTime > lastMigrationDate;
+  })
+  .sort();
 console.log(`Available migrations: ${availableMigrations.length}`);
 console.log(`New migrations to apply: ${newMigrations.length}`);
 
@@ -70,5 +70,4 @@ for (const migration of newMigrations) {
   }
 }
 
-await setLastMigrationDate(new Date());
 process.exit(0);

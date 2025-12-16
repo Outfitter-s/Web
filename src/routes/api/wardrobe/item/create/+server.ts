@@ -4,6 +4,7 @@ import { ClothingItemDAO } from '$lib/server/db/clothingItem';
 import { clothingItemColors, clothingItemTypes } from '$lib/types';
 import z from 'zod';
 import { json } from '@sveltejs/kit';
+import { ImageProcessor } from '$lib/server/imageProcessing';
 
 const schema = z.object({
   name: z.string().min(1).max(100),
@@ -30,7 +31,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
     const { name, description, type, color, image } = form.data;
 
-    const imageBuffer = Buffer.from(await image.arrayBuffer());
+    const imageBuffer = await ImageProcessor.resizeImage(await image.arrayBuffer());
 
     const item = await ClothingItemDAO.uploadClothingItem(
       user.id,

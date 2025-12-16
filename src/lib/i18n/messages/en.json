@@ -48,6 +48,16 @@
           "description": "Edit the details of your clothing item in your Outfitter wardrobe."
         }
       }
+    },
+    "social": {
+      "feed": {
+        "title": "Feed",
+        "description": "Explore the Outfitter community feed to see stylish outfits and clothing items shared by other users."
+      },
+      "post": {
+        "title": "Post",
+        "description": "View a stylish outfit or clothing item shared by a user in the Outfitter community feed."
+      }
     }
   },
   "errors": {
@@ -448,7 +458,8 @@
         "description": {
           "label": "Description"
         },
-        "submit": "Post"
+        "submit": "Post",
+        "todaysOutfit": "Are you wearing the outfit you selected for today?"
       }
     }
   }

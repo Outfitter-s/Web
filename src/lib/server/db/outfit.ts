@@ -105,4 +105,21 @@ export class OutfitDAO {
     );
     if (res.rows.length === 0) throw new Error('errors.clothing.outfit.notAuthorized');
   }
+
+  static async getTodaysOutfitIdForUser(
+    userId: UUID,
+    todaysOutfit: boolean | undefined
+  ): Promise<UUID | null> {
+    if (!todaysOutfit) return null;
+
+    const res = await pool.query<OutfitTable>(
+      'SELECT * FROM outfit WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
+      [userId]
+    );
+    if (res.rows.length === 0) {
+      return null;
+    }
+
+    return res.rows[0].id;
+  }
 }
