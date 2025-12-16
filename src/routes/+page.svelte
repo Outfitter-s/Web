@@ -4,7 +4,39 @@
   import { SEO } from '$lib/components';
   import Button from '$lib/components/ui/button/button.svelte';
   import ArrowRight from '@lucide/svelte/icons/arrow-right';
-  import ChevronRight from '@lucide/svelte/icons/chevron-right';
+  import PackageSearch from '@lucide/svelte/icons/package-search';
+  import Settings from '@lucide/svelte/icons/settings';
+  import Eye from '@lucide/svelte/icons/eye';
+  import IPhone15Pro from '$lib/components/IPhone15Pro.svelte';
+  import Features from '$lib/components/Features.svelte';
+  import Footer from '$lib/components/FooterOne.svelte';
+
+  let data = [
+    {
+      id: 1,
+      title: '1. Add your wardrobe',
+      content:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      image: '/items.webp',
+      icon: PackageSearch,
+    },
+    {
+      id: 2,
+      title: '2. Generate your outfits',
+      content:
+        'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      image: '/choose-outfit.webp',
+      icon: Settings,
+    },
+    {
+      id: 3,
+      title: '3. Explore & Share',
+      content:
+        'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      image: '',
+      icon: Eye,
+    },
+  ];
 </script>
 
 <SEO title="seo.homePage.title" description="seo.homePage.description" />
@@ -55,136 +87,130 @@
             </a>
           {/if}
 
-          <h1 class="mt-8 text-balance text-6xl md:text-7xl lg:mt-16 xl:text-[5.25rem]">
-            Style Simplified, Community Amplified
+          <h1 class="mt-8 text-balance text-5xl md:text-7xl lg:mt-16 xl:text-[5.25rem]">
+            Weart It, Share It, Own it.
           </h1>
           <p class="mx-auto mt-8 max-w-2xl text-balance text-lg">
             Outfitter is your wardrobe companion. Organize your fashion, get outfit recommendations,
             and connect with a style-driven community. Fashion made effortless.
           </p>
 
-          <div class="mt-12 flex flex-col items-center justify-center gap-2 md:flex-row">
-            <Button size="lg" variant="default" href={resolve('/auth')}>
-              <span class="text-nowrap">Get started</span>
+          <div class="mt-12 flex items-center justify-center gap-2 md:flex-row">
+            <Button
+              size="lg"
+              variant="default"
+              href="/auth"
+              class="group relative overflow-hidden bg-linear-to-r from-primary to-primary/80"
+            >
+              <span class="relative z-10 flex items-center text-nowrap">
+                Find my look
+                <ArrowRight
+                  class="ml-2 inline-block size-4 transition-transform duration-300 group-hover:translate-x-1"
+                />
+              </span>
+              <div
+                class="absolute inset-0 bg-linear-to-r from-primary/60 via-primary to-primary/40 opacity-0 blur-lg transition-all duration-500 group-hover:opacity-100"
+              ></div>
             </Button>
-            <Button size="lg" variant="ghost" href="/#about">Learn more</Button>
+
+            <Button
+              size="lg"
+              variant="ghost"
+              href="#about"
+              class="group relative overflow-hidden border border-primary/30 hover:border-primary/60"
+            >
+              <span class="relative z-10 transition-colors duration-300 group-hover:text-primary">
+                Learn more
+              </span>
+              <div
+                class="absolute inset-0 z-0 bg-primary/5 opacity-0 transition-all duration-500 group-hover:opacity-100"
+              ></div>
+              <div
+                class="absolute -inset-1 -z-20 bg-linear-to-r from-primary/20 to-transparent opacity-0 blur transition-all duration-500 group-hover:opacity-100"
+              ></div>
+            </Button>
           </div>
         </div>
       </div>
-
-      <div class="relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
-        <div
-          class="bg-linear-to-b to-background absolute inset-0 z-10 from-transparent from-35%"
-        ></div>
-        <div
-          class="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4"
-        >
-          <img
-            class="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
-            src="/hero.png"
-            alt="app screen"
-            width="2700"
-            height="1440"
-          />
-          <img
-            class="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
-            src="/hero-light.png"
-            alt="app screen"
-            width="2700"
-            height="1440"
-          />
+      <div class="relative mt-8 overflow-visible px-2 sm:mr-0 sm:mt-12 md:mt-20">
+        <div class="relative mx-auto flex max-w-6xl justify-center">
+          <div class="relative origin-center rotate-15">
+            <IPhone15Pro videoSrc="/hero.mp4" scale={0.8} />
+          </div>
         </div>
       </div>
     </div>
   </section>
+
   <section class="bg-background pb-16 pt-16 md:pb-32">
-    <div class="group relative m-auto max-w-5xl px-6">
-      <div
-        class="absolute inset-0 z-10 flex scale-95 items-center justify-center opacity-0 duration-500 group-hover:scale-100 group-hover:opacity-100"
-      >
-        <a href={resolve('/')} class="block text-sm duration-150 hover:opacity-75">
-          <span> Meet Our Customers</span>
-
-          <ChevronRight class="ml-1 inline-block size-3" />
-        </a>
-      </div>
-      <div
-        class="group-hover:blur-xs mx-auto mt-12 grid max-w-2xl grid-cols-4 gap-x-12 gap-y-8 transition-all duration-500 group-hover:opacity-50 sm:gap-x-16 sm:gap-y-14"
-      >
-        <div class="flex">
-          <img
-            class="mx-auto h-5 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/nvidia.svg"
-            alt="Nvidia Logo"
-            height="20"
-            width="auto"
-          />
-        </div>
-
-        <div class="flex">
-          <img
-            class="mx-auto h-4 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/column.svg"
-            alt="Column Logo"
-            height="16"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-4 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/github.svg"
-            alt="GitHub Logo"
-            height="16"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-5 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/nike.svg"
-            alt="Nike Logo"
-            height="20"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-5 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/lemonsqueezy.svg"
-            alt="Lemon Squeezy Logo"
-            height="20"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-4 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/laravel.svg"
-            alt="Laravel Logo"
-            height="16"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-7 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/lilly.svg"
-            alt="Lilly Logo"
-            height="28"
-            width="auto"
-          />
-        </div>
-        <div class="flex">
-          <img
-            class="mx-auto h-6 w-fit dark:invert"
-            src="https://html.tailus.io/blocks/customers/openai.svg"
-            alt="OpenAI Logo"
-            height="24"
-            width="auto"
-          />
+    <div id="about" class="mx-auto max-w-7xl px-6">
+      <!-- Badge -->
+      <div class="mb-8 flex justify-center">
+        <div
+          class="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium text-primary"
+        >
+          <span class="relative flex size-2">
+            <span
+              class="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75"
+            ></span>
+            <span class="relative inline-flex size-2 rounded-full bg-primary"></span>
+          </span>
+          About Outfitter
         </div>
       </div>
+
+      <h2
+        class="bg-linear-to-br from-foreground to-foreground/60 bg-clip-text text-center text-4xl font-bold text-white md:text-5xl"
+      >
+        Who we are?
+      </h2>
+
+      <p
+        class="mx-auto mt-6 max-w-2xl text-balance text-center text-lg leading-relaxed text-muted-foreground"
+      >
+        Outfitter was born from an ambitious university project in the 3rd year of a Bachelor's
+        degree in Computer Science at Paul Sabatier University in Toulouse. Initiated by a
+        passionate team of students, this application reflects our commitment to innovation and
+        creating practical solutions to everyday challenges. This academic project has transformed
+        into a genuine modern platform, combining technical expertise and creativity to deliver an
+        exceptional user experience.
+      </p>
+
+      <p
+        class="mx-auto mt-6 max-w-2xl text-balance text-center text-lg leading-relaxed text-muted-foreground"
+      >
+        Outfitter is a cutting-edge web application designed to revolutionize the way you manage and
+        style your wardrobe. Our mission is to empower fashion enthusiasts by providing them with
+        innovative tools to organize their clothing, discover new outfit ideas, and connect with a
+        vibrant community of like-minded individuals.
+      </p>
     </div>
   </section>
+
+  <section class="bg-background pb-16 pt-16 md:pb-32">
+    <div id="features" class="mx-auto max-w-7xl px-6">
+      <!-- Badge -->
+      <div class="mb-8 flex justify-center">
+        <div
+          class="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium text-primary"
+        >
+          <span class="relative flex size-2">
+            <span
+              class="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75"
+            ></span>
+            <span class="relative inline-flex size-2 rounded-full bg-primary"></span>
+          </span>
+          Features
+        </div>
+      </div>
+      <h2
+        class="bg-linear-to-br from-foreground to-foreground/60 bg-clip-text text-center text-4xl font-bold text-white md:text-5xl"
+      >
+        What we offer?
+      </h2>
+      <Features {data} />
+    </div>
+  </section>
+
+  <Footer />
 </main>
