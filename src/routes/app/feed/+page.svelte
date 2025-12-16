@@ -73,7 +73,7 @@
     <!-- svelte-ignore a11y_consider_explicit_label -->
     <button class="fixed z-0 appearance-none inset-0" onclick={() => (searchResults = [])}></button>
   {/if}
-  <div class="sticky items-center p-2 gap-2 top-0 left-0 right-0 flex flex-row w-full bg-card z-20">
+  <div class="sticky items-center p-2 gap-2 top-0 left-0 right-0 flex flex-row w-full z-20">
     <div class="relative w-full">
       <InputGroup.Root class="z-10">
         <InputGroup.Input
