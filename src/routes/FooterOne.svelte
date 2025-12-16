@@ -6,15 +6,15 @@
     },
     {
       title: 'About Us',
-      href: '#about',
+      href: '/#about',
     },
     {
       title: 'Features',
-      href: '#features',
+      href: '/#features',
     },
     {
       title: 'CGV & CGU',
-      href: '#',
+      href: '/#',
     },
   ];
 </script>

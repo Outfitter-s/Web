@@ -14,9 +14,9 @@
   $effect(() => {
     if (form?.action === 'resetPassword') {
       if (form?.error) {
-        Toaster.error(form.message);
+        Toaster.error(form.message as any);
       } else if (form?.success) {
-        Toaster.success(form.message);
+        Toaster.success(form.message as any);
       }
     }
   });

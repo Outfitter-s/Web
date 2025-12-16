@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { OutfitCard, SEO } from '$lib/components';
+  import { SEO } from '$lib/components';
   import Swiper from './Swiper.svelte';
   import type { Outfit } from '$lib/types';
   import { DateUtils } from '$lib/utils';
@@ -13,6 +13,7 @@
   import { Toaster } from '$lib/components/Toast/toast';
   import { invalidateAll } from '$app/navigation';
   import { resolve } from '$app/paths';
+  import { OutfitCard } from '$lib/components/wardrobe';
 
   let chosenOutfit = $derived(
     (page.data.outfits as Outfit[]).find((o) => DateUtils.isToday(o.createdAt)) ?? null

@@ -13,7 +13,7 @@
   import Theming, { availableModes, availableThemes, type Mode } from '$lib/theming/index.svelte';
   import { capitalize } from '$lib/utils';
   import { Hr } from '$lib/components';
-  import ProfilePicture from '$lib/components/ProfilePicture.svelte';
+  import ProfilePicture from '$lib/components/social/ProfilePicture.svelte';
   import { resolve } from '$app/paths';
 
   let currentTheme = $state(page.data.theme);

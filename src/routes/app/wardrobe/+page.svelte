@@ -6,9 +6,10 @@
   import { itemOpen } from '$lib/components/routes/app/nav';
   import i18n from '$lib/i18n';
   import { page } from '$app/state';
-  import { OutfitItemCard, SEO } from '$lib/components';
-  import OutfitCard from '$lib/components/OutfitCard.svelte';
+  import { SEO } from '$lib/components';
+  import OutfitCard from '$lib/components/wardrobe/OutfitCard.svelte';
   import { resolve } from '$app/paths';
+  import { OutfitItemCard } from '$lib/components/wardrobe';
 
   const sections = ['items', 'outfits'] as const;
   type Section = (typeof sections)[number];

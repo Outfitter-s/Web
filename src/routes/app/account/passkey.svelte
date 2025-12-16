@@ -57,7 +57,7 @@
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error(errorMessage);
-      Toaster.error(errorMessage);
+      Toaster.error(errorMessage as any);
     }
   }
 </script>

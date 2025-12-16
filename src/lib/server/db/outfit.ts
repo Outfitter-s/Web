@@ -94,6 +94,8 @@ export class OutfitDAO {
   }
 
   static async deleteOutfit(outfitId: UUID): Promise<void> {
+    // Remove references from associated posts
+    await pool.query('UPDATE publication SET outfit_id = NULL WHERE outfit_id = $1', [outfitId]);
     await pool.query('DELETE FROM outfit_clothing_items WHERE outfit_id = $1', [outfitId]);
     await pool.query('DELETE FROM outfit WHERE id = $1', [outfitId]);
   }

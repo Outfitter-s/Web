@@ -7,9 +7,9 @@
   import PackageSearch from '@lucide/svelte/icons/package-search';
   import Settings from '@lucide/svelte/icons/settings';
   import Eye from '@lucide/svelte/icons/eye';
-  import IPhone15Pro from '$lib/components/IPhone15Pro.svelte';
-  import Features from '$lib/components/Features.svelte';
-  import Footer from '$lib/components/FooterOne.svelte';
+  import IPhone15Pro from './IPhone15Pro.svelte';
+  import Features from './Features.svelte';
+  import Footer from './FooterOne.svelte';
 
   let data = [
     {
@@ -88,7 +88,7 @@
           {/if}
 
           <h1 class="mt-8 text-balance text-5xl md:text-7xl lg:mt-16 xl:text-[5.25rem]">
-            Weart It, Share It, Own it.
+            Wear It, Share It, Own it.
           </h1>
           <p class="mx-auto mt-8 max-w-2xl text-balance text-lg">
             Outfitter is your wardrobe companion. Organize your fashion, get outfit recommendations,

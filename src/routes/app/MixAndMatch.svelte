@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/state';
-  import { OutfitItemCard } from '$lib/components';
   import { Button } from '$lib/components/ui/button';
+  import { OutfitItemCard } from '$lib/components/wardrobe';
   import i18n from '$lib/i18n';
   import { type ClothingItem, clothingItemTypes, type SwiperCard } from '$lib/types';
   import { hashStringToNumber } from '$lib/utils';
