@@ -22,7 +22,7 @@
       ? [
           {
             href: '/app',
-            text: 'nav.home',
+            text: i18n.t('nav.home'),
             icon: House,
             alert: () => {
               if (!user) return false;
@@ -33,16 +33,16 @@
               return !hasTodayOutfit;
             },
           },
-          { href: '/app/feed', text: 'nav.feed', icon: Rss },
-          { href: 'add-item', text: 'nav.outfits' },
-          { href: '/app/wardrobe', text: 'nav.wardrobe', icon: Shirt },
-          { href: '/app/account', text: 'nav.account', icon: User },
+          { href: '/app/feed', text: i18n.t('nav.feed'), icon: Rss },
+          { href: 'add-item', text: i18n.t('nav.outfits') },
+          { href: '/app/wardrobe', text: i18n.t('nav.wardrobe'), icon: Shirt },
+          { href: '/app/account', text: i18n.t('nav.account'), icon: User },
         ]
       : [
-          { href: '/', text: 'nav.home' },
-          { href: '/#about', text: 'nav.about' },
-          { href: '/auth/sign-up', text: 'nav.signUp' },
-          { href: '/auth/log-in', text: 'nav.logIn' },
+          { href: '/', text: i18n.t('nav.home') },
+          { href: '/#about', text: i18n.t('nav.about') },
+          { href: '/auth/sign-up', text: i18n.t('nav.signUp') },
+          { href: '/auth/log-in', text: i18n.t('nav.logIn') },
         ]),
   ]);
 </script>
@@ -56,38 +56,6 @@
   </div>
 {/snippet}
 
-{#snippet entry(link: Link)}
-  {#if link.href == 'add-item'}
-    <Button
-      variant="none"
-      onclick={() => ($itemOpen = !$itemOpen)}
-      class=" border-border bg-card z-10 mx-auto -translate-y-5 size-14 rounded-full border p-2 shadow-xl"
-    >
-      <Plus class="size-full" />
-    </Button>
-  {:else}
-    <Button
-      variant="none"
-      href={link.href}
-      class="dark:before:bg-accent before:bg-border px-4 font-mono before:absolute before:inset-0 before:z-0 before:scale-0 before:rounded-xs before:transition-all hover:before:scale-100 active:before:scale-100"
-    >
-      <div class="relative">
-        {#if link.icon}
-          <!-- svelte-ignore svelte_component_deprecated -->
-          <svelte:component this={link.icon} class="z-10 size-5" />
-        {:else}
-          <span class="z-10 ltr:ml-2 rtl:mr-2" transition:slide={{ duration: 300, axis: 'x' }}
-            >{i18n.t(link.text as any)}</span
-          >
-        {/if}
-        {#if link?.alert && link.alert()}
-          {@render alertDot()}
-        {/if}
-      </div>
-    </Button>
-  {/if}
-{/snippet}
-
 <nav
   class="fixed right-0 bottom-0 left-0 z-10 h-14 shrink-0 border-border bg-card grid w-full border-t px-2"
 >
@@ -95,8 +63,36 @@
     class="max-w-250 grid w-full justify-center items-center gap-2 mx-auto"
     style="grid-template-columns: repeat({links.length}, 1fr);"
   >
-    {#each links as l}
-      {@render entry(l)}
+    {#each links as link}
+      {#if link.href == 'add-item'}
+        <Button
+          variant="none"
+          onclick={() => ($itemOpen = !$itemOpen)}
+          class=" border-border bg-card z-10 mx-auto -translate-y-5 size-14 rounded-full border p-2 shadow-xl"
+        >
+          <Plus class="size-full" />
+        </Button>
+      {:else}
+        <Button
+          variant="none"
+          href={link.href}
+          class="dark:before:bg-accent before:bg-border px-4 font-mono before:absolute before:inset-0 before:z-0 before:scale-0 before:rounded-xs before:transition-all hover:before:scale-100 active:before:scale-100"
+        >
+          <div class="relative">
+            {#if link.icon}
+              <!-- svelte-ignore svelte_component_deprecated -->
+              <svelte:component this={link.icon} class="z-10 size-5" />
+            {:else}
+              <span class="z-10 ltr:ml-2 rtl:mr-2" transition:slide={{ duration: 300, axis: 'x' }}
+                >{@html link.text}</span
+              >
+            {/if}
+            {#if link?.alert && link.alert()}
+              {@render alertDot()}
+            {/if}
+          </div>
+        </Button>
+      {/if}
     {/each}
   </div>
 </nav>

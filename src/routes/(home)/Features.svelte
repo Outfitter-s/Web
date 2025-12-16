@@ -1,21 +1,29 @@
 <script lang="ts">
+  import i18n from '$lib/i18n';
+  import { Eye, PackageSearch, Settings } from '@lucide/svelte';
   import { onMount } from 'svelte';
   import { cn } from 'tailwind-variants';
 
-  interface Props {
-    collapseDelay?: number;
-    ltr?: boolean;
-    linePosition?: 'left' | 'right' | 'top' | 'bottom';
-    data: {
-      id: number;
-      title: string;
-      content: string;
-      image: string;
-      icon?: any;
-    }[];
-  }
+  let features = $derived([
+    {
+      title: i18n.t('homepage.features.items.wardrobeManagement.title'),
+      content: i18n.t('homepage.features.items.wardrobeManagement.description'),
+      image: '/items.webp',
+      icon: PackageSearch,
+    },
+    {
+      title: i18n.t('homepage.features.items.outfitGeneration.title'),
+      content: i18n.t('homepage.features.items.outfitGeneration.description'),
+      icon: Settings,
+    },
+    {
+      title: i18n.t('homepage.features.items.exploreShare.title'),
+      content: i18n.t('homepage.features.items.exploreShare.description'),
+      icon: Eye,
+    },
+  ]);
 
-  let { collapseDelay = 5000, ltr = false, linePosition = 'left', data }: Props = $props();
+  let { collapseDelay = 5000, ltr = false, linePosition = 'left' } = $props();
   let currentIndex = $state(0);
   let carouselRef = $state<HTMLUListElement | null>(null);
 
@@ -37,7 +45,7 @@
 
   onMount(() => {
     const handleAutoScroll = () => {
-      currentIndex = (currentIndex + 1) % data.length;
+      currentIndex = (currentIndex + 1) % features.length;
       scrollToIndex(currentIndex);
     };
 
@@ -58,7 +66,7 @@
             : 'justify-start'}"
         >
           <div>
-            {#each data as item, index}
+            {#each features as item, index}
               <div class="relative mb-8 flex items-center last:mb-0">
                 {#if linePosition === 'left' || linePosition === 'right'}
                   <div
@@ -97,9 +105,9 @@
 
         <!-- Image (Desktop et Mobile) -->
         <div class="min-h-50 h-80 w-full sm:h-96 lg:h-87.5 {ltr && 'lg:order-1'}">
-          {#if data[currentIndex] && data[currentIndex].image}
+          {#if features[currentIndex] && features[currentIndex].image}
             <img
-              src={data[currentIndex].image}
+              src={features[currentIndex].image}
               alt="feature"
               class="aspect-auto size-full rounded-xl border border-border object-cover p-1 shadow-lg"
             />
@@ -110,7 +118,7 @@
 
         <!-- Mobile: Barre de progression -->
         <div class="relative -mb-8 pb-0.5 md:hidden">
-          {#each data as _, index}
+          {#each features as _, index}
             <div class="absolute inset-x-0 top-0 h-0.5 w-full overflow-hidden rounded-lg bg-accent">
               <div
                 class={cn(
@@ -128,7 +136,7 @@
           bind:this={carouselRef}
           class="relative flex h-full snap-x snap-mandatory flex-nowrap overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden"
         >
-          {#each data as item, index}
+          {#each features as item, index}
             <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
             <li
               class="card_code relative mr-6 grid h-full max-w-[85vw] shrink-0 items-start justify-start gap-3 pl-2 last:mr-0 sm:mr-8 sm:max-w-md snap-center transiton-all"

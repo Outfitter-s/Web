@@ -44,7 +44,7 @@
   }
 </script>
 
-<SEO title="seo.homePage.title" description="seo.homePage.description" />
+<SEO title="seo.home.homePage.title" description="seo.home.homePage.description" />
 
 <Dialog.Root bind:open={changeOutfitConfirmModal.open}>
   <Dialog.Content>

@@ -9,9 +9,21 @@
         "description": "Sorry, an unexpected error has occurred. Please try again later."
       }
     },
-    "homePage": {
-      "title": "Home",
-      "description": "Welcome to Outfitter, your personal outfit generator and wardrobe manager. Create stylish outfits based on your clothing items."
+    "home": {
+      "homePage": {
+        "title": "Home",
+        "description": "Welcome to Outfitter, your personal outfit generator and wardrobe manager. Create stylish outfits based on your clothing items."
+      },
+      "legal": {
+        "tos": {
+          "title": "Terms of Service",
+          "description": "Read the Terms of Service for using Outfitter."
+        },
+        "privacyPolicy": {
+          "title": "Privacy Policy",
+          "description": "Read the Privacy Policy to understand how Outfitter handles your data."
+        }
+      }
     },
     "auth": {
       "logIn": {
@@ -117,11 +129,13 @@
         "description": "Please provide a description for this item (max 500 characters).",
         "type": "Please select a type for this item.",
         "color": "Please select a color for this item.",
-        "image": "Please take an image of this item."
+        "image": "Please take an image of this item.",
+        "notFound": "Item not found."
       },
       "outfit": {
         "delete": "Failed to delete outfit. Please try again later.",
-        "notAuthorized": "This outfit does not belong to you."
+        "notAuthorized": "This outfit does not belong to you.",
+        "notFound": "Outfit not found."
       }
     },
     "outfitGeneration": {
@@ -133,6 +147,11 @@
       "searchFailed": "Failed to search users. Please try again later.",
       "item": {
         "requiredField": "The following field{{s}} {{is}} required: {{field}}"
+      },
+      "post": {
+        "notFound": "Post not found.",
+        "deleteFailed": "Failed to delete post. Please try again later.",
+        "notAuthorized": "You are not authorized to delete this post."
       }
     }
   },
@@ -466,5 +485,52 @@
       "forYou": "For You",
       "followedFeed": "Followed"
     }
+  },
+  "homepage": {
+    "hero": {
+      "version": "Introducing Outfitter v{{version}}",
+      "slogan": "Wear It, Share It, Own it.",
+      "description": "Outfitter is your wardrobe companion. Organize your fashion, get outfit recommendations, and connect with a style-driven community. Fashion made effortless.",
+      "cta": {
+        "findMyLook": "Find my look",
+        "learnMore": "Learn More"
+      }
+    },
+    "about": {
+      "badge": "About Outfitter",
+      "title": "Who we are?",
+      "intro": "Outfitter was born from an ambitious university project in the 3rd year of a Bachelor's degree in Computer Science at Paul Sabatier University in Toulouse. Initiated by a passionate team of students, this application reflects our commitment to innovation and creating practical solutions to everyday challenges. This academic project has transformed into a genuine modern platform, combining technical expertise and creativity to deliver an exceptional user experience.",
+      "description": "Outfitter is a cutting-edge web application designed to revolutionize the way you manage and style your wardrobe. Our mission is to empower fashion enthusiasts by providing them with innovative tools to organize their clothing, discover new outfit ideas, and connect with a vibrant community of like-minded individuals."
+    },
+    "features": {
+      "badge": "Features",
+      "title": "What we offer",
+      "items": {
+        "wardrobeManagement": {
+          "title": "1. Wardrobe Management",
+          "description": "Easily catalog and organize your clothing items with our intuitive wardrobe management system. Add details, photos, and categorize your clothes for quick access."
+        },
+        "outfitGeneration": {
+          "title": "2. Outfit Generation",
+          "description": "Get personalized outfit recommendations based on your wardrobe. Our smart algorithm suggests stylish combinations to help you look your best every day."
+        },
+        "exploreShare": {
+          "title": "3. Explore & Share",
+          "description": "Join a community of fashion enthusiasts. Share your outfits, get inspired by others, and discover new trends and styles."
+        }
+      }
+    }
+  },
+  "footer": {
+    "links": {
+      "home": "Home",
+      "about": "About",
+      "features": "Features",
+      "account": "Account",
+      "logIn": "Log In",
+      "signUp": "Sign Up"
+    },
+    "rights": "© {{year}} Outfitter. All rights reserved.",
+    "madeWith": "Made with ❤️"
   }
 }
