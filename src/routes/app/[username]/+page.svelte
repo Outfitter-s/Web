@@ -4,6 +4,7 @@
   import type { PageProps } from './$types';
   import { Button } from '$lib/components/ui/button';
   import { ProfilePicture } from '$lib/components/social';
+  import { logger } from '$lib/utils';
 
   let { data }: PageProps = $props();
   // svelte-ignore state_referenced_locally
@@ -39,15 +40,13 @@
       }
       Toaster.success(
         i18n.t(
-          (youFollow
-            ? 'successes.social.follow.followed'
-            : 'successes.social.follow.unfollowed') as any,
+          youFollow ? 'successes.social.follow.followed' : 'successes.social.follow.unfollowed',
           { username: pageUser.username }
         )
       );
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      console.error('Error toggling follow status:', msg);
+      logger.error('Error toggling follow status:', msg);
       Toaster.error(msg as any);
     } finally {
       isFollowingAction = false;

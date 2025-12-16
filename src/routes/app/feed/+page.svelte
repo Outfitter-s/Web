@@ -2,7 +2,6 @@
   import * as InputGroup from '$lib/components/ui/input-group';
   import i18n from '$lib/i18n';
   import { Search, Plus } from '@lucide/svelte';
-  import type { PageProps } from './$types';
   import type { Publication, User } from '$lib/types';
   import { logger } from '$lib/utils';
   import { Toaster } from '$lib/components/Toast/toast';
@@ -38,7 +37,7 @@
       const msg = e instanceof Error ? e.message : String(e);
       logger.error('Error searching users:', msg);
       searchResults = [];
-      Toaster.error((msg as any) || 'errors.social.searchFailed');
+      Toaster.error(msg as any);
     }
   }
 

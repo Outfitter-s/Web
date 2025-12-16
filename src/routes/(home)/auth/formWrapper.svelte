@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cn, isMobile, navHeight } from '$lib/utils';
+  import { cn, isMobile } from '$lib/utils';
   import type { SvelteHTMLElements } from 'svelte/elements';
   import FormImageDark from '$lib/assets/authForm/FormImageDark.jpg';
   import FormImageLight from '$lib/assets/authForm/FormImageLight.jpg';
@@ -51,8 +51,11 @@
 {/if}
 
 <div
-  class={cn('relative flex flex-row overflow-hidden', reverse && 'flex-row-reverse', className)}
-  style="height: calc(100dvh - {navHeight}px);"
+  class={cn(
+    'relative flex flex-row overflow-hidden h-[calc(100svh-var(--spacing)*14)]',
+    reverse && 'flex-row-reverse',
+    className
+  )}
   {...restProps}
 >
   {#if back}

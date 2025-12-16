@@ -50,7 +50,6 @@
         logger.error(page.form.message);
         Toaster.error(page.form.message);
       }
-      page.form.action = null; // reset form action to prevent duplicate toasts
     }
   });
 

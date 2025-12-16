@@ -7,41 +7,33 @@
   import Password from './password.svelte';
   import General from './general.svelte';
   import { SEO } from '$lib/components';
-  import type { Component } from 'svelte';
 
-  interface Entry {
-    name: string;
-    component: Component;
-    title: Parameters<typeof i18n.t>[0];
-    description: Parameters<typeof i18n.t>[0];
-  }
-
-  const entries: Entry[] = [
+  let entries = $derived([
     {
       name: 'General',
       component: General,
-      title: 'account.tabs.general.title',
-      description: 'account.tabs.general.description',
+      title: i18n.t('account.tabs.general.title'),
+      description: i18n.t('account.tabs.general.description'),
     },
     {
       name: 'Password',
       component: Password,
-      title: 'account.tabs.password.title',
-      description: 'account.tabs.password.description',
+      title: i18n.t('account.tabs.password.title'),
+      description: i18n.t('account.tabs.password.description'),
     },
     {
       name: 'TOTP',
       component: Totp,
-      title: 'account.tabs.TOTP.title',
-      description: 'account.tabs.TOTP.description',
+      title: i18n.t('account.tabs.TOTP.title'),
+      description: i18n.t('account.tabs.TOTP.description'),
     },
     {
       name: 'Passkey',
       component: Passkey,
-      title: 'account.tabs.passkey.title',
-      description: 'account.tabs.passkey.description',
+      title: i18n.t('account.tabs.passkey.title'),
+      description: i18n.t('account.tabs.passkey.description'),
     },
-  ];
+  ]);
 </script>
 
 <SEO title={'seo.account.settings.title'} description="seo.account.settings.description" />
@@ -49,18 +41,18 @@
 <Tabs.Root value={entries[0].name} class="mx-auto flex w-full max-w-250 flex-col gap-4 p-2">
   <Tabs.List class="mx-auto">
     {#each entries as e (e.name)}
-      <Tabs.Trigger value={e.name}>{i18n.t(e.title)}</Tabs.Trigger>
+      <Tabs.Trigger value={e.name}>{e.title}</Tabs.Trigger>
     {/each}
   </Tabs.List>
   {#each entries as e (e.name)}
     <Tabs.Content value={e.name}>
       <Card.Root>
         <Card.Header>
-          <Card.Title>{i18n.t(e.title)}</Card.Title>
-          <Card.Description>{i18n.t(e.description)}</Card.Description>
+          <Card.Title>{e.title}</Card.Title>
+          <Card.Description>{e.description}</Card.Description>
         </Card.Header>
         <Card.Content class="grid gap-6">
-          <svelte:component this={e.component} />
+          <e.component />
         </Card.Content>
       </Card.Root>
     </Tabs.Content>
