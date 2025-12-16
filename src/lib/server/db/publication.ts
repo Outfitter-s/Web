@@ -88,9 +88,16 @@ export class PublicationDAO {
   }
 
   static async getFeed(userId: User['id'], limit: number, offset: number): Promise<Publication[]> {
+    // Only return posts from users followed by the given user
     const res = await pool.query<PublicationTable>(
-      'SELECT * FROM publication ORDER BY created_at DESC LIMIT $1 OFFSET $2',
-      [limit, offset]
+      `SELECT p.*
+      FROM publication p
+      JOIN followers f ON f.following_id = p.user_id
+      WHERE f.follower_id = $1
+      ORDER BY p.created_at DESC
+      LIMIT $2
+      OFFSET $3`,
+      [userId, limit, offset]
     );
 
     return await PublicationDAO.publicationTableToPublicationArray(res.rows, userId);
