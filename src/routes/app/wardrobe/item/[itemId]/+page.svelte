@@ -15,7 +15,7 @@
 
   $effect(() => {
     if (!item) {
-      throw new Error('Item not found');
+      throw new Error('Item not found'); // TODO: i18n
     }
   });
 </script>

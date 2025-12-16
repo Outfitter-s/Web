@@ -145,9 +145,10 @@ export interface SwiperCard {
 export const PublicationZ = z.object({
   id: UUID.or(z.string()),
   imageUrl: z.url(),
-  userId: UUID,
+  user: UserZ,
   description: z.string(),
   createAt: DateZ,
+  outfit: OutfitZ.optional(),
 });
 
 export type Publication = z.infer<typeof PublicationZ>;

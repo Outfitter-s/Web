@@ -12,7 +12,7 @@
 
   $effect(() => {
     if (!outfit) {
-      throw new Error('Outfit not found');
+      throw new Error('Outfit not found'); // TODO: i18n
     }
   });
 </script>

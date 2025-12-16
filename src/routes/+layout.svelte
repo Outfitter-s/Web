@@ -5,7 +5,6 @@
   import Globals from '$lib/globals.svelte';
   import { onMount } from 'svelte';
   import AddItem from '$lib/components/routes/app/nav/add_item.svelte';
-  import Publier from '$lib/components/routes/app/feed/publier.svelte';
 
   let { children, data } = $props();
 
@@ -27,7 +26,5 @@
   <div class="flex grow flex-col">
     <svelte:boundary>{@render children()}</svelte:boundary>
   </div>
-
-  <Publier />
   <Navbar />
 </div>

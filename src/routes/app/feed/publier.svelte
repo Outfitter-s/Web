@@ -1,16 +1,20 @@
 <script lang="ts">
   import { Toaster } from '$lib/components/Toast/toast';
-  import Input from '$lib/components/ui/input/input.svelte';
   import i18n from '$lib/i18n';
   import { logger } from '$lib/utils/logger';
   import * as Field from '$lib/components/ui/field';
   import { Button } from '$lib/components/ui/button';
   import * as Dialog from '$lib/components/ui/dialog';
-  import { publierOpen } from '.';
   import { Camera } from '@lucide/svelte';
   import Spinner from '$lib/components/Spinner/Spinner.svelte';
   import { fade, slide } from 'svelte/transition';
   import { invalidateAll } from '$app/navigation';
+  import Textarea from '$lib/components/ui/textarea/textarea.svelte';
+  import { Switch } from '$lib/components/ui/switch';
+  import { Label } from '$lib/components/ui/label';
+  import type { Outfit } from '$lib/types';
+  import { DateUtils } from '$lib/utils';
+  import { page } from '$app/state';
 
   let takePictureStates = $state({
     open: false,
@@ -22,22 +26,33 @@
     streaming: false,
   });
 
+  interface Props {
+    open?: boolean;
+  }
+
+  let { open = $bindable(false) }: Props = $props();
+
   const width = 320; // We will scale the photo width to this
   let height = 0; // This will be computed based on the input stream
   let loading = $state(false);
   let processingImage = $state(false);
+  let hasOutfitForToday = $derived(
+    ((page.data.outfits as Outfit[]) || []).find((o) => DateUtils.isToday(o.createdAt)) != null
+  );
 
   $effect(() => {
-    if (!$publierOpen) {
+    if (!open) {
       resetForm();
     }
   });
 
   type FormValues = {
     description: string;
+    isTodaysOutfit: boolean;
   };
   let formValues = $state<FormValues>({
     description: '',
+    isTodaysOutfit: true,
   });
 
   async function onImageTaken() {
@@ -73,11 +88,11 @@
         is: multiple ? 'are' : 'is',
       });
       logger.error('Creation error:', msg);
-      Toaster.error(msg);
+      Toaster.error(msg as any);
     } else {
-      Toaster.success(i18n.t('successes.social.item.created'));
+      Toaster.success('successes.social.item.created');
       (event.target as HTMLFormElement).reset();
-      $publierOpen = false;
+      open = false;
       await invalidateAll();
     }
     loading = false;
@@ -86,6 +101,7 @@
   function resetForm() {
     formValues = {
       description: '',
+      isTodaysOutfit: true,
     };
     takePictureStates.capturedImage = '';
     processingImage = false;
@@ -93,7 +109,7 @@
   }
 
   async function openCamera() {
-    $publierOpen = false;
+    open = false;
     takePictureStates.open = true;
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: 'environment' },
@@ -131,7 +147,7 @@
         open: false,
       };
       closeCamera();
-      $publierOpen = true;
+      open = true;
       onImageTaken();
     } else {
       clearPhoto();
@@ -203,7 +219,7 @@
   </Dialog.Content>
 </Dialog.Root>
 
-<Dialog.Root bind:open={$publierOpen}>
+<Dialog.Root bind:open>
   <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title>{i18n.t('social.feed.addPublication.title')}</Dialog.Title>
@@ -247,13 +263,20 @@
         <Field.Label for="name"
           >{i18n.t('social.feed.addPublication.description.label')}</Field.Label
         >
-        <Input
+        <Textarea
           id="description"
           name="description"
-          type="text"
+          rows={2}
           bind:value={formValues.description}
         />
       </Field.Field>
+
+      {#if hasOutfitForToday}
+        <div class="flex flex-row items-center justify-between hap-4">
+          <Label for="todaysOutfit">{i18n.t('social.feed.addPublication.todaysOutfit')}</Label>
+          <Switch id="todaysOutfit" name="todaysOutfit" bind:checked={formValues.isTodaysOutfit} />
+        </div>
+      {/if}
 
       <Dialog.Footer>
         <Button type="submit" {loading}>{i18n.t('social.feed.addPublication.submit')}</Button>
