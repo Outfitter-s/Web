@@ -32,6 +32,6 @@
     <span class="text-muted-foreground block text-center text-sm">
       © {new Date().getFullYear()} Outfiter, All rights reserved</span
     >
-    <span class="text-muted-foreground block text-center text-sm mt-2"> Made with 🩵</span>
+    <span class="text-muted-foreground block text-center text-sm mt-2"> Made with ❤️</span>
   </div>
 </footer>

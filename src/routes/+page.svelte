@@ -24,7 +24,7 @@
       title: '2. Generate your outfits',
       content:
         'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      image: '/add-items.webp',
+      image: '/choose-outfit.webp',
       icon: Settings,
     },
     {
@@ -134,7 +134,7 @@
       <div class="relative mt-8 overflow-visible px-2 sm:mr-0 sm:mt-12 md:mt-20">
         <div class="relative mx-auto flex max-w-6xl justify-center">
           <div class="relative origin-center rotate-15">
-            <IPhone15Pro src="/hero.webp" scale={0.8} />
+            <IPhone15Pro videoSrc="/hero.mp4" scale={0.8} />
           </div>
         </div>
       </div>

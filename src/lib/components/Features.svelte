@@ -143,6 +143,7 @@
           class="relative flex h-full snap-x snap-mandatory flex-nowrap overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden"
         >
           {#each data as item, index}
+            <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
             <li
               class="card_code relative mr-6 grid h-full max-w-[85vw] shrink-0 items-start justify-start gap-3 pl-2 last:mr-0 sm:mr-8 sm:max-w-md"
               on:click={() => currentIndex.set(index)}
