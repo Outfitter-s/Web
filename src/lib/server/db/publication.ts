@@ -1,7 +1,8 @@
 import type { Publication, UUID } from '$lib/types';
+import { dirname } from 'node:path';
 import pool from '.';
 import { getEnv } from '../utils';
-import { writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 
 export interface PublicationTable {
   id: UUID;
@@ -37,6 +38,7 @@ export class PublicationDAO {
     const publication = PublicationDAO.convertToPublication(res.rows[0]);
 
     const outputPath = new URL(publication.imageUrl).pathname.slice(1);
+
     await writeFile(outputPath, imageBuffer);
 
     return publication;
@@ -62,7 +64,17 @@ export class PublicationDAO {
       return [];
     }
 
-    return this.publicationTableToPublicationArray(res.rows);
+    return PublicationDAO.publicationTableToPublicationArray(res.rows);
+  }
+
+  static async getAllPublication(): Promise<Publication[]> {
+    const res = await pool.query<PublicationTable>('SELECT * FROM publication');
+
+    if (res.rows.length === 0) {
+      return [];
+    }
+
+    return PublicationDAO.publicationTableToPublicationArray(res.rows);
   }
 
   static publicationTableToPublicationArray(table: PublicationTable[]): Publication[] {

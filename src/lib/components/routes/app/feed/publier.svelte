@@ -1,25 +1,16 @@
 <script lang="ts">
   import { Toaster } from '$lib/components/Toast/toast';
   import Input from '$lib/components/ui/input/input.svelte';
-  import * as Select from '$lib/components/ui/select';
   import i18n from '$lib/i18n';
-  import {
-    clothingItemColors,
-    clothingItemTypes,
-    type ClothingItemColor,
-    type ClothingItemType,
-  } from '$lib/types';
   import { logger } from '$lib/utils/logger';
   import * as Field from '$lib/components/ui/field';
   import { Button } from '$lib/components/ui/button';
   import * as Dialog from '$lib/components/ui/dialog';
-  import { capitalize } from '$lib/utils';
-  import { itemOpen } from '.';
+  import { publierOpen } from '.';
   import { Camera } from '@lucide/svelte';
   import Spinner from '$lib/components/Spinner/Spinner.svelte';
   import { fade, slide } from 'svelte/transition';
   import { invalidateAll } from '$app/navigation';
-  import ColorDot from '$lib/components/colorDot.svelte';
 
   let takePictureStates = $state({
     open: false,
@@ -30,62 +21,29 @@
     videoElement: null as HTMLVideoElement | null,
     streaming: false,
   });
+
   const width = 320; // We will scale the photo width to this
   let height = 0; // This will be computed based on the input stream
   let loading = $state(false);
   let processingImage = $state(false);
 
   $effect(() => {
-    if (!$itemOpen) {
+    if (!$publierOpen) {
       resetForm();
     }
   });
 
   type FormValues = {
-    name: string;
     description: string;
-    color: ClothingItemColor;
-    type: ClothingItemType;
   };
   let formValues = $state<FormValues>({
-    name: '',
     description: '',
-    color: clothingItemColors[0],
-    type: clothingItemTypes[0],
   });
 
-  async function onImageUpload() {
+  async function onImageTaken() {
     processingImage = true;
     if (!takePictureStates.capturedImage) {
       return;
-    }
-    const response = await fetch(takePictureStates.capturedImage);
-    const blob = await response.blob();
-    const file = new File([blob], 'uploaded_image.png', { type: blob.type });
-    const formData = new FormData();
-    formData.append('image', file);
-    try {
-      const res = await fetch('/api/wardrobe/item/classify', {
-        method: 'POST',
-        body: formData,
-      });
-      const result = await res.json();
-      if (res.ok) {
-        if (result.type) formValues.type = result.type;
-        if (result.color) formValues.color = result.color;
-        if (result.type && result.color)
-          formValues.name = `${capitalize(result.color)} ${result.type}`;
-        const buffer = result.buffer;
-        const byteArray = new Uint8Array(buffer.data ?? buffer);
-        const blob = new Blob([byteArray], { type: result.mime || 'image/png' });
-        takePictureStates.capturedImage = URL.createObjectURL(blob);
-      } else {
-        throw new Error(result.message);
-      }
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      logger.error('Error classifying clothing item :', msg);
-      Toaster.error('errors.clothing.item.classificationFailed');
     }
     processingImage = false;
   }
@@ -98,10 +56,10 @@
     if (takePictureStates.capturedImage) {
       const response = await fetch(takePictureStates.capturedImage);
       const blob = await response.blob();
-      const file = new File([blob], 'uploaded_image.png', { type: blob.type });
+      const file = new File([blob], 'image.png', { type: blob.type });
       formData.append('image', file);
     }
-    const res = await fetch('/api/wardrobe/item/create', {
+    const res = await fetch('/api/social/publication', {
       method: 'POST',
       body: formData,
     });
@@ -109,7 +67,7 @@
     if (!res.ok) {
       const fields = result.message.split(', ');
       const multiple = fields.length > 1;
-      const msg = i18n.t('errors.clothing.item.requiredField', {
+      const msg = i18n.t('errors.social.item.requiredField', {
         field: result.message,
         s: multiple ? 's' : '',
         is: multiple ? 'are' : 'is',
@@ -117,9 +75,9 @@
       logger.error('Creation error:', msg);
       Toaster.error(msg);
     } else {
-      Toaster.success(i18n.t('successes.clothing.item.created'));
+      Toaster.success(i18n.t('successes.social.item.created'));
       (event.target as HTMLFormElement).reset();
-      $itemOpen = false;
+      $publierOpen = false;
       await invalidateAll();
     }
     loading = false;
@@ -127,10 +85,7 @@
 
   function resetForm() {
     formValues = {
-      name: '',
       description: '',
-      color: clothingItemColors[0],
-      type: clothingItemTypes[0],
     };
     takePictureStates.capturedImage = '';
     processingImage = false;
@@ -138,7 +93,7 @@
   }
 
   async function openCamera() {
-    $itemOpen = false;
+    $publierOpen = false;
     takePictureStates.open = true;
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: 'environment' },
@@ -176,8 +131,8 @@
         open: false,
       };
       closeCamera();
-      $itemOpen = true;
-      onImageUpload();
+      $publierOpen = true;
+      onImageTaken();
     } else {
       clearPhoto();
     }
@@ -248,11 +203,10 @@
   </Dialog.Content>
 </Dialog.Root>
 
-<Dialog.Root bind:open={$itemOpen}>
+<Dialog.Root bind:open={$publierOpen}>
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>{i18n.t('wardrobe.createItem.title')}</Dialog.Title>
-      <Dialog.Description>{i18n.t('wardrobe.createItem.description')}</Dialog.Description>
+      <Dialog.Title>{i18n.t('social.feed.addPublication.title')}</Dialog.Title>
     </Dialog.Header>
     <form onsubmit={submitHandler} class="mt-6 flex flex-col gap-4">
       <div class="flex w-full flex-col">
@@ -290,13 +244,8 @@
       </div>
 
       <Field.Field>
-        <Field.Label for="name">{i18n.t('wardrobe.createItem.fields.name')}</Field.Label>
-        <Input id="name" name="name" type="text" bind:value={formValues.name} />
-      </Field.Field>
-
-      <Field.Field>
-        <Field.Label for="description"
-          >{i18n.t('wardrobe.createItem.fields.description')}</Field.Label
+        <Field.Label for="name"
+          >{i18n.t('social.feed.addPublication.description.label')}</Field.Label
         >
         <Input
           id="description"
@@ -306,42 +255,8 @@
         />
       </Field.Field>
 
-      <div class="grid grid-cols-2 gap-2">
-        <Field.Field>
-          <Field.Label for="type">{i18n.t('wardrobe.createItem.fields.type')}</Field.Label>
-          <Select.Root type="single" name="type" bind:value={formValues.type}>
-            <Select.Trigger>{capitalize(formValues.type)}</Select.Trigger>
-            <Select.Content>
-              {#each clothingItemTypes as type}
-                <Select.Item value={type} label={capitalize(type)} />
-              {/each}
-            </Select.Content>
-          </Select.Root>
-        </Field.Field>
-
-        <Field.Field>
-          <Field.Label for="color">{i18n.t('wardrobe.createItem.fields.color')}</Field.Label>
-          <Select.Root type="single" name="color" bind:value={formValues.color}>
-            <Select.Trigger>
-              <div class="flex flex-row items-center gap-2">
-                <ColorDot color={formValues.color} />
-                {capitalize(formValues.color)}
-              </div>
-            </Select.Trigger>
-            <Select.Content>
-              {#each clothingItemColors as color}
-                <Select.Item value={color}>
-                  <ColorDot {color} />
-                  {capitalize(color)}
-                </Select.Item>
-              {/each}
-            </Select.Content>
-          </Select.Root>
-        </Field.Field>
-      </div>
-
       <Dialog.Footer>
-        <Button type="submit" {loading}>{i18n.t('wardrobe.createItem.submit')}</Button>
+        <Button type="submit" {loading}>{i18n.t('social.feed.addPublication.submit')}</Button>
       </Dialog.Footer>
     </form>
   </Dialog.Content>

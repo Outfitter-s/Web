@@ -115,7 +115,10 @@
     },
     "social": {
       "cannotFollowYourself": "You cannot follow yourself.",
-      "searchFailed": "Failed to search users. Please try again later."
+      "searchFailed": "Failed to search users. Please try again later.",
+      "item": {
+        "requiredField": "The following field{{s}} {{is}} required: {{field}}"
+      }
     }
   },
   "successes": {
@@ -137,6 +140,9 @@
       "follow": {
         "followed": "You are now following {{username}}.",
         "unfollowed": "You have unfollowed {{username}}."
+      },
+      "item": {
+        "created": "Posted."
       }
     }
   },
@@ -426,6 +432,13 @@
     "feed": {
       "search": {
         "placeholder": "Search users..."
+      },
+      "addPublication": {
+        "title": "Make a publication",
+        "description": {
+          "label": "Description"
+        },
+        "submit": "Post"
       }
     }
   }
