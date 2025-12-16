@@ -23,7 +23,7 @@ class ICS {
     const lines = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//Outfitter//EN',
+      `PRODID:-//Outfitter//${this.i18n.locale}`,
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
     ];
