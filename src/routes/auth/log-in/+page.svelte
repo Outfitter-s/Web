@@ -14,6 +14,7 @@
   import { Checkbox } from '$lib/components/ui/checkbox';
   import * as Dialog from '$lib/components/ui/dialog';
   import { InputOTP } from '$lib/components/ui/input-otp';
+  import { resolve } from '$app/paths';
 
   let { form }: PageProps = $props();
   let loading = $state(false);
@@ -33,7 +34,7 @@
       }
       if (form?.message) {
         logger.error('Log in error:', form.message);
-        Toaster.error(form.message);
+        Toaster.error(form.message as any);
       }
     }
   });
@@ -61,7 +62,7 @@
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error(errorMessage);
-      Toaster.error(errorMessage);
+      Toaster.error(errorMessage as any);
     } finally {
       passkeyLoading = false;
     }
@@ -122,7 +123,7 @@
       <h1 class="mb-2 text-2xl font-semibold">{i18n.t('auth.logIn.title')}</h1>
       <p class="text-muted-foreground text-base">
         {i18n.t('auth.logIn.dontHaveAnAccount.text')}
-        <a href="/auth/sign-up" class="text-primary font-medium"
+        <a href={resolve('/auth/sign-up')} class="text-primary font-medium"
           >{i18n.t('auth.logIn.dontHaveAnAccount.cta')}</a
         >
       </p>
@@ -139,7 +140,7 @@
           <Checkbox id="rememberMe" name="rememberMe" checked />
           <Label for="rememberMe">{i18n.t('auth.rememberMe')}</Label>
         </div>
-        <a href="/auth/forgot-password" class="text-primary text-sm font-medium"
+        <a href={resolve('/auth/forgot-password')} class="text-primary text-sm font-medium"
           >{i18n.t('auth.forgotPasswordKeyword')}</a
         >
       </div>

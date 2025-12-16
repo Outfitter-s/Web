@@ -94,14 +94,20 @@
     },
     "account": {
       "settings": {
-        "cannotChangeUsername": "Cannot change username."
+        "cannotChangeUsername": "Cannot change username.",
+        "invalidProfilePicture": "Invalid profile picture. Please upload a valid image file."
       }
     },
     "clothing": {
       "item": {
         "requiredField": "The following field{{s}} {{is}} required: {{field}}",
         "classificationFailed": "Failed to classify the clothing item. Please enter values manually.",
-        "missingImage": "Image file is required"
+        "missingImage": "Image file is required",
+        "name": "Please a name for this item (max 100 characters).",
+        "description": "Please provide a description for this item (max 500 characters).",
+        "type": "Please select a type for this item.",
+        "color": "Please select a color for this item.",
+        "image": "Please take an image of this item."
       },
       "outfit": {
         "delete": "Failed to delete outfit. Please try again later.",
@@ -111,6 +117,13 @@
     "outfitGeneration": {
       "notEnoughItems": "Not enough clothing items to generate an outfit. Please add more items to your wardrobe.",
       "apiError": "Failed to generate outfit due to an internal error. Please try again later."
+    },
+    "social": {
+      "cannotFollowYourself": "You cannot follow yourself.",
+      "searchFailed": "Failed to search users. Please try again later.",
+      "item": {
+        "requiredField": "The following field{{s}} {{is}} required: {{field}}"
+      }
     }
   },
   "successes": {
@@ -122,9 +135,19 @@
     "resetPassword": "Your password has been reset successfully!",
     "usernameUpdated": "Username updated successfully.",
     "emailUpdated": "Email updated successfully.",
+    "profilePictureUpdated": "Profile picture updated successfully.",
     "clothing": {
       "item": {
         "created": "Clothing item created successfully."
+      }
+    },
+    "social": {
+      "follow": {
+        "followed": "You are now following {{username}}.",
+        "unfollowed": "You have unfollowed {{username}}."
+      },
+      "item": {
+        "created": "Posted."
       }
     }
   },
@@ -253,7 +276,8 @@
         "logout": "Log out",
         "danger": {
           "title": "Danger Zone"
-        }
+        },
+        "profilePicture": "Profile Picture"
       },
       "password": {
         "title": "Password",
@@ -288,6 +312,7 @@
     "outfits": "Outfits",
     "account": "Account",
     "settings": "Settings",
+    "feed": "Feed",
     "logIn": "Login",
     "signUp": "Sign Up",
     "wardrobe": "Wardrobe",
@@ -377,7 +402,16 @@
           "confirm": "Yes, change it",
           "cancel": "No, keep it"
         }
+      },
+      "mixAndMatch": {
+        "button": "I have some inspiration!",
+        "title": "Mix and Match",
+        "createButton": "Create outfit"
       }
+    },
+    "reminder": {
+      "noTodayOutfit": "You don't have an outfit for today - create one!",
+      "createButton": "Create"
     },
     "outfitDetails": {
       "lastWornOn": "Last worn on {{date}}"
@@ -391,6 +425,30 @@
         "body": "We received a request to reset your password for your Outfitter account. Click the link below to reset your password:",
         "resetLinkText": "Reset Password",
         "footer": "If you did not request a password reset, please ignore this email. Your password will remain unchanged."
+      }
+    }
+  },
+  "social": {
+    "profile": {
+      "follow": {
+        "follow": "Follow",
+        "unfollow": "Unfollow"
+      },
+      "nbFollowers": "<b>{{count}}</b> follower{{s}}",
+      "nbFollowing": "<b>{{count}}</b> following{{s}}",
+      "isFollowing": "User is following you",
+      "notFollowing": "User is not following you"
+    },
+    "feed": {
+      "search": {
+        "placeholder": "Search users..."
+      },
+      "addPublication": {
+        "title": "Make a publication",
+        "description": {
+          "label": "Description"
+        },
+        "submit": "Post"
       }
     }
   }

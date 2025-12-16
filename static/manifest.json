@@ -42,23 +42,7 @@
   "orientation": "portrait",
   "prefer_related_applications": false,
   "scope": "/",
-  "screenshots": [
-    {
-      "sizes": "537x1168",
-      "src": "/screenshots/Notes.png",
-      "type": "image/png"
-    },
-    {
-      "sizes": "537x1168",
-      "src": "/screenshots/Note.png",
-      "type": "image/png"
-    },
-    {
-      "sizes": "537x1168",
-      "src": "/screenshots/NoteSettings.png",
-      "type": "image/png"
-    }
-  ],
+  "screenshots": [],
   "short_name": "Outfitter",
   "start_url": "/",
   "theme_color": "#000000"

@@ -13,6 +13,8 @@
   import Theming, { availableModes, availableThemes, type Mode } from '$lib/theming/index.svelte';
   import { capitalize } from '$lib/utils';
   import { Hr } from '$lib/components';
+  import ProfilePicture from '$lib/components/ProfilePicture.svelte';
+  import { resolve } from '$app/paths';
 
   let currentTheme = $state(page.data.theme);
   let currentLocale = $state(i18n.locale);
@@ -26,6 +28,7 @@
     controller: new AbortController(),
   });
   let updateEmailLoading = $state(false);
+  let isUpdatingProfilePicture = $state(false);
 
   async function onUsernameInput() {
     const newUsername = formValues.username.trim();
@@ -163,6 +166,35 @@
   </Button>
 </form>
 
+<form
+  action="?/updateProfilePicture"
+  enctype="multipart/form-data"
+  class="space-y-4"
+  method="POST"
+  use:enhance={() => {
+    isUpdatingProfilePicture = true;
+    return async ({ update }) => {
+      update({ reset: false });
+      isUpdatingProfilePicture = false;
+    };
+  }}
+>
+  <Label>{i18n.t('account.tabs.general.profilePicture')}</Label>
+  <label for="updateProfilePictureInput" class="size-20 block">
+    <ProfilePicture userId={page.data.user.id} class="size-full" />
+    <input
+      type="file"
+      name="updateProfilePictureInput"
+      id="updateProfilePictureInput"
+      class="hidden"
+      accept="image/*"
+      onchange={(e) => {
+        (e.target as HTMLInputElement).closest('form')?.submit();
+      }}
+    />
+  </label>
+</form>
+
 <div class="grid md:grid-cols-3 grid-cols-2 gap-4">
   <div class="flex flex-col gap-2">
     <Label for="modeSelect">{i18n.t('account.tabs.general.theme.mode')}</Label>
@@ -241,7 +273,7 @@
 <Hr class={{ container: 'mb-0' }} text={i18n.t('account.tabs.general.danger.title')} />
 
 <div class="grid grid-cols-3 gap-4">
-  <Button variant="destructive" href="/auth/log-out" class="gap-2">
+  <Button variant="destructive" href={resolve('/auth/log-out')} class="gap-2">
     <LogOut class="size-4" />
     {i18n.t('account.tabs.general.logout')}
   </Button>

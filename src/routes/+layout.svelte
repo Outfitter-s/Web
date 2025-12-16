@@ -5,6 +5,7 @@
   import Globals from '$lib/globals.svelte';
   import { onMount } from 'svelte';
   import AddItem from '$lib/components/routes/app/nav/add_item.svelte';
+  import Publier from '$lib/components/routes/app/feed/publier.svelte';
 
   let { children, data } = $props();
 
@@ -22,10 +23,11 @@
 <!-- The API is restricted to authenticated users so there is not issue -->
 <AddItem />
 
-<div class="flex min-h-dvh flex-col pb-16">
+<div class="flex min-h-dvh flex-col pb-14">
   <div class="flex grow flex-col">
     <svelte:boundary>{@render children()}</svelte:boundary>
   </div>
 
+  <Publier />
   <Navbar />
 </div>

@@ -9,3 +9,5 @@ export { default as OutfitCard } from './OutfitCard.svelte';
 export { default as IPhone15Pro } from './IPhone15Pro.svelte';
 export { default as Features } from './Features.svelte';
 export { default as Footer } from './FooterOne.svelte';
+export { default as ProfilePicture } from './ProfilePicture.svelte';
+export { default as NavBack } from './NavBack.svelte';

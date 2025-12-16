@@ -12,6 +12,7 @@
   import { logger } from '$lib/utils/logger';
   import { Toaster } from '$lib/components/Toast/toast';
   import { invalidateAll } from '$app/navigation';
+  import { resolve } from '$app/paths';
 
   let chosenOutfit = $derived(
     (page.data.outfits as Outfit[]).find((o) => DateUtils.isToday(o.createdAt)) ?? null
@@ -44,7 +45,7 @@
 
 <SEO title="seo.homePage.title" description="seo.homePage.description" />
 
-<Dialog.Root bind:open={changeOutfitConfirmModal.open} dismissible={false}>
+<Dialog.Root bind:open={changeOutfitConfirmModal.open}>
   <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title>{i18n.t('wardrobe.outfitGeneration.choosen.change.title')}</Dialog.Title>
@@ -100,7 +101,7 @@
       <OutfitCard
         outfit={chosenOutfit}
         showDate={false}
-        href="/app/wardrobe/outfit/{chosenOutfit.id}"
+        href={resolve('/app/wardrobe/outfit/[outfitId]', { outfitId: chosenOutfit.id })}
       />
     </div>
   </section>

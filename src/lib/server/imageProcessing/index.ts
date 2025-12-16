@@ -2,6 +2,7 @@ import { clothingItemTypes, type ClothingItemColor, type ClothingItemType } from
 import ColorThief from 'colorthief';
 import { getEnv } from '../utils';
 import { logger } from '$lib/utils/logger';
+import sharp from 'sharp';
 type RGB = [number, number, number];
 
 const clothingItemColorsMapping: Record<ClothingItemColor, RGB> = {
@@ -85,5 +86,23 @@ export class ImageProcessor {
       this.getImageColor(imageBuffer),
     ]);
     return { type, color };
+  }
+
+  static async resizeImage(
+    imageBuffer: ArrayBuffer,
+    {
+      width = 512,
+      height = undefined,
+      aspectRatio = 9 / 12,
+    }: { width?: number; height?: number; aspectRatio?: number } = {}
+  ): Promise<Buffer> {
+    if (height === null) {
+      height = Math.floor(width / aspectRatio);
+    }
+    const image = await sharp(imageBuffer)
+      .png()
+      .resize(width, height, { fit: 'inside' })
+      .toBuffer();
+    return image;
   }
 }

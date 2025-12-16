@@ -64,7 +64,7 @@
 
       <!-- Message -->
       <p class="font-base mt-0.5 grow text-sm text-wrap">
-        {i18n.t(t.message)}
+        {i18n.t(t.message as any)}
       </p>
 
       <!-- Close button -->
@@ -87,7 +87,7 @@
               variant={action.variant || 'default'}
               onclick={() => Toaster.remove(t.id)}
             >
-              {i18n.t(action.label)}
+              {i18n.t(action.label as any)}
             </Button>
           {:else if action.type === 'button'}
             <Button
@@ -98,7 +98,7 @@
                 Toaster.remove(t.id);
               }}
             >
-              {i18n.t(action.label)}
+              {i18n.t(action.label as any)}
             </Button>
           {/if}
         {/each}

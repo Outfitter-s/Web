@@ -71,7 +71,7 @@ export const actions: Actions = {
         throw new Error('errors.auth.passwordReset.passwordsDontMatch');
 
       // Check if the password is the same as the current one
-      if (!(await bcrypt.compare(currentPassword, user.passwordHash)))
+      if (!(await bcrypt.compare(currentPassword, user.passwordHash!)))
         throw new Error('errors.auth.passwordReset.wrongCurrentPassword');
 
       // Hash password
@@ -140,6 +140,28 @@ export const actions: Actions = {
     } catch (error) {
       return fail(500, {
         action: 'setUpTOTP',
+        error: true,
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  },
+  updateProfilePicture: async ({ locals, request }) => {
+    const user = locals.user!;
+    const formData = Object.fromEntries(await request.formData());
+    const { updateProfilePictureInput: image } = formData as {
+      updateProfilePictureInput: File;
+    };
+    try {
+      if (image.type.split('/')[0] !== 'image') {
+        throw new Error('errors.account.settings.invalidProfilePicture');
+      }
+      const imageBuffer = Buffer.from(await image.arrayBuffer());
+
+      await UserDAO.updateProfilePicture(user.id, imageBuffer);
+      return { success: true, action: 'general', message: 'successes.profilePictureUpdated' };
+    } catch (error) {
+      return fail(500, {
+        action: 'general',
         error: true,
         message: error instanceof Error ? error.message : String(error),
       });

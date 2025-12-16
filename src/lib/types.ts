@@ -18,10 +18,11 @@ export const UserZ = z.object({
   id: UUID,
   username: z.string().min(3).max(30),
   email: z.email(),
-  passwordHash: z.string(),
+  passwordHash: z.string().optional(),
   createdAt: DateZ,
   totpSecret: z.string().optional(),
   passkey: z.any().nullable(),
+  following: z.array(UUID).default([]),
 });
 export type User = z.infer<typeof UserZ>;
 export interface Passkey {
@@ -140,3 +141,13 @@ export interface SwiperCard {
   id: number;
   outfit: OutfitPreview | Outfit;
 }
+
+export const PublicationZ = z.object({
+  id: UUID.or(z.string()),
+  imageUrl: z.url(),
+  userId: UUID,
+  description: z.string(),
+  createAt: DateZ,
+});
+
+export type Publication = z.infer<typeof PublicationZ>;

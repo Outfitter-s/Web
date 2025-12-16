@@ -41,8 +41,8 @@ services:
     image: valkey/valkey:9.0.1
     command: valkey-server --save 60 1 --loglevel debug
     volumes:
-      - valkey-data:/data
+      - valkey_data:/data
 
 volumes:
   pg_data:
-  valkey-data:
+  valkey_data:

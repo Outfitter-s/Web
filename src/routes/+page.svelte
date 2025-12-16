@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
   import { SEO } from '$lib/components';
   import Button from '$lib/components/ui/button/button.svelte';
@@ -61,7 +62,7 @@
         <div class="text-center sm:mx-auto lg:mr-auto lg:mt-0">
           {#if page.data.release}
             <a
-              href="/"
+              href={resolve('/')}
               class="hover:bg-background dark:hover:border-t-border bg-muted group mx-auto flex w-fit items-center gap-4 rounded-full border p-1 pl-4 transition-colors duration-300 dark:border-t-white/5"
             >
               <span class="text-foreground text-sm">Introducing Outfitter v{page.data.release}</span

@@ -2,6 +2,8 @@ import type { Passkey, User, UUID } from '$lib/types';
 import pool from '.';
 import { Caching } from './caching';
 import { PasskeyDAO } from './passkey';
+import { SocialDAO } from './social';
+import { writeFile } from 'node:fs/promises';
 
 export interface UserTable {
   id: UUID;
@@ -12,7 +14,11 @@ export interface UserTable {
   totp_secret: string;
 }
 export class UserDAO {
-  static convertToUser(row: UserTable, passkey: Passkey | null = null): User {
+  static convertToUser(
+    row: UserTable,
+    passkey: Passkey | null = null,
+    following: User['following'] = []
+  ): User {
     return {
       id: row.id,
       username: row.username,
@@ -21,13 +27,14 @@ export class UserDAO {
       createdAt: row.created_at,
       passkey: passkey,
       totpSecret: row.totp_secret,
+      following,
     };
   }
 
   static async createUser(
     username: User['username'],
     email: User['email'],
-    passwordHash: string
+    passwordHash: Required<User>['passwordHash']
   ): Promise<User> {
     if (await UserDAO.userExists(username)) {
       throw new Error('errors.auth.usernameTaken');
@@ -57,8 +64,8 @@ export class UserDAO {
   }
 
   static async getUserById(id: User['id']): Promise<User> {
-    const cachedUser = await Caching.get<User>(`user:${id}`);
-    if (cachedUser) return cachedUser;
+    // const cachedUser = await Caching.get<User>(`user:${id}`);
+    // if (cachedUser) return cachedUser;
 
     const userResult = await pool.query<UserTable>('SELECT * FROM users WHERE id = $1', [id]);
     if (userResult.rows.length === 0) {
@@ -66,7 +73,8 @@ export class UserDAO {
     }
     const user = UserDAO.convertToUser(
       userResult.rows[0],
-      await PasskeyDAO.getUserPasskey(userResult.rows[0].id)
+      await PasskeyDAO.getUserPasskey(userResult.rows[0].id),
+      await SocialDAO.getFollowingIds(id)
     );
     await Caching.set(`user:${user.id}`, user);
     return user;
@@ -81,7 +89,8 @@ export class UserDAO {
     }
     const user = UserDAO.convertToUser(
       userResult.rows[0],
-      await PasskeyDAO.getUserPasskey(userResult.rows[0].id)
+      await PasskeyDAO.getUserPasskey(userResult.rows[0].id),
+      await SocialDAO.getFollowingIds(userResult.rows[0].id)
     );
     return user;
   }
@@ -91,9 +100,11 @@ export class UserDAO {
     if (userResult.rows.length === 0) {
       throw new Error('errors.auth.userNotFound');
     }
+    const user = userResult.rows[0];
     return UserDAO.convertToUser(
       userResult.rows[0],
-      await PasskeyDAO.getUserPasskey(userResult.rows[0].id)
+      await PasskeyDAO.getUserPasskey(user.id),
+      await SocialDAO.getFollowingIds(user.id)
     );
   }
 
@@ -176,5 +187,10 @@ export class UserDAO {
       await Caching.del(`user:${updates.username}`);
       await Caching.del(`userExists:${updates.username}`);
     }
+  }
+
+  static async updateProfilePicture(userId: User['id'], imageBuffer: Buffer): Promise<void> {
+    const outputPath = 'assets/profile_pictures/' + String(userId) + '.png';
+    await writeFile(outputPath, imageBuffer);
   }
 }
