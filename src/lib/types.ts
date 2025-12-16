@@ -174,3 +174,5 @@ export const PublicationZ = z.object({
   userReaction: z.enum(reactions).optional(),
 });
 export type Publication = z.infer<typeof PublicationZ>;
+export const feedTypes = ['forYou', 'followed'];
+export type FeedType = (typeof feedTypes)[number];
