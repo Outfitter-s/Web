@@ -27,7 +27,7 @@
             alert: () => {
               if (!user) return false;
               const today = new Date();
-              const hasTodayOutfit = (page.data.outfits as Outfit[]).some((outfit) =>
+              const hasTodayOutfit = ((page.data.outfits as Outfit[]) || []).some((outfit) =>
                 DateUtils.isSameDay(outfit.createdAt, today)
               );
               return !hasTodayOutfit;
@@ -48,9 +48,12 @@
 </script>
 
 {#snippet alertDot()}
-  <div
-    class="absolute top-0 right-0 bg-destructive rounded-full size-2 translate-x-1/2 -translate-y-1/2"
-  ></div>
+  <div class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 size-2">
+    <div class="size-full relativ">
+      <div class="absolute inset-0 bg-destructive rounded-full animate-ping"></div>
+      <div class="absolute inset-0 bg-destructive rounded-full"></div>
+    </div>
+  </div>
 {/snippet}
 
 {#snippet entry(link: Link)}

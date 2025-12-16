@@ -78,7 +78,7 @@
       </p>
     </div>
   {/if}
-  <div class="relative aspect-square">
+  <div class="relative aspect-square isolate">
     {#each outfit.items as item, index}
       {@render outfitCard(item, index, outfit.items.length)}
     {/each}
