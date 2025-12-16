@@ -1,8 +1,8 @@
 <script lang="ts">
   import { page } from '$app/state';
   import type { ClothingItem } from '$lib/types';
-  import { capitalize, cn, DateUtils } from '$lib/utils';
-  import { Calendar, Palette, Shirt, Pencil, ChevronLeft } from '@lucide/svelte';
+  import { capitalize, DateUtils } from '$lib/utils';
+  import { Calendar, Palette, Shirt, Pencil } from '@lucide/svelte';
   import ColorDot from '$lib/components/colorDot.svelte';
   import { Button } from '$lib/components/ui/button';
   import { NavBack, SEO } from '$lib/components';

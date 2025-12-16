@@ -142,6 +142,21 @@ export interface SwiperCard {
   outfit: OutfitPreview | Outfit;
 }
 
+// Post - reaction
+export const reactions = ['love', 'like', 'haha', 'wow', 'sad'] as const;
+export type Reactions = (typeof reactions)[number];
+export const ReactionZ = z.object({
+  postId: UUID,
+  userId: UUID,
+  type: z.enum(reactions),
+  createdAt: DateZ,
+});
+export type Reaction = z.infer<typeof ReactionZ>;
+export type PostReactions = {
+  [key in Reactions]: number;
+};
+
+// Post - publication
 export const PublicationZ = z.object({
   id: UUID.or(z.string()),
   imageUrl: z.url(),
@@ -149,6 +164,13 @@ export const PublicationZ = z.object({
   description: z.string(),
   createAt: DateZ,
   outfit: OutfitZ.optional(),
+  reactions: z.record(z.enum(reactions), z.number()).default({
+    like: 0,
+    love: 0,
+    haha: 0,
+    wow: 0,
+    sad: 0,
+  }),
+  userReaction: z.enum(reactions).optional(),
 });
-
 export type Publication = z.infer<typeof PublicationZ>;

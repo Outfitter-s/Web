@@ -45,7 +45,7 @@
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       logger.error(msg);
-      Toaster.error(msg);
+      Toaster.error(msg as any);
     }
   };
 

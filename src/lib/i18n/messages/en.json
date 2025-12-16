@@ -460,7 +460,9 @@
         },
         "submit": "Post",
         "todaysOutfit": "Are you wearing the outfit you selected for today?"
-      }
+      },
+      "loadingMore": "Loading more posts...",
+      "noMorePosts": "No more posts to show."
     }
   }
 }

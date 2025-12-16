@@ -3,8 +3,7 @@
   import i18n from '$lib/i18n';
   import type { PageProps } from './$types';
   import { Button } from '$lib/components/ui/button';
-  import { User } from '@lucide/svelte';
-  import { ProfilePicture } from '$lib/components';
+  import { ProfilePicture } from '$lib/components/social';
 
   let { data }: PageProps = $props();
   // svelte-ignore state_referenced_locally
@@ -40,7 +39,9 @@
       }
       Toaster.success(
         i18n.t(
-          youFollow ? 'successes.social.follow.followed' : 'successes.social.follow.unfollowed',
+          (youFollow
+            ? 'successes.social.follow.followed'
+            : 'successes.social.follow.unfollowed') as any,
           { username: pageUser.username }
         )
       );

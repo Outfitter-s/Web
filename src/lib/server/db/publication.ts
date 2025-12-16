@@ -1,9 +1,10 @@
-import type { Outfit, Publication, User, UUID } from '$lib/types';
+import type { Outfit, PostReactions, Publication, Reactions, User, UUID } from '$lib/types';
 import pool from '.';
 import { getEnv } from '../utils';
 import { writeFile } from 'node:fs/promises';
 import { UserDAO } from './user';
 import { OutfitDAO } from './outfit';
+import { ReactionDAO } from './reaction';
 
 export interface PublicationTable {
   id: UUID;
@@ -14,14 +15,22 @@ export interface PublicationTable {
 }
 
 export class PublicationDAO {
-  static convertToPublication(row: PublicationTable, user: User, outfit?: Outfit): Publication {
+  static convertToPublication(
+    row: PublicationTable,
+    user: User,
+    outfit: Outfit | undefined,
+    reactions: PostReactions,
+    userReaction?: Reactions
+  ): Publication {
     return {
       id: row.id,
       imageUrl: `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/publication/${String(row.id)}.png`,
       user,
       description: row.description,
       createAt: new Date(row.created_at),
-      outfit: outfit,
+      outfit,
+      reactions,
+      userReaction,
     };
   }
 
@@ -40,15 +49,15 @@ export class PublicationDAO {
       throw new Error('Failed to create publication');
     }
 
-    const user = await UserDAO.getUserById(userId);
-    const outfit = (await OutfitDAO.getOutfitById(outfitId as UUID)) ?? undefined;
-    const publication = PublicationDAO.convertToPublication(res.rows[0], user, outfit);
+    const post = await this.getPublicationById(res.rows[0].id);
+    if (!post) {
+      throw new Error('Failed to retrieve created publication');
+    }
 
-    const outputPath = new URL(publication.imageUrl).pathname.slice(1);
-
+    const outputPath = new URL(post.imageUrl).pathname.slice(1);
     await writeFile(outputPath, imageBuffer);
 
-    return publication;
+    return post;
   }
 
   static async getPublicationById(id: UUID): Promise<Publication | null> {
@@ -60,7 +69,9 @@ export class PublicationDAO {
 
     const item = res.rows[0];
     const user = await UserDAO.getUserById(item.user_id);
-    return PublicationDAO.convertToPublication(item, user);
+    const outfit = (await OutfitDAO.getOutfitById(item.outfit_id as UUID)) ?? undefined;
+    const reactions = await ReactionDAO.getReactionsForPost(item.id);
+    return PublicationDAO.convertToPublication(item, user, outfit, reactions);
   }
 
   static async getPublicationByUserId(userId: UUID): Promise<Publication[]> {
@@ -76,26 +87,28 @@ export class PublicationDAO {
     return await PublicationDAO.publicationTableToPublicationArray(res.rows);
   }
 
-  static async getAllPublication(): Promise<Publication[]> {
+  static async getFeed(userId: User['id'], limit: number, offset: number): Promise<Publication[]> {
     const res = await pool.query<PublicationTable>(
-      'SELECT * FROM publication ORDER BY created_at DESC'
+      'SELECT * FROM publication ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+      [limit, offset]
     );
 
-    if (res.rows.length === 0) {
-      return [];
-    }
-
-    return await PublicationDAO.publicationTableToPublicationArray(res.rows);
+    return await PublicationDAO.publicationTableToPublicationArray(res.rows, userId);
   }
 
   static async publicationTableToPublicationArray(
-    table: PublicationTable[]
+    table: PublicationTable[],
+    userId?: User['id']
   ): Promise<Publication[]> {
     const res: Publication[] = [];
     for (const row of table) {
       const user = await UserDAO.getUserById(row.user_id);
       const outfit = (await OutfitDAO.getOutfitById(row.outfit_id as UUID)) ?? undefined;
-      res.push(PublicationDAO.convertToPublication(row, user, outfit));
+      const reactions = await ReactionDAO.getReactionsForPost(row.id);
+      const hasUserReacted = userId
+        ? ((await ReactionDAO.getUserReaction(row.id, userId)) ?? undefined)
+        : undefined;
+      res.push(PublicationDAO.convertToPublication(row, user, outfit, reactions, hasUserReacted));
     }
     return res;
   }

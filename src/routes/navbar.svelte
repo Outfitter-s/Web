@@ -80,7 +80,7 @@
             >{i18n.t(link.text as any)}</span
           >
         {/if}
-        {#if link.alert && link.alert()}
+        {#if link?.alert && link.alert()}
           {@render alertDot()}
         {/if}
       </div>

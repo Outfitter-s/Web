@@ -3,8 +3,9 @@
   import { page } from '$app/state';
   import type { Outfit } from '$lib/types';
   import { DateUtils } from '$lib/utils';
-  import { NavBack, OutfitItemCard, SEO } from '$lib/components';
+  import { NavBack, SEO } from '$lib/components';
   import { resolve } from '$app/paths';
+  import { OutfitItemCard } from '$lib/components/wardrobe';
 
   let outfitId = $derived<string>(page.params.outfitId as string);
   let outfits = $derived<Outfit[]>(page.data.outfits);
