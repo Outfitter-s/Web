@@ -32,7 +32,7 @@
         loginWithPasskey();
         return;
       }
-      if (form?.message) {
+      if ('message' in form) {
         logger.error('Log in error:', form.message);
         Toaster.error(form.message as any);
       }

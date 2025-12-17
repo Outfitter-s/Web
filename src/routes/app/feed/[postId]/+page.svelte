@@ -17,17 +17,23 @@
 
 <SEO title="seo.social.post.title" description="seo.social.post.description" />
 
-<!-- TODO: Fix this mess of a page -->
 <NavBack title="{post.user.username} - {i18n.t('seo.social.post.title')}" />
-<div class="lg:p-2 max-lg:pt-2 max-lg:p-4 lg:pl-4" data-post={post.id}>
+<div
+  class="lg:p-2 max-lg:pt-2 lg:pl-4 max-lg:p-4 max-w-[1500px] mx-auto w-full"
+  data-post={post.id}
+>
   <div class="bg-card relative border-border flex flex-col rounded-lg border lg:flex-row">
     <!-- Image -->
     <div
-      class="max-lg:-ml-2 relative shrink-0 border border-border max-lg:-mt-2 rounded-lg overflow-hidden bg-primary max-lg:-mr-2 h-full max-h-[70vh] lg:max-h-200"
+      class="relative block -ml-2 max-lg:-mr-2 -mt-2 lg:-mb-2 lg:max-w-1/2 lg:w-full bg-primary border border-border rounded-lg overflow-hidden"
     >
       <!-- svelte-ignore a11y_missing_attribute -->
-      <img src={post.imageUrl} class="h-full object-cover" onerror={onPostImageError} />
-      <Reaction {post} class="absolute bottom-2 right-2 z-10" />
+      <img
+        src={post.imageUrl}
+        class="size-full object-center object-cover aspect-[9/12]"
+        onerror={onPostImageError}
+      />
+      <Reaction bind:post class="absolute bottom-2 right-2 z-10" />
     </div>
 
     <!-- Details -->

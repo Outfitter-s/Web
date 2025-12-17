@@ -35,7 +35,7 @@
       <!-- svelte-ignore a11y_missing_attribute -->
       <img src={post.imageUrl} class="rounded w-full" onerror={onPostImageError} />
     </a>
-    <Reaction {post} class="absolute bottom-2 right-2" />
+    <Reaction bind:post class="absolute bottom-2 right-2" />
   </div>
   {#if post.description}
     <p class="text-base font-base font-mono">{post.description}</p>

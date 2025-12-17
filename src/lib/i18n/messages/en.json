@@ -177,7 +177,8 @@
     },
     "clothing": {
       "item": {
-        "created": "Clothing item created successfully."
+        "created": "Clothing item created successfully.",
+        "updated": "Clothing item updated successfully."
       }
     },
     "social": {
