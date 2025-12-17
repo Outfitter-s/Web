@@ -1,11 +1,20 @@
 <script lang="ts">
   import { Toaster } from '$lib/components/Toast/toast';
-  import i18n from '$lib/i18n';
   import type { PageProps } from './$types';
   import { Button } from '$lib/components/ui/button';
-  import { ProfilePicture } from '$lib/components/social';
+  import { Post, ProfilePicture } from '$lib/components/social';
+  import i18n from '$lib/i18n';
+  import type { Publication } from '$lib/types';
   import { logger } from '$lib/utils';
+  import { slide } from 'svelte/transition';
+  import { Spinner } from '$lib/components';
+  import { onMount } from 'svelte';
 
+  let posts = $state<Publication[]>([]);
+  let offset = $state<number>(0);
+  let loadingMore = $state<boolean>(false);
+  let noMorePosts = $state<boolean>(false);
+  const POST_LIMIT = 3;
   let { data }: PageProps = $props();
   // svelte-ignore state_referenced_locally
   let user = $state(data.user);
@@ -52,6 +61,45 @@
       isFollowingAction = false;
     }
   }
+
+  async function getFeed() {
+    if (loadingMore || noMorePosts) return;
+    loadingMore = true;
+    try {
+      const res = await fetch(
+        `/api/social/getUsersPublications?userId=${pageUser.id}&limit=${POST_LIMIT}&offset=${offset}`
+      );
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message);
+      posts.push(...result.feed);
+      offset += posts.length;
+      if (result.feed.length < POST_LIMIT) {
+        noMorePosts = true;
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error('Error fetching feed:', msg);
+      Toaster.error(msg as any);
+    } finally {
+      loadingMore = false;
+    }
+  }
+
+  onMount(() => {
+    function onScroll() {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && !loadingMore) {
+        getFeed();
+      }
+    }
+    window.addEventListener('scroll', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+    };
+  });
+
+  $effect(() => {
+    getFeed();
+  });
 </script>
 
 <div class="mx-auto flex w-full max-w-250 flex-col gap-4 p-2 items-start">
@@ -93,4 +141,23 @@
       >{i18n.t(isFollowingYou ? 'social.profile.isFollowing' : 'social.profile.notFollowing')}</span
     >
   </div>
+
+  <div class="w-full px-2 flex flex-col gap-12">
+    {#each posts as post (post.id)}
+      <Post {post} />
+    {/each}
+  </div>
+
+  {#if loadingMore}
+    <div
+      class="w-full p-4 flex flex-row items-center justify-center gap-4"
+      transition:slide={{ axis: 'y', duration: 300 }}
+    >
+      <Spinner />
+      {i18n.t('social.feed.loadingMore')}
+    </div>
+  {/if}
+  {#if noMorePosts}
+    <p class="text-lg font-medium my-8 text-center w-full">{i18n.t('social.feed.noMorePosts')}</p>
+  {/if}
 </div>

@@ -162,7 +162,6 @@ export const PublicationZ = z.object({
   imageUrl: z.url(),
   user: UserZ,
   description: z.string(),
-  createAt: DateZ,
   outfit: OutfitZ.optional(),
   reactions: z.record(z.enum(reactions), z.number()).default({
     like: 0,
@@ -172,6 +171,7 @@ export const PublicationZ = z.object({
     sad: 0,
   }),
   userReaction: z.enum(reactions).optional(),
+  createdAt: DateZ,
 });
 export type Publication = z.infer<typeof PublicationZ>;
 export const feedTypes = ['forYou', 'followed'];

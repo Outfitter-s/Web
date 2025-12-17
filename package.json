@@ -15,6 +15,7 @@
     "db:migrate": "bun scripts/db/migrate.ts",
     "db:create-migration": "bun scripts/db/createMigration.ts",
     "db:make-admin": "bun scripts/db/makeAdmin.ts",
+    "db:bootstrap": "bun scripts/bootstrap.ts",
     "repo:version-bump": "scripts/version-bump.sh",
     "repo:docker-build": "scripts/build-image.sh",
     "repo:deploy": "scripts/build-image.sh",

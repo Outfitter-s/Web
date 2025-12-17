@@ -27,7 +27,7 @@ export class PublicationDAO {
       imageUrl: `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/publication/${String(row.id)}.png`,
       user,
       description: row.description,
-      createAt: new Date(row.created_at),
+      createdAt: new Date(row.created_at),
       outfit,
       reactions,
       userReaction,
@@ -74,10 +74,14 @@ export class PublicationDAO {
     return PublicationDAO.convertToPublication(item, user, outfit, reactions);
   }
 
-  static async getPublicationByUserId(userId: UUID): Promise<Publication[]> {
+  static async getPublicationByUserId(
+    userId: UUID,
+    limit: number,
+    offset: number
+  ): Promise<Publication[]> {
     const res = await pool.query<PublicationTable>(
-      'SELECT * FROM publication WHERE user_id = $1 ORDER BY created_at DESC',
-      [userId]
+      'SELECT * FROM publication WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3',
+      [userId, limit, offset]
     );
 
     if (res.rows.length === 0) {
@@ -153,7 +157,7 @@ export class PublicationDAO {
         : 0;
       const popularity = positiveScore - negativeScore;
 
-      const ageInHours = (Date.now() - p.createAt.getTime()) / (1000 * 60 * 60);
+      const ageInHours = (Date.now() - p.createdAt.getTime()) / (1000 * 60 * 60);
       const recency = 1 / (1 + ageInHours); // More recent posts have higher recency
       return 1.2 * recency + 0.8 * popularity;
     }

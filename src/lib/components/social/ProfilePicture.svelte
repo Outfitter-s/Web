@@ -12,7 +12,9 @@
   let hasError = $state(false);
   let classes = $derived(cn('rounded-full size-6 overflow-hidden border border-border', className));
 
-  function onError() {
+  function onError(e: Event) {
+    e.preventDefault();
+    e.stopPropagation();
     hasError = true;
   }
 </script>

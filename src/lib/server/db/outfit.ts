@@ -85,8 +85,8 @@ export class OutfitDAO {
 
     for (const item of outfit.items) {
       await pool.query(
-        'INSERT INTO outfit_clothing_items (outfit_id, clothing_item_id, position) VALUES ($1, $2, $3)',
-        [outfitRow.id, item.id, item.type]
+        'INSERT INTO outfit_clothing_items (outfit_id, clothing_item_id) VALUES ($1, $2)',
+        [outfitRow.id, item.id]
       );
     }
 
