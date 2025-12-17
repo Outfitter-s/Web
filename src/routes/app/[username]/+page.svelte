@@ -127,20 +127,24 @@
     </div>
   </div>
 
-  <div class="flex flex-row gap-2 justify-between items-center w-full">
-    <Button
-      onclick={toggleFollow}
-      loading={isFollowingAction}
-      disabled={isFollowingAction || isYourProfile}
-      >{i18n.t(
-        youFollow ? 'social.profile.follow.unfollow' : 'social.profile.follow.follow'
-      )}</Button
-    >
+  {#if user.id !== pageUser.id}
+    <div class="flex flex-row gap-2 justify-between items-center w-full">
+      <Button
+        onclick={toggleFollow}
+        loading={isFollowingAction}
+        disabled={isFollowingAction || isYourProfile}
+        >{i18n.t(
+          youFollow ? 'social.profile.follow.unfollow' : 'social.profile.follow.follow'
+        )}</Button
+      >
 
-    <span class="text-sm text-muted-foreground"
-      >{i18n.t(isFollowingYou ? 'social.profile.isFollowing' : 'social.profile.notFollowing')}</span
-    >
-  </div>
+      <span class="text-sm text-muted-foreground"
+        >{i18n.t(
+          isFollowingYou ? 'social.profile.isFollowing' : 'social.profile.notFollowing'
+        )}</span
+      >
+    </div>
+  {/if}
 
   <div class="w-full px-2 flex flex-col gap-12">
     {#each posts as post (post.id)}
