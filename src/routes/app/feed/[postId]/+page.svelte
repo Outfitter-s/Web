@@ -24,7 +24,6 @@
   // svelte-ignore state_referenced_locally
   let editedPost = $state({ ...post });
   let deletePostConfirmOpen = $state(false);
-  let fieldsErrors = $state<string[]>([]);
   let editedPostImage = $state<string | null>(null);
   let isDeletingPost = $state(false);
 
@@ -33,7 +32,7 @@
     img.src = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/1255/image-not-found.svg';
   }
 
-  async function saveChanged() {
+  async function saveChanges() {
     if (user?.id !== post.user.id || !editModeEnabled) return;
     try {
       const formData = new FormData();
@@ -64,10 +63,6 @@
       logger.error(msg);
       Toaster.error(msg as any);
     }
-  }
-
-  function resetFormError(name: string) {
-    fieldsErrors = fieldsErrors.filter((field) => field !== name);
   }
 </script>
 
@@ -158,7 +153,7 @@
               size="icon"
               onclick={() => {
                 if (editModeEnabled) {
-                  saveChanged();
+                  saveChanges();
                 } else {
                   editModeEnabled = true;
                 }
@@ -205,7 +200,7 @@
       </div>
       {#if post.description}
         {#if editModeEnabled}
-          <Field.Field data-invalid={fieldsErrors.includes('description')}>
+          <Field.Field>
             <Field.Label for="description"
               >{i18n.t('social.feed.addPublication.description.label')}</Field.Label
             >
@@ -213,9 +208,7 @@
               id="description"
               name="description"
               rows={2}
-              onkeydown={() => resetFormError('description')}
               bind:value={editedPost.description}
-              aria-invalid={fieldsErrors.includes('description')}
             />
           </Field.Field>
         {:else}
