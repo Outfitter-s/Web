@@ -1,6 +1,6 @@
 <script lang="ts">
   import { capitalize, DateUtils, logger } from '$lib/utils';
-  import { Calendar, Palette, Shirt, Pencil, Save, X } from '@lucide/svelte';
+  import { Calendar, Palette, Shirt, Pencil, Save, X, Trash2 } from '@lucide/svelte';
   import ColorDot from '$lib/components/colorDot.svelte';
   import { Button } from '$lib/components/ui/button';
   import { NavBack, SEO } from '$lib/components';
@@ -15,14 +15,25 @@
   import { Toaster } from '$lib/components/Toast/toast';
   import PictureTaker from '$lib/components/PictureTaker.svelte';
   import { invalidateAll } from '$app/navigation';
+  import * as Dialog from '$lib/components/ui/dialog';
+  import { enhance } from '$app/forms';
 
-  let { data }: PageProps = $props();
+  let { data, form }: PageProps = $props();
   let item = $derived(data.item);
   let editModeEnabled = $state(false);
   // svelte-ignore state_referenced_locally
   let editedItem = $state({ ...item });
   let editedItemImage = $state<string | null>(null);
   let fieldsErrors = $state<string[]>([]);
+  let deleteItemConfirmOpen = $state(false);
+  let isDeletingItem = $state(false);
+
+  $effect(() => {
+    if (form?.message && form?.action === 'delete') {
+      logger.error('Log in error:', form.message);
+      Toaster.error(form.message as any);
+    }
+  });
 
   async function saveItemChanges() {
     try {
@@ -64,12 +75,50 @@
 
 <SEO title="seo.wardrobe.item.title" description="seo.wardrobe.item.description" />
 
+<!-- Delete item confirm modal -->
+<Dialog.Root bind:open={deleteItemConfirmOpen}>
+  <Dialog.Content>
+    <Dialog.Header>
+      <Dialog.Title>{i18n.t('wardrobe.itemPage.delete.title')}</Dialog.Title>
+      <Dialog.Description>{i18n.t('wardrobe.itemPage.delete.description')}</Dialog.Description>
+    </Dialog.Header>
+    <form
+      class="mt-6 flex flex-col gap-4 h-full grow"
+      method="POST"
+      action="?/delete"
+      use:enhance={() => {
+        isDeletingItem = true;
+        return async ({ update }) => {
+          await update({ reset: false });
+          isDeletingItem = false;
+        };
+      }}
+    >
+      <Dialog.Footer class="mt-auto">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={isDeletingItem}
+          onclick={() => (deleteItemConfirmOpen = false)}
+          >{i18n.t('wardrobe.itemPage.delete.cancel')}</Button
+        >
+        <Button
+          type="submit"
+          variant="destructive"
+          disabled={isDeletingItem}
+          loading={isDeletingItem}>{i18n.t('wardrobe.itemPage.delete.confirm')}</Button
+        >
+      </Dialog.Footer>
+    </form>
+  </Dialog.Content>
+</Dialog.Root>
+
 <NavBack title="{item.name} - {i18n.t('seo.wardrobe.item.title')}" />
 <div class="lg:p-2 max-lg:pt-2 max-lg:p-4 lg:pl-4 mx-auto flex w-full max-w-300">
   <div class="bg-card w-full relative border-border flex flex-col rounded-lg border lg:flex-row">
     <!-- Image -->
     <div
-      class="-ml-2 border border-border -mt-2 rounded-lg overflow-hidden bg-card lg:-mb-2 max-lg:-mr-2 max-h-[70vh] lg:max-h-200 aspect-10/14 lg:aspect-square inline-block shrink-0 relative"
+      class="-ml-2 border border-border -mt-2 rounded-lg overflow-hidden bg-card lg:-mb-2 lg:max-w-1/2 max-lg:-mr-2 max-h-[70vh] lg:max-h-200 aspect-10/14 lg:aspect-square inline-block shrink-0 relative"
     >
       {#if editModeEnabled}
         <div class="absolute inset-0">
@@ -141,6 +190,17 @@
               }}
             >
               <X class="size-4" />
+            </Button>
+          {:else}
+            <Button
+              class="ml-2"
+              variant="destructive"
+              size="icon"
+              onclick={() => {
+                deleteItemConfirmOpen = true;
+              }}
+            >
+              <Trash2 class="size-4" />
             </Button>
           {/if}
         </div>

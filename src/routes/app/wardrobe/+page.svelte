@@ -43,7 +43,7 @@
   </div>
 
   <!-- Content -->
-  <div class="size-full grow">
+  <div class="size-full grow flex flex-col">
     {#if activeSection === 'items'}
       {#if page.data.items.length > 0}
         <div
@@ -77,9 +77,9 @@
         </Empty.Root>
       {/if}
     {:else if activeSection === 'outfits'}
-      {#if page.data.items.length > 0}
+      {#if page.data.outfits.length > 0}
         <div
-          class="grid gap-8 p-2 h-full overflow-hidden"
+          class="grid gap-8 p-2 h-full grow overflow-hidden"
           style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));"
         >
           {#each page.data.outfits as outfit}

@@ -107,4 +107,15 @@ export class ClothingItemDAO {
     const outputPath = `assets/clothing_item/${id}.png`;
     await writeFile(outputPath, imageBuffer);
   }
+
+  static async getOwner(clothingItemId: UUID): Promise<UUID | null> {
+    const res = await pool.query<{ user_id: UUID }>(
+      'SELECT user_id FROM clothing_item WHERE id = $1',
+      [clothingItemId]
+    );
+    if (res.rows.length === 0) {
+      return null;
+    }
+    return res.rows[0].user_id;
+  }
 }
