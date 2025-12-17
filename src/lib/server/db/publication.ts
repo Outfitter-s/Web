@@ -5,6 +5,7 @@ import { unlink, writeFile } from 'node:fs/promises';
 import { UserDAO } from './user';
 import { OutfitDAO } from './outfit';
 import { ReactionDAO } from './reaction';
+import { filterText } from '../socialFilter';
 
 export interface PublicationTable {
   id: UUID;
@@ -43,7 +44,7 @@ export class PublicationDAO {
     const outfitId = await OutfitDAO.getTodaysOutfitIdForUser(userId, todaysOutfit);
     const res = await pool.query<PublicationTable>(
       'INSERT INTO publication (user_id, description, outfit_id) VALUES ($1, $2, $3) RETURNING *',
-      [userId, description, outfitId]
+      [userId, filterText(description), outfitId]
     );
     if (res.rows.length === 0) {
       throw new Error('Failed to create publication');
@@ -248,7 +249,7 @@ export class PublicationDAO {
       throw new Error('Publication not found');
     }
     await pool.query('UPDATE publication SET description = $1 WHERE id = $2', [
-      publication.description ?? existingPublication.description,
+      filterText(publication.description ?? existingPublication.description),
       id,
     ]);
     if (publication.imageBuffer) {

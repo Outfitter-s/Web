@@ -2,13 +2,6 @@ import type { User } from '$lib/types';
 import pool from '.';
 import { UserDAO } from './user';
 
-interface FollowerTable {
-  id: number;
-  follower_id: User['id'];
-  following_id: User['id'];
-  created_at: Date;
-}
-
 export class SocialDAO {
   static async getFollowingUsers(userId: User['id']): Promise<User[]> {
     const result = await pool.query(
@@ -62,12 +55,12 @@ export class SocialDAO {
     return result.rows.map((row) => row.following_id);
   }
 
-  static async searchUsers(query: string): Promise<User[]> {
+  static async searchUsers(query: string, limit: number = 6): Promise<User[]> {
     const result = await pool.query(
       `SELECT id, username, email FROM users
        WHERE username ILIKE $1
-       LIMIT 10`,
-      [`%${query}%`]
+       LIMIT $2`,
+      [`%${query}%`, limit]
     );
 
     return result.rows;
