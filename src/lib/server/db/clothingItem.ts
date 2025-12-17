@@ -27,6 +27,7 @@ export class ClothingItemDAO {
       name: String(row.name ?? ''),
       createdAt: new Date(row.created_at),
       lastWornAt,
+      userId: row.user_id,
     };
   }
 
@@ -46,9 +47,7 @@ export class ClothingItemDAO {
       throw new Error('Failed to create clothing item');
     }
     const clothingItem = ClothingItemDAO.convertToClothingItem(res.rows[0]);
-
-    const outputPath = new URL(clothingItem.imageUrl).pathname.slice(1); // Remove leading '/'
-    await writeFile(outputPath, imageBuffer);
+    await ClothingItemDAO.writeClothingItemImage(clothingItem.id, imageBuffer);
 
     return clothingItem;
   }
@@ -92,5 +91,31 @@ export class ClothingItemDAO {
       [item]
     );
     return res.rows[0].last_worn_at;
+  }
+
+  static async updateClothingItem(item: ClothingItem): Promise<void> {
+    const res = await pool.query<ClothingItemTable>(
+      'UPDATE clothing_item SET name = $1, description = $2, type = $3, color = $4 WHERE id = $5 RETURNING *',
+      [item.name, item.description, item.type, item.color, item.id]
+    );
+    if (res.rows.length === 0) {
+      throw new Error('Failed to update clothing item');
+    }
+  }
+
+  static async writeClothingItemImage(id: UUID, imageBuffer: Buffer): Promise<void> {
+    const outputPath = `assets/clothing_item/${id}.png`;
+    await writeFile(outputPath, imageBuffer);
+  }
+
+  static async getOwner(clothingItemId: UUID): Promise<UUID | null> {
+    const res = await pool.query<{ user_id: UUID }>(
+      'SELECT user_id FROM clothing_item WHERE id = $1',
+      [clothingItemId]
+    );
+    if (res.rows.length === 0) {
+      return null;
+    }
+    return res.rows[0].user_id;
   }
 }

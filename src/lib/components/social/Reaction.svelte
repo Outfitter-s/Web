@@ -11,7 +11,11 @@
     post: Publication;
   }
 
-  let { post, class: className, ...restProps }: Props & SvelteHTMLElements['div'] = $props();
+  let {
+    post = $bindable(),
+    class: className,
+    ...restProps
+  }: Props & SvelteHTMLElements['div'] = $props();
   let reactionsOpen = $state<UUID | null>(null);
 
   const reactionsMap: Record<Reactions, { icon: string; color: string }> = {

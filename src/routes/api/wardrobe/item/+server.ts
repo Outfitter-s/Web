@@ -53,3 +53,50 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     );
   }
 };
+
+export const PATCH: RequestHandler = async ({ locals, request }) => {
+  try {
+    const user = locals.user!;
+    const formData = Object.fromEntries(await request.formData());
+    const newSchema = schema.extend({
+      id: z.string().min(1),
+      image: z.instanceof(File).optional(),
+    });
+    const form = newSchema.safeParse(formData);
+    if (!form.success)
+      throw new Error(
+        form.error.issues
+          .map((i) => i.path)
+          .flat()
+          .join(',')
+      );
+
+    const { name, description, type, color, image, id } = form.data;
+    const item = await ClothingItemDAO.getClothingItemById(id);
+    if (!item || item.userId !== user.id) {
+      throw new Error('errors.clothing.item.notFound');
+    }
+    await ClothingItemDAO.updateClothingItem({
+      ...item,
+      name,
+      description: description || '',
+      type,
+      color,
+    });
+    if (image) {
+      const imageBuffer = await ImageProcessor.resizeImage(await image.arrayBuffer());
+      await ClothingItemDAO.writeClothingItemImage(item.id, imageBuffer);
+    }
+
+    return json({ success: true });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    logger.error('Error creating clothing item :', msg);
+    return json(
+      {
+        message: msg || 'errors.server.connectionRefused',
+      },
+      { status: 400 }
+    );
+  }
+};

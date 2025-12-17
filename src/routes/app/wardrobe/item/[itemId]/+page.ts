@@ -8,7 +8,7 @@ export const load = (async ({ params, parent }) => {
   const items = data.items;
   const item = items.find((i) => i.id === itemId);
 
-  if (!item) {
+  if (!item || item.userId !== data.user.id) {
     return error(404, 'errors.clothing.item.notFound');
   }
 

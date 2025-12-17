@@ -177,7 +177,8 @@
     },
     "clothing": {
       "item": {
-        "created": "Clothing item created successfully."
+        "created": "Clothing item created successfully.",
+        "updated": "Clothing item updated successfully."
       }
     },
     "social": {
@@ -460,6 +461,14 @@
     },
     "outfitDetails": {
       "lastWornOn": "Last worn on {{date}}"
+    },
+    "itemPage": {
+      "delete": {
+        "title": "Delete Item",
+        "description": "Are you sure you want to delete this item? This action cannot be undone.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      }
     }
   },
   "transactional": {
