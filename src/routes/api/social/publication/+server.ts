@@ -10,7 +10,8 @@ const schema = z.object({
   todaysOutfit: z
     .string()
     .refine((val) => val === 'on' || val === undefined)
-    .transform((val) => val === 'on'),
+    .transform((val) => val === 'on')
+    .default(false),
   image: z
     .instanceof(File)
     .refine((file) => file.size > 0, { message: 'Missing image when making a post' }),
