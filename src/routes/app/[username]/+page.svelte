@@ -14,7 +14,7 @@
   let offset = $state<number>(0);
   let loadingMore = $state<boolean>(false);
   let noMorePosts = $state<boolean>(false);
-  const POST_LIMIT = 3;
+  const POST_LIMIT = 20;
   let { data }: PageProps = $props();
   // svelte-ignore state_referenced_locally
   let user = $state(data.user);
@@ -72,7 +72,7 @@
       const result = await res.json();
       if (!res.ok) throw new Error(result.message);
       posts.push(...result.feed);
-      offset += posts.length;
+      offset += result.feed.length;
       if (result.feed.length < POST_LIMIT) {
         noMorePosts = true;
       }

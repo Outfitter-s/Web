@@ -18,7 +18,6 @@ export const GET: RequestHandler = async ({ url }) => {
       userId: url.searchParams.get('userId') ?? undefined,
     };
     const parsed = schema.safeParse(queryParams);
-    console.log(parsed);
     if (!parsed.success) throw new Error(parsed.error.issues[0].message);
 
     const { userId, limit, offset } = parsed.data;
