@@ -183,23 +183,19 @@ Located in `src/lib/server/db/`:
 | [`passkey.ts`](../src/lib/server/db/passkey.ts)           | WebAuthn credentials                 |
 | [`ICSToken.ts`](../src/lib/server/db/ICSToken.ts)         | Calendar token management            |
 
-### Utilities
-
-| Module
-
 ## Common Development Tasks
 
 ### Adding a New Clothing Item Type
 
-1. | Update                                                                    | Purpose                                       |
-   | ------------------------------------------------------------------------- | --------------------------------------------- |
-   | [`utils/date.ts`](../src/lib/utils/date.ts)                               | Date formatting and manipulation              |
-   | [`utils/form.ts`](../src/lib/utils/form.ts)                               | Form validation schemas                       |
-   | [`utils/logger.ts`](../src/lib/utils/logger.ts)                           | Logging utility                               |
-   | [`utils/portal.svelte.ts`](../src/lib/utils/portal.svelte.ts)             | Portal component helper                       |
-   | [`server/mail/index.ts`](../src/lib/server/mail/index.ts)                 | Email template handling                       |
-   | [`server/imageProcessing.ts`](../src/lib/server/imageProcessing/index.ts) | Image processing (resize, background removal) |
-   | [`server/totp/index.ts`](../src/lib/server/totp/index.ts)                 | TOTP validation                               |
+| Update                                                                    | Purpose                                       |
+| ------------------------------------------------------------------------- | --------------------------------------------- |
+| [`utils/date.ts`](../src/lib/utils/date.ts)                               | Date formatting and manipulation              |
+| [`utils/form.ts`](../src/lib/utils/form.ts)                               | Form validation schemas                       |
+| [`utils/logger.ts`](../src/lib/utils/logger.ts)                           | Logging utility                               |
+| [`utils/portal.svelte.ts`](../src/lib/utils/portal.svelte.ts)             | Portal component helper                       |
+| [`server/mail/index.ts`](../src/lib/server/mail/index.ts)                 | Email template handling                       |
+| [`server/imageProcessing.ts`](../src/lib/server/imageProcessing/index.ts) | Image processing (resize, background removal) |
+| [`server/totp/index.ts`](../src/lib/server/totp/index.ts)                 | TOTP validation                               |
 
 ### Components
 

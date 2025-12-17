@@ -24,7 +24,6 @@
   // svelte-ignore state_referenced_locally
   let editedItem = $state({ ...item });
   let editedItemImage = $state<string | null>(null);
-  let fieldsErrors = $state<string[]>([]);
   let deleteItemConfirmOpen = $state(false);
   let isDeletingItem = $state(false);
 
@@ -67,10 +66,6 @@
     // Reset edited item when item changes
     editedItem = { ...item };
   });
-
-  function resetFormError(name: string) {
-    fieldsErrors = fieldsErrors.filter((field) => field !== name);
-  }
 </script>
 
 <SEO title="seo.wardrobe.item.title" description="seo.wardrobe.item.description" />
@@ -141,19 +136,9 @@
     <div class="flex w-full flex-col gap-4 p-2 lg:grow lg:p-4">
       <div class="flex items-start justify-between gap-2">
         {#if editModeEnabled}
-          <Field.Field data-invalid={fieldsErrors.includes('name')}>
+          <Field.Field>
             <Field.Label for="name">{i18n.t('wardrobe.createItem.fields.name')}</Field.Label>
-            <Input
-              id="name"
-              name="name"
-              type="text"
-              onkeydown={() => resetFormError('name')}
-              bind:value={editedItem.name}
-              aria-invalid={fieldsErrors.includes('name')}
-            />
-            {#if fieldsErrors.includes('name')}
-              <Field.Error>{i18n.t('errors.clothing.item.name')}</Field.Error>
-            {/if}
+            <Input id="name" name="name" type="text" bind:value={editedItem.name} />
           </Field.Field>
         {:else}
           <h1 class="font-sans text-2xl font-bold">{item.name}</h1>
@@ -211,7 +196,7 @@
       </div>
 
       {#if editModeEnabled}
-        <Field.Field data-invalid={fieldsErrors.includes('description')}>
+        <Field.Field>
           <Field.Label for="description"
             >{i18n.t('wardrobe.createItem.fields.description')}</Field.Label
           >
@@ -219,13 +204,8 @@
             id="description"
             name="description"
             rows={2}
-            onkeydown={() => resetFormError('description')}
             bind:value={editedItem.description}
-            aria-invalid={fieldsErrors.includes('description')}
           />
-          {#if fieldsErrors.includes('description')}
-            <Field.Error>{i18n.t('errors.clothing.item.description')}</Field.Error>
-          {/if}
         </Field.Field>
       {:else}
         <p class="font-mono text-base font-normal wrap-normal">{item.description}</p>
@@ -233,14 +213,9 @@
 
       {#if editModeEnabled}
         <div class="grid grid-cols-2 gap-2">
-          <Field.Field data-invalid={fieldsErrors.includes('color')}>
+          <Field.Field>
             <Field.Label for="color">{i18n.t('wardrobe.createItem.fields.color')}</Field.Label>
-            <Select.Root
-              type="single"
-              name="color"
-              bind:value={editedItem.color}
-              onValueChange={() => resetFormError('color')}
-            >
+            <Select.Root type="single" name="color" bind:value={editedItem.color}>
               <Select.Trigger>
                 <div class="flex flex-row items-center gap-2">
                   <ColorDot color={editedItem.color} />
@@ -256,19 +231,11 @@
                 {/each}
               </Select.Content>
             </Select.Root>
-            {#if fieldsErrors.includes('color')}
-              <Field.Error>{i18n.t('errors.clothing.item.color')}</Field.Error>
-            {/if}
           </Field.Field>
 
-          <Field.Field data-invalid={fieldsErrors.includes('type')}>
+          <Field.Field>
             <Field.Label for="type">{i18n.t('wardrobe.createItem.fields.type')}</Field.Label>
-            <Select.Root
-              type="single"
-              name="type"
-              bind:value={editedItem.type}
-              onValueChange={() => resetFormError('type')}
-            >
+            <Select.Root type="single" name="type" bind:value={editedItem.type}>
               <Select.Trigger>{capitalize(editedItem.type)}</Select.Trigger>
               <Select.Content>
                 {#each clothingItemTypes as type}
@@ -276,9 +243,6 @@
                 {/each}
               </Select.Content>
             </Select.Root>
-            {#if fieldsErrors.includes('type')}
-              <Field.Error>{i18n.t('errors.clothing.item.type')}</Field.Error>
-            {/if}
           </Field.Field>
         </div>
       {:else}

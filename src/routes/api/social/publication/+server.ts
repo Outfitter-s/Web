@@ -72,10 +72,11 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
     if (!post || post.user.id !== user.id) {
       throw new Error('errors.social.post.notFound');
     }
+    let imageBuffer: Buffer | undefined = undefined;
     if (image) {
-      const imageBuffer = await ImageProcessor.resizeImage(await image.arrayBuffer());
-      await PublicationDAO.updatePublication(id, { description, imageBuffer });
+      imageBuffer = await ImageProcessor.resizeImage(await image.arrayBuffer());
     }
+    await PublicationDAO.updatePublication(id, { description, imageBuffer });
 
     return json({ success: true });
   } catch (error) {
