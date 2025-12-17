@@ -22,14 +22,14 @@ Une fois authentifié, chaque utilisateur peut :
 - **Publication de photos de tenues**, consultation du feed communautaire.
 - **Système de followers** : Suivi d'utilisateurs, influenceurs, et amis.
 - **Feed interactif** : Swipe pour aimer ou passer une tenue, affichage des recommandations et des tenues d'amis.
-- **Réactions et commentaires** sur les tenues.
+- **Réactions** sur les tenues.
 
 ## Stack technique
 
 - **Frontend** : Svelte
-- **Backend** : SvelteKit, Node.js (Express)
+- **Backend** : SvelteKit
 - **Base de données** : PostgreSQL
-- **Authentification** : JWT
+- **Authentification** : JWT, TOTP, Passkey
 - **Stockage des images** : Local
 - **Déploiement** : Docker
 
