@@ -1,4 +1,5 @@
 import { PublicationDAO } from '$lib/server/db/publication';
+import { ImageProcessor } from '$lib/server/imageProcessing';
 import { logger } from '$lib/utils/logger';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import z from 'zod';
@@ -23,7 +24,9 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
     const { description, image, todaysOutfit } = form.data;
 
-    const imageBuffer = Buffer.from(await image.arrayBuffer());
+    const imageBuffer = await ImageProcessor.resizeImage(await image.arrayBuffer(), {
+      width: 1024,
+    });
 
     const item = await PublicationDAO.create(
       user.id,

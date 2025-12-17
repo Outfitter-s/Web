@@ -2,8 +2,8 @@
   import * as InputGroup from '$lib/components/ui/input-group';
   import i18n from '$lib/i18n';
   import { Search, Plus } from '@lucide/svelte';
-  import type { Publication, User } from '$lib/types';
-  import { logger } from '$lib/utils';
+  import type { FeedType, Publication, User } from '$lib/types';
+  import { cn, logger } from '$lib/utils';
   import { Toaster } from '$lib/components/Toast/toast';
   import { flip } from 'svelte/animate';
   import { slide } from 'svelte/transition';
@@ -17,7 +17,6 @@
   let posts = $state<Record<FeedType, Publication[]>>({ forYou: [], followed: [] });
   let searchResults = $state<User[]>([]);
   let publierOpen = $state(false);
-  let offset = $state<Record<FeedType, number>>({ forYou: 0, followed: 0 });
   let loadingMore = $state<Record<FeedType, boolean>>({ forYou: false, followed: false });
   let noMorePosts = $state<Record<FeedType, boolean>>({ forYou: false, followed: false });
   let activeFeedTab = $state<FeedType>('forYou');
@@ -55,7 +54,6 @@
       const result = await res.json();
       if (!res.ok) throw new Error(result.message);
       posts[type].push(...result.feed);
-      offset[type] += posts[type].length;
       if (result.feed.length < POST_LIMIT) {
         noMorePosts[type] = true;
       }
@@ -69,7 +67,6 @@
   }
 
   onMount(() => {
-    getFeed(activeFeedTab);
     function onScroll() {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && !loadingMore) {
         getFeed(activeFeedTab);
