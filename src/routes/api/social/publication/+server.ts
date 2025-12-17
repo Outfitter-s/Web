@@ -1,5 +1,6 @@
 import { PublicationDAO } from '$lib/server/db/publication';
 import { ImageProcessor } from '$lib/server/imageProcessing';
+import { UUID } from '$lib/types';
 import { logger } from '$lib/utils/logger';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import z from 'zod';
@@ -39,6 +40,47 @@ export const POST: RequestHandler = async ({ locals, request }) => {
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     logger.error('Error creating a post :', msg);
+    return json(
+      {
+        message: msg || 'errors.server.connectionRefused',
+      },
+      { status: 400 }
+    );
+  }
+};
+
+export const PATCH: RequestHandler = async ({ locals, request }) => {
+  try {
+    const user = locals.user!;
+    const formData = Object.fromEntries(await request.formData());
+    const patchSchema = z.object({
+      description: schema.shape.description,
+      image: schema.shape.image.optional(),
+      id: UUID,
+    });
+    const form = patchSchema.safeParse(formData);
+    if (!form.success)
+      throw new Error(
+        form.error.issues
+          .map((i) => i.path)
+          .flat()
+          .join(',')
+      );
+
+    const { description, id, image } = form.data;
+    const post = await PublicationDAO.getPublicationById(id);
+    if (!post || post.user.id !== user.id) {
+      throw new Error('errors.social.post.notFound');
+    }
+    if (image) {
+      const imageBuffer = await ImageProcessor.resizeImage(await image.arrayBuffer());
+      await PublicationDAO.updatePublication(id, { description, imageBuffer });
+    }
+
+    return json({ success: true });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    logger.error('Error editing post :', msg);
     return json(
       {
         message: msg || 'errors.server.connectionRefused',

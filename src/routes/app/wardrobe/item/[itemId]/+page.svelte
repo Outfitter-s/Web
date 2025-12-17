@@ -123,7 +123,11 @@
       {#if editModeEnabled}
         <div class="absolute inset-0">
           <PictureTaker
-            class={{ container: 'border-0 max-h-max min-h-0 h-full bg-card/70', image: 'h-full' }}
+            class={{
+              container:
+                'border-0 max-h-max min-h-0 h-full backdrop-blur-xs hover:backdrop-blur-md transition-all bg-card/70 hover:bg-card/70',
+              image: 'h-full',
+            }}
             onPictureTaken={(file) => {
               editedItemImage = file;
             }}

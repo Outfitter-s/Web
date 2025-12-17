@@ -188,6 +188,9 @@
       },
       "item": {
         "created": "Posted."
+      },
+      "post": {
+        "edited": "Post edited successfully."
       }
     }
   },
@@ -509,6 +512,14 @@
       "noMorePosts": "No more posts to show.",
       "forYou": "For You",
       "followedFeed": "Followed"
+    },
+    "post": {
+      "delete": {
+        "title": "Delete Post",
+        "description": "Are you sure you want to delete this post? This action cannot be undone.",
+        "confirm": "Delete",
+        "cancel": "Cancel"
+      }
     }
   },
   "homepage": {

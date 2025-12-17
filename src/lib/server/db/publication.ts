@@ -1,7 +1,7 @@
 import type { Outfit, PostReactions, Publication, Reactions, User, UUID } from '$lib/types';
 import pool from '.';
 import { getEnv } from '../utils';
-import { writeFile } from 'node:fs/promises';
+import { unlink, writeFile } from 'node:fs/promises';
 import { UserDAO } from './user';
 import { OutfitDAO } from './outfit';
 import { ReactionDAO } from './reaction';
@@ -54,8 +54,7 @@ export class PublicationDAO {
       throw new Error('Failed to retrieve created publication');
     }
 
-    const outputPath = new URL(post.imageUrl).pathname.slice(1);
-    await writeFile(outputPath, imageBuffer);
+    await this.writePostImage(post.id, imageBuffer);
 
     return post;
   }
@@ -219,5 +218,46 @@ export class PublicationDAO {
     );
 
     return await PublicationDAO.publicationTableToPublicationArray(res.rows);
+  }
+
+  static async deletePublication(postId: UUID): Promise<void> {
+    await pool.query('DELETE FROM publication WHERE id = $1', [postId]);
+    await unlink(`assets/publication/${String(postId)}.png`);
+  }
+
+  static async getOwner(publicationId: UUID): Promise<UUID | null> {
+    const res = await pool.query<{ user_id: UUID }>(
+      'SELECT user_id FROM publication WHERE id = $1',
+      [publicationId]
+    );
+    if (res.rows.length === 0) {
+      return null;
+    }
+    return res.rows[0].user_id;
+  }
+
+  static async updatePublication(
+    id: UUID,
+    publication: {
+      description?: string;
+      imageBuffer?: Buffer;
+    }
+  ): Promise<void> {
+    const existingPublication = await this.getPublicationById(id);
+    if (!existingPublication) {
+      throw new Error('Publication not found');
+    }
+    await pool.query('UPDATE publication SET description = $1 WHERE id = $2', [
+      publication.description ?? existingPublication.description,
+      id,
+    ]);
+    if (publication.imageBuffer) {
+      await this.writePostImage(id, publication.imageBuffer);
+    }
+  }
+
+  static async writePostImage(id: UUID, imageBuffer: Buffer): Promise<void> {
+    const outputPath = `assets/publication/${id}.png`;
+    await writeFile(outputPath, imageBuffer);
   }
 }

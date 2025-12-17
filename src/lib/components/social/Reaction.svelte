@@ -6,6 +6,7 @@
   import i18n from '$lib/i18n';
   import { onMount } from 'svelte';
   import type { SvelteHTMLElements } from 'svelte/elements';
+  import { page } from '$app/state';
 
   interface Props {
     post: Publication;
@@ -17,6 +18,7 @@
     ...restProps
   }: Props & SvelteHTMLElements['div'] = $props();
   let reactionsOpen = $state<UUID | null>(null);
+  let user = $derived(page.data.user);
 
   const reactionsMap: Record<Reactions, { icon: string; color: string }> = {
     love: { icon: '❤️', color: 'oklch(88.5% 0.062 18.334)' },
@@ -75,40 +77,45 @@
   });
 </script>
 
-<div
-  class={cn(
-    'border-2 border-border rounded-full overflow-hidden transition-colors p-0.5 bg-card flex flex-row-reverse items-center reaction-container',
-    className
-  )}
-  style={post.userReaction && reactionsOpen !== post.id
-    ? `border-color: ${reactionsMap[post.userReaction].color};`
-    : ''}
-  {...restProps}
->
-  {#if reactionsOpen === post.id}
-    <div
-      class="flex flex-row items-center gap-1 overflow-hidden transition-all duration-300"
-      transition:slide={{ axis: 'x', duration: 200 }}
-    >
-      {#key post.userReaction}
-        {#each reactions as reaction}
-          {@const isReaction = reaction === post.userReaction}
-          <button
-            class="py-0.5 px-1 border flex flex-row gap-1 relative items-center justify-center border-border rounded-full h-8 transition-colors"
-            onclick={() => onReactionClick(reaction)}
-            style={isReaction ? `background-color: ${reactionsMap[reaction].color};` : ''}
-          >
-            <span>{reactionsMap[reaction].icon}</span>
-            <span class={cn('text-xs', isReaction ? 'text-background' : 'text-foreground')}
-              >{formatNumber(post.reactions[reaction])}</span
+{#if user?.id !== post.user.id}
+  <div
+    class={cn(
+      'border-2 border-border rounded-full overflow-hidden transition-colors p-0.5 bg-card flex flex-row-reverse items-center reaction-container',
+      className
+    )}
+    style={post.userReaction && reactionsOpen !== post.id
+      ? `border-color: ${reactionsMap[post.userReaction].color};`
+      : ''}
+    {...restProps}
+  >
+    {#if reactionsOpen === post.id}
+      <div
+        class="flex flex-row items-center gap-1 overflow-hidden transition-all duration-300"
+        transition:slide={{ axis: 'x', duration: 200 }}
+      >
+        {#key post.userReaction}
+          {#each reactions as reaction}
+            {@const isReaction = reaction === post.userReaction}
+            <button
+              class="py-0.5 px-1 border flex flex-row gap-1 relative items-center justify-center border-border rounded-full h-8 transition-colors"
+              onclick={() => onReactionClick(reaction)}
+              style={isReaction ? `background-color: ${reactionsMap[reaction].color};` : ''}
             >
-          </button>
-        {/each}
-      {/key}
-    </div>
-  {:else}
-    <button class={cn('size-8 p-0.5 rounded-full')} transition:slide={{ axis: 'x', duration: 100 }}>
-      {reactionsMap[post.userReaction ?? reactions[0]].icon}
-    </button>
-  {/if}
-</div>
+              <span>{reactionsMap[reaction].icon}</span>
+              <span class={cn('text-xs', isReaction ? 'text-background' : 'text-foreground')}
+                >{formatNumber(post.reactions[reaction])}</span
+              >
+            </button>
+          {/each}
+        {/key}
+      </div>
+    {:else}
+      <button
+        class={cn('size-8 p-0.5 rounded-full')}
+        transition:slide={{ axis: 'x', duration: 100 }}
+      >
+        {reactionsMap[post.userReaction ?? reactions[0]].icon}
+      </button>
+    {/if}
+  </div>
+{/if}
