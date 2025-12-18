@@ -1,5 +1,6 @@
 import type { ClothingItem, ClothingItemType, Outfit, OutfitPreview, UUID } from '$lib/types';
 import pool from '.';
+import { Caching } from './caching';
 import { ClothingItemDAO } from './clothingItem';
 
 export interface OutfitTable {
@@ -23,6 +24,8 @@ export class OutfitDAO {
   }
 
   static async getOutfitById(id: UUID): Promise<Outfit | null> {
+    const cached = await Caching.get<Outfit>(`outfit:${id}`);
+    if (cached) return cached;
     const res = await pool.query<OutfitTable>('SELECT * FROM outfit WHERE id = $1', [id]);
     if (res.rows.length === 0) {
       return null;
@@ -42,7 +45,9 @@ export class OutfitDAO {
       }
     }
 
-    return OutfitDAO.convertToOutfit(res.rows[0], clothingItems);
+    const outfit = OutfitDAO.convertToOutfit(res.rows[0], clothingItems);
+    await Caching.set(`outfit:${id}`, outfit);
+    return outfit;
   }
 
   static async getAllUserOutfits(userId: UUID): Promise<Outfit[]> {
@@ -98,6 +103,7 @@ export class OutfitDAO {
     await pool.query('UPDATE publication SET outfit_id = NULL WHERE outfit_id = $1', [outfitId]);
     await pool.query('DELETE FROM outfit_clothing_items WHERE outfit_id = $1', [outfitId]);
     await pool.query('DELETE FROM outfit WHERE id = $1', [outfitId]);
+    await Caching.del(`outfit:${outfitId}`);
   }
 
   static async outfitBelongsToUser(userId: UUID, outfitId: UUID): Promise<void> {

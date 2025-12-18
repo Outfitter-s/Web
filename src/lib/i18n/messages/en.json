@@ -519,7 +519,8 @@
         "description": "Are you sure you want to delete this post? This action cannot be undone.",
         "confirm": "Delete",
         "cancel": "Cancel"
-      }
+      },
+      "blurred": "Post a picture of your outfit to see this content"
     }
   },
   "homepage": {

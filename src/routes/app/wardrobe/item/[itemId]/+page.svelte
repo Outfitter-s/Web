@@ -223,7 +223,7 @@
                 </div>
               </Select.Trigger>
               <Select.Content>
-                {#each clothingItemColors as color}
+                {#each clothingItemColors as color (color)}
                   <Select.Item value={color}>
                     <ColorDot {color} />
                     {capitalize(color)}
@@ -238,7 +238,7 @@
             <Select.Root type="single" name="type" bind:value={editedItem.type}>
               <Select.Trigger>{capitalize(editedItem.type)}</Select.Trigger>
               <Select.Content>
-                {#each clothingItemTypes as type}
+                {#each clothingItemTypes as type (type)}
                   <Select.Item value={type} label={capitalize(type)} />
                 {/each}
               </Select.Content>

@@ -295,13 +295,13 @@
               100}%; transform: translateX(-{multiStageAnswers.currentIndex *
               (100 / nbQuestions)}%);"
           >
-            {#each Object.entries(multistageQuestions) as [id, question]}
+            {#each Object.entries(multistageQuestions) as [id, question] (id)}
               <div class="flex flex-col gap-2 w-full items-center p-2">
                 <h1 class="text-lg mb-4 font-semibold">
                   {i18n.t(`wardrobe.outfitGeneration.initialQuestions.${id}.question` as any)}
                 </h1>
                 <div class="grid gap-2 grid-cols-2 w-full">
-                  {#each question.options as opt}
+                  {#each question.options as opt (opt)}
                     <Button
                       onclick={() => completeQuestion(id as keyof typeof multistageQuestions, opt)}
                       variant={'hint' in question && question.hint === opt ? 'default' : 'outline'}

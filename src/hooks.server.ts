@@ -12,7 +12,7 @@ import Theming, {
   effectiveModes,
 } from '$lib/theming/index.svelte';
 
-const NEED_AUTH_ROUTES: string[] = ['/app', '/api/sse', '/api/wardrobe', '/api/social'];
+const NEED_AUTH_ROUTES: string[] = ['/app', '/api/sse', '/api/wardrobe', '/api/social', '/assets'];
 
 const authHandler: Handle = async ({ event, resolve }) => {
   const { url, cookies, locals } = event;

@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [enhancedImages(), tailwindcss(), sveltekit()],
   server: {
     fs: {
-      allow: ['./config.json', 'assets/', './VERSION'],
+      allow: ['./config.json', 'assets/*', './VERSION'],
     },
   },
   assetsInclude: ['transactional/**/*.html'],

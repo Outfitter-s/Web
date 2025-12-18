@@ -20,6 +20,7 @@
   let { data }: PageProps = $props();
   let post = $derived(data.post);
   let user = $derived(data.user);
+  let hasUserPostedToday = $derived(data.hasUserPostedToday);
   let editModeEnabled = $state(false);
   // svelte-ignore state_referenced_locally
   let editedPost = $state({ ...post });
@@ -133,7 +134,15 @@
         class="size-full object-center object-cover aspect-9/12"
         onerror={onPostImageError}
       />
-      <Reaction bind:post class="absolute bottom-2 right-2 z-10" />
+      {#if hasUserPostedToday}
+        <Reaction bind:post class="absolute bottom-2 right-2 z-10" />
+      {:else}
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <p class="text-xl font-bold text-background w-fit">
+            {i18n.t('social.post.blurred')}
+          </p>
+        </div>
+      {/if}
     </div>
 
     <!-- Details -->
@@ -225,7 +234,7 @@
           class="grid gap-x-6 w-full gap-y-4 p-4"
           style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));"
         >
-          {#each post.outfit.items as item}
+          {#each post.outfit.items as item (item.id)}
             <OutfitItemCard element="a" {item} />
           {/each}
         </div>

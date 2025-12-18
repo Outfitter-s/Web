@@ -42,7 +42,7 @@
   <div class="mx-auto max-w-5xl px-6">
     {#each links as row}
       <div class="my-8 flex flex-wrap justify-center gap-6 text-sm">
-        {#each row as link}
+        {#each row as link (link.href)}
           <a href={link.href} class="text-muted-foreground hover:text-primary block duration-150">
             <span>{link.title}</span>
           </a>

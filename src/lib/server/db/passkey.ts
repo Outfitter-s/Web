@@ -40,8 +40,8 @@ export class PasskeyDAO {
   }
 
   static async getUserPasskey(userId: User['id']): Promise<Passkey | null> {
-    // const cachedPasskey = await Caching.get<Passkey[]>(`user:${userId}:passkey`);
-    // if (cachedPasskey) return cachedPasskey;
+    const cachedPasskey = await Caching.get<Passkey>(`user:${userId}:passkey`);
+    if (cachedPasskey) return cachedPasskey;
 
     const result = await pool.query<PasskeyTable>('SELECT * FROM passkey WHERE user_id = $1', [
       userId,
@@ -101,7 +101,8 @@ export class PasskeyDAO {
     if (result.rows.length === 0) {
       return null;
     }
-    return PasskeyDAO.convertToPasskey(result.rows[0]);
+    const passkey = PasskeyDAO.convertToPasskey(result.rows[0]);
+    return passkey;
   }
 
   static async deletePasskey(userId: User['id']): Promise<void> {

@@ -94,7 +94,7 @@
         transition:slide={{ axis: 'x', duration: 200 }}
       >
         {#key post.userReaction}
-          {#each reactions as reaction}
+          {#each reactions as reaction (reaction)}
             {@const isReaction = reaction === post.userReaction}
             <button
               class="py-0.5 px-1 border flex flex-row gap-1 relative items-center justify-center border-border rounded-full h-8 transition-colors"

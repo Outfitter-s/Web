@@ -4,6 +4,8 @@ interface CensorshipOptions {
   censorCharacter?: string;
   censorPartialWords?: boolean;
 }
+const pattern = BAD_WORDS.map((word) => word.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')) // Escape special regex characters
+  .join('|');
 
 export function filterText(
   content: string,
@@ -15,8 +17,6 @@ export function filterText(
   };
 
   const wordBoundary = censorPartialWords ? '' : '\\b';
-  const pattern = BAD_WORDS.map((word) => word.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')) // Escape special regex characters
-    .join('|');
   const regex = new RegExp(`${wordBoundary}(${pattern})${wordBoundary}`, 'gi');
 
   return content.replace(regex, (matched) => censorWord(matched));
