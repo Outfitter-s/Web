@@ -53,19 +53,23 @@ export class UserDAO {
     const cachedValue = await Caching.get<boolean>(`userExists:${username}`);
     if (cachedValue) return cachedValue;
     const result = await pool.query('SELECT 1 FROM users WHERE username = $1', [username]);
-    return result.rows.length > 0;
+    const exists = result.rows.length > 0;
+    await Caching.set(`userExists:${username}`, exists);
+    return exists;
   }
 
   static async isEmailTaken(email: User['email']) {
     const cachedValue = await Caching.get<boolean>(`emailTaken:${email}`);
     if (cachedValue) return cachedValue;
     const result = await pool.query('SELECT 1 FROM users WHERE email = $1', [email]);
-    return result.rows.length > 0;
+    const taken = result.rows.length > 0;
+    await Caching.set(`emailTaken:${email}`, taken);
+    return taken;
   }
 
   static async getUserById(id: User['id']): Promise<User> {
-    // const cachedUser = await Caching.get<User>(`user:${id}`);
-    // if (cachedUser) return cachedUser;
+    const cachedUser = await Caching.get<User>(`user:${id}`);
+    if (cachedUser) return cachedUser;
 
     const userResult = await pool.query<UserTable>('SELECT * FROM users WHERE id = $1', [id]);
     if (userResult.rows.length === 0) {
@@ -183,10 +187,7 @@ export class UserDAO {
       throw new Error('errors.auth.updateUser');
     }
     await Caching.del(`user:${id}`);
-    if (updates.username) {
-      await Caching.del(`user:${updates.username}`);
-      await Caching.del(`userExists:${updates.username}`);
-    }
+    await Caching.del(`userExists:${updates.username}`);
   }
 
   static async updateProfilePicture(userId: User['id'], imageBuffer: Buffer): Promise<void> {

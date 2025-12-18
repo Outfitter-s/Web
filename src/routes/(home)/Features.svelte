@@ -66,7 +66,7 @@
             : 'justify-start'}"
         >
           <div>
-            {#each features as item, index}
+            {#each features as item, index (item.title)}
               <div class="relative mb-8 flex items-center last:mb-0">
                 {#if linePosition === 'left' || linePosition === 'right'}
                   <div
@@ -118,7 +118,7 @@
 
         <!-- Mobile: Barre de progression -->
         <div class="relative -mb-8 pb-0.5 md:hidden">
-          {#each features as _, index}
+          {#each features as feature, index (feature.title)}
             <div class="absolute inset-x-0 top-0 h-0.5 w-full overflow-hidden rounded-lg bg-accent">
               <div
                 class={cn(
@@ -136,7 +136,7 @@
           bind:this={carouselRef}
           class="relative flex h-full snap-x snap-mandatory flex-nowrap overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] lg:hidden [&::-webkit-scrollbar]:hidden"
         >
-          {#each features as item, index}
+          {#each features as item, index (item.title)}
             <!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
             <li
               class="card_code relative mr-6 grid h-full max-w-[85vw] shrink-0 items-start justify-start gap-3 pl-2 last:mr-0 sm:mr-8 sm:max-w-md snap-center transiton-all"

@@ -153,8 +153,8 @@
   </div>
 
   <div class="w-full px-2 flex flex-col gap-12">
-    {#each posts[activeFeedTab] as post (post.id)}
-      <Post {post} />
+    {#each posts[activeFeedTab] as post, i (post.id)}
+      <Post bind:post={posts[activeFeedTab][i]} />
     {/each}
   </div>
 

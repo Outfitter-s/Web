@@ -4,7 +4,7 @@ export class Caching {
   static async get<T = unknown>(key: string): Promise<T | null> {
     const valkey = await getValkeyInstance();
     const value = await valkey.get(key);
-    return value ? (JSON.parse(value) as T) : null;
+    return this.parseJSON<T>(value);
   }
 
   static async set(key: string, value: unknown, { ttl = 3600 }: { ttl?: number } = {}) {
@@ -30,6 +30,23 @@ export class Caching {
     const keys = await valkey.keys('*');
     if (keys.length > 0) {
       await valkey.del(keys);
+    }
+  }
+
+  static parseJSON<T>(data: string | null): T | null {
+    if (!data) return null;
+    const dateTimeReviver = (key: string, value: unknown) => {
+      if (typeof value === 'string') {
+        if (!isNaN(Date.parse(value))) {
+          return new Date(value);
+        }
+      }
+      return value;
+    };
+    try {
+      return JSON.parse(data, dateTimeReviver) as T;
+    } catch {
+      return null;
     }
   }
 }

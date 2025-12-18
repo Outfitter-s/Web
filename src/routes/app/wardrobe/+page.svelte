@@ -50,7 +50,7 @@
           class="grid gap-x-6 gap-y-4 p-4"
           style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"
         >
-          {#each page.data.items as item}
+          {#each page.data.items as item (item.id)}
             <OutfitItemCard
               element="a"
               {item}
@@ -82,7 +82,7 @@
           class="grid gap-8 p-2 h-full grow overflow-hidden"
           style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));"
         >
-          {#each page.data.outfits as outfit}
+          {#each page.data.outfits as outfit (outfit.id)}
             <OutfitCard
               {outfit}
               href={resolve('/app/wardrobe/outfit/[outfitId]', { outfitId: outfit.id })}

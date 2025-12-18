@@ -6,6 +6,8 @@ import { UserDAO } from './user';
 import { OutfitDAO } from './outfit';
 import { ReactionDAO } from './reaction';
 import { filterText } from '../socialFilter';
+import { DateUtils } from '$lib/utils';
+import { Caching } from './caching';
 
 export interface PublicationTable {
   id: UUID;
@@ -56,11 +58,16 @@ export class PublicationDAO {
     }
 
     await this.writePostImage(post.id, imageBuffer);
+    await Caching.del(`user_posted_today_${userId}`);
 
     return post;
   }
 
   static async getPublicationById(id: UUID): Promise<Publication | null> {
+    const cached = await Caching.get<Publication>(`publication:${id}`);
+    if (cached) {
+      return cached;
+    }
     const res = await pool.query<PublicationTable>('SELECT * FROM publication WHERE id = $1', [id]);
 
     if (res.rows.length === 0) {
@@ -71,7 +78,9 @@ export class PublicationDAO {
     const user = await UserDAO.getUserById(item.user_id);
     const outfit = (await OutfitDAO.getOutfitById(item.outfit_id as UUID)) ?? undefined;
     const reactions = await ReactionDAO.getReactionsForPost(item.id);
-    return PublicationDAO.convertToPublication(item, user, outfit, reactions);
+    const post = PublicationDAO.convertToPublication(item, user, outfit, reactions);
+    await Caching.set(`publication:${id}`, post);
+    return post;
   }
 
   static async getPublicationByUserId(
@@ -156,7 +165,6 @@ export class PublicationDAO {
         ? negativeReactionsTypes.reduce((sum, type) => sum + (p.reactions?.[type] ?? 0), 0)
         : 0;
       const popularity = positiveScore - negativeScore;
-
       const ageInHours = (Date.now() - p.createdAt.getTime()) / (1000 * 60 * 60);
       const recency = 1 / (1 + ageInHours); // More recent posts have higher recency
       return 1.2 * recency + 0.8 * popularity;
@@ -174,13 +182,26 @@ export class PublicationDAO {
   ): Promise<Publication[]> {
     const res: Publication[] = [];
     for (const row of table) {
+      const cached = await Caching.get<Publication>(`publication:${row.id}`);
+      if (cached) {
+        res.push(cached);
+        continue;
+      }
       const user = await UserDAO.getUserById(row.user_id);
       const outfit = (await OutfitDAO.getOutfitById(row.outfit_id as UUID)) ?? undefined;
       const reactions = await ReactionDAO.getReactionsForPost(row.id);
       const hasUserReacted = userId
         ? ((await ReactionDAO.getUserReaction(row.id, userId)) ?? undefined)
         : undefined;
-      res.push(PublicationDAO.convertToPublication(row, user, outfit, reactions, hasUserReacted));
+      const post = PublicationDAO.convertToPublication(
+        row,
+        user,
+        outfit,
+        reactions,
+        hasUserReacted
+      );
+      await Caching.set(`publication:${row.id}`, post);
+      res.push(post);
     }
     return res;
   }
@@ -224,6 +245,7 @@ export class PublicationDAO {
   static async deletePublication(postId: UUID): Promise<void> {
     await pool.query('DELETE FROM publication WHERE id = $1', [postId]);
     await unlink(`assets/publication/${String(postId)}.png`);
+    await Caching.del(`publication:${postId}`);
   }
 
   static async getOwner(publicationId: UUID): Promise<UUID | null> {
@@ -255,10 +277,25 @@ export class PublicationDAO {
     if (publication.imageBuffer) {
       await this.writePostImage(id, publication.imageBuffer);
     }
+    await Caching.del(`publication:${id}`);
   }
 
   static async writePostImage(id: UUID, imageBuffer: Buffer): Promise<void> {
     const outputPath = `assets/publication/${id}.png`;
     await writeFile(outputPath, imageBuffer);
+  }
+
+  static async hasUserPostedToday(userId: UUID): Promise<boolean> {
+    const cache = await Caching.get<boolean>(`user_posted_today_${userId}`);
+    if (cache !== null) {
+      return cache;
+    }
+    const res = await pool.query<PublicationTable>(
+      'SELECT * FROM publication WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
+      [userId]
+    );
+    const hasPosted = res.rows.length > 0 && DateUtils.isToday(res.rows[0].created_at);
+    await Caching.set(`user_posted_today_${userId}`, hasPosted);
+    return hasPosted;
   }
 }

@@ -121,10 +121,10 @@
   >
     <div class="relative z-0 aspect-square w-full">
       <div class="bg-card grid gap-2 overflow-hidden p-4 grid-cols-2">
-        {#each card.outfit.items as items}
+        {#each card.outfit.items as item (item.id)}
           <img
-            src={items.imageUrl}
-            alt={items.name}
+            src={item.imageUrl}
+            alt={item.name}
             class="h-full w-auto rounded-lg object-contain size-full"
           />
         {/each}

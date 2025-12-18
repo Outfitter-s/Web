@@ -63,7 +63,7 @@
     class="max-w-250 grid w-full justify-center items-center gap-2 mx-auto"
     style="grid-template-columns: repeat({links.length}, 1fr);"
   >
-    {#each links as link}
+    {#each links as link (link.href)}
       {#if link.href == 'add-item'}
         <Button
           variant="none"

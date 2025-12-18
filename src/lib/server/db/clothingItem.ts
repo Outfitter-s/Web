@@ -2,6 +2,7 @@ import type { ClothingItem, UUID } from '$lib/types';
 import pool from '.';
 import { unlink, writeFile } from 'node:fs/promises';
 import { getEnv } from '../utils';
+import { Caching } from './caching';
 
 export interface ClothingItemTable {
   id: UUID;
@@ -53,6 +54,9 @@ export class ClothingItemDAO {
   }
 
   static async getClothingItemById(id: UUID): Promise<ClothingItem | null> {
+    const cached = await Caching.get<ClothingItem>(`clothingItem:${id}`);
+    if (cached) return cached;
+
     const res = await pool.query<ClothingItemTable>('SELECT * FROM clothing_item WHERE id = $1', [
       id,
     ]);
@@ -61,7 +65,9 @@ export class ClothingItemDAO {
     }
     const item = res.rows[0];
     const lastWornAt = await ClothingItemDAO.getLastWornAt(item.id);
-    return ClothingItemDAO.convertToClothingItem(item, lastWornAt);
+    const clothingItem = ClothingItemDAO.convertToClothingItem(item, lastWornAt);
+    await Caching.set(`clothingItem:${id}`, clothingItem);
+    return clothingItem;
   }
 
   static async getClothingItemsByUserId(userId: UUID): Promise<ClothingItem[]> {
@@ -80,9 +86,14 @@ export class ClothingItemDAO {
   static async deleteClothingItem(id: UUID): Promise<void> {
     await pool.query('DELETE FROM clothing_item WHERE id = $1', [id]);
     await unlink(`assets/clothing_item/${id}.png`);
+    await Caching.del(`clothingItem:${id}`);
   }
 
   static async getLastWornAt(item: UUID): Promise<Date | null> {
+    const cached = await Caching.get<ClothingItem>(`clothingItem:${item}`);
+    if (cached && cached.lastWornAt) {
+      return cached.lastWornAt;
+    }
     interface LastWornAtResult {
       last_worn_at: Date | null;
     }
@@ -101,6 +112,7 @@ export class ClothingItemDAO {
     if (res.rows.length === 0) {
       throw new Error('Failed to update clothing item');
     }
+    await Caching.del(`clothingItem:${item.id}`);
   }
 
   static async writeClothingItemImage(id: UUID, imageBuffer: Buffer): Promise<void> {
@@ -109,6 +121,9 @@ export class ClothingItemDAO {
   }
 
   static async getOwner(clothingItemId: UUID): Promise<UUID | null> {
+    const cached = await Caching.get<ClothingItem>(`clothingItem:${clothingItemId}`);
+    if (cached && cached.userId) return cached.userId;
+
     const res = await pool.query<{ user_id: UUID }>(
       'SELECT user_id FROM clothing_item WHERE id = $1',
       [clothingItemId]

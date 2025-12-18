@@ -22,7 +22,7 @@
     class="grid gap-x-6 gap-y-4 px-2"
     style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));"
   >
-    {#each outfit.items as item}
+    {#each outfit.items as item (item.id)}
       <OutfitItemCard
         element="a"
         {item}

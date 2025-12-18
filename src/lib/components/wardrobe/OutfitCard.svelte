@@ -79,7 +79,7 @@
     </div>
   {/if}
   <div class="relative aspect-square isolate">
-    {#each outfit.items as item, index}
+    {#each outfit.items as item, index (item.id)}
       {@render outfitCard(item, index, outfit.items.length)}
     {/each}
   </div>

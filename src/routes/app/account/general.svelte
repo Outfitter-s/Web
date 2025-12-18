@@ -259,7 +259,7 @@
         {capitalize(i18n.getLocaleName(currentLocale))}
       </Select.Trigger>
       <Select.Content>
-        {#each i18n.locales as loc}
+        {#each i18n.locales as loc (loc)}
           <Select.Item value={loc} disabled={loc === currentLocale}>
             {capitalize(i18n.getLocaleName(loc))}
           </Select.Item>
