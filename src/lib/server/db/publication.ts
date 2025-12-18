@@ -58,7 +58,6 @@ export class PublicationDAO {
     }
 
     await this.writePostImage(post.id, imageBuffer);
-    await Caching.del(`user_posted_today_${userId}`);
 
     return post;
   }
@@ -286,16 +285,11 @@ export class PublicationDAO {
   }
 
   static async hasUserPostedToday(userId: UUID): Promise<boolean> {
-    const cache = await Caching.get<boolean>(`user_posted_today_${userId}`);
-    if (cache !== null) {
-      return cache;
-    }
     const res = await pool.query<PublicationTable>(
       'SELECT * FROM publication WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
       [userId]
     );
     const hasPosted = res.rows.length > 0 && DateUtils.isToday(res.rows[0].created_at);
-    await Caching.set(`user_posted_today_${userId}`, hasPosted);
     return hasPosted;
   }
 }
