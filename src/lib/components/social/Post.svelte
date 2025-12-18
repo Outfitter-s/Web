@@ -5,7 +5,6 @@
   import { type Publication } from '$lib/types';
   import { DateUtils } from '$lib/utils';
   import { ProfilePicture } from '.';
-  import Spinner from '../Spinner';
   import Reaction from './Reaction.svelte';
 
   interface Props {

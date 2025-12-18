@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { NavBack, SEO } from '$lib/components';
+  import { SEO } from '$lib/components';
   import { resolve } from '$app/paths';
   import i18n from '$lib/i18n';
   import { ProfilePicture, Reaction } from '$lib/components/social';
@@ -147,8 +147,8 @@
       {#if hasUserPostedToday}
         <Reaction bind:post class="absolute bottom-2 right-2 z-10" />
       {:else}
-        <div class="absolute p-4 inset-0 flex flex-col items-center justify-center">
-          <p class="text-xl text-center text-background font-bold w-fit">
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <p class="text-xl font-bold text-background w-fit">
             {i18n.t('social.post.blurred')}
           </p>
         </div>
