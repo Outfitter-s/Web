@@ -64,8 +64,8 @@ export class UserDAO {
   }
 
   static async getUserById(id: User['id']): Promise<User> {
-    // const cachedUser = await Caching.get<User>(`user:${id}`);
-    // if (cachedUser) return cachedUser;
+    const cachedUser = await Caching.get<User>(`user:${id}`);
+    if (cachedUser) return cachedUser;
 
     const userResult = await pool.query<UserTable>('SELECT * FROM users WHERE id = $1', [id]);
     if (userResult.rows.length === 0) {
