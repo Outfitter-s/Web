@@ -36,11 +36,14 @@
     </span>
   </div>
   <div class="w-full relative">
-    <a class="w-full block relative" href={resolve('/app/feed/[postId]', { postId: post.id })}>
+    <a
+      class="w-full block relative rounded overflow-hidden"
+      href={resolve('/app/feed/[postId]', { postId: post.id })}
+    >
       <!-- svelte-ignore a11y_missing_attribute -->
-      <img src={post.imageUrl} class="rounded w-full block" onerror={onPostImageError} />
+      <img src={post.imageUrl} class="w-full block" onerror={onPostImageError} />
       {#if !hasUserPostedToday}
-        <div class="absolute inset-0 flex flex-col items-center justify-center">
+        <div class="absolute backdrop-blur-md inset-0 flex flex-col items-center justify-center">
           <p class="text-xl text-background font-bold w-fit">
             {i18n.t('social.post.blurred')}
           </p>
