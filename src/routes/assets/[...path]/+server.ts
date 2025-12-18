@@ -1,12 +1,12 @@
 import path from 'node:path';
 import type { RequestHandler } from './$types';
-import { PublicationDAO } from '$lib/server/db/publication';
+// import { PublicationDAO } from '$lib/server/db/publication';
 import sharp from 'sharp';
 import { existsSync } from 'node:fs';
 
 // This route serves static assets from the assets folder because adding it to the fs allow list only works in development mode
 export const GET: RequestHandler = async ({ params, locals }) => {
-  const user = locals.user!;
+  // const user = locals.user!;
   const requestPath = params.path;
   const parts = requestPath.split('/');
   try {
@@ -15,10 +15,10 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     }
     const [scope, fileName] = parts;
     let pathName = path.resolve('assets', scope, fileName);
-    let hasUserPostedToday = true;
-    if (scope === 'publication') {
-      hasUserPostedToday = await PublicationDAO.hasUserPostedToday(user.id);
-    }
+    // let hasUserPostedToday = true;
+    // if (scope === 'publication') {
+    //   hasUserPostedToday = await PublicationDAO.hasUserPostedToday(user.id);
+    // }
 
     const fileExists = existsSync(pathName);
     if (!fileExists) {
@@ -29,9 +29,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       }
     }
     let file = await sharp(pathName);
-    if (!hasUserPostedToday) {
-      file = file.blur(7);
-    }
+    // if (!hasUserPostedToday) {
+    //   file = file.blur(7);
+    // }
     const buffer = await file.toBuffer();
     const body = new Uint8Array(buffer);
     return new Response(body, {
