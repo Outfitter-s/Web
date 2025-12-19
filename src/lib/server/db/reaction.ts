@@ -1,6 +1,6 @@
 import type { PostReactions, Reactions, UUID } from '$lib/types';
 import pool from '.';
-import { Caching } from './caching';
+// import { Caching } from './caching';
 
 export interface ReactionTable {
   post_id: UUID;
@@ -28,7 +28,7 @@ export class ReactionDAO {
   }
 
   static async removeReaction(postId: UUID, userId: UUID): Promise<void> {
-    await Caching.del(`reaction:post:${postId}`);
+    // await Caching.del(`reaction:post:${postId}`);
     await pool.query(
       `DELETE FROM reaction
        WHERE post_id = $1 AND user_id = $2`,
@@ -37,10 +37,10 @@ export class ReactionDAO {
   }
 
   static async getReactionsForPost(postId: UUID): Promise<PostReactions> {
-    const cached = await Caching.get<PostReactions>(`reaction:post:${postId}`);
-    if (cached) {
-      return cached;
-    }
+    // const cached = await Caching.get<PostReactions>(`reaction:post:${postId}`);
+    // if (cached) {
+    //   return cached;
+    // }
     const res = await pool.query<ReactionTable>(
       `SELECT * FROM reaction
        WHERE post_id = $1`,
@@ -57,16 +57,16 @@ export class ReactionDAO {
     for (const row of res.rows) {
       reactionsCount[row.type]++;
     }
-    await Caching.set(`reaction:post:${postId}`, reactionsCount);
+    // await Caching.set(`reaction:post:${postId}`, reactionsCount);
 
     return reactionsCount;
   }
 
   static async getUserReaction(postId: UUID, userId: UUID): Promise<Reactions | null> {
-    const cached = await Caching.get<Reactions>(`reaction:post:${postId}:user:${userId}`);
-    if (cached) {
-      return cached;
-    }
+    // const cached = await Caching.get<Reactions>(`reaction:post:${postId}:user:${userId}`);
+    // if (cached) {
+    //   return cached;
+    // }
     const res = await pool.query<ReactionTable>(
       `SELECT * FROM reaction
        WHERE post_id = $1 AND user_id = $2`,
@@ -76,7 +76,7 @@ export class ReactionDAO {
       return null;
     }
     const reaction = res.rows[0].type;
-    await Caching.set(`reaction:post:${postId}:user:${userId}`, reaction);
+    // await Caching.set(`reaction:post:${postId}:user:${userId}`, reaction);
     return reaction;
   }
 }
