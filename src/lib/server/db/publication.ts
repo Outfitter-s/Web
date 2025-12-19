@@ -7,7 +7,7 @@ import { OutfitDAO } from './outfit';
 import { ReactionDAO } from './reaction';
 import { filterText } from '../socialFilter';
 import { DateUtils } from '$lib/utils';
-import { Caching } from './caching';
+// import { Caching } from './caching';
 
 export interface PublicationTable {
   id: UUID;
@@ -63,10 +63,10 @@ export class PublicationDAO {
   }
 
   static async getPublicationById(id: UUID): Promise<Publication | null> {
-    const cached = await Caching.get<Publication>(`publication:${id}`);
-    if (cached) {
-      return cached;
-    }
+    // const cached = await Caching.get<Publication>(`publication:${id}`);
+    // if (cached) {
+    //   return cached;
+    // }
     const res = await pool.query<PublicationTable>('SELECT * FROM publication WHERE id = $1', [id]);
 
     if (res.rows.length === 0) {
@@ -78,7 +78,7 @@ export class PublicationDAO {
     const outfit = (await OutfitDAO.getOutfitById(item.outfit_id as UUID)) ?? undefined;
     const reactions = await ReactionDAO.getReactionsForPost(item.id);
     const post = PublicationDAO.convertToPublication(item, user, outfit, reactions);
-    await Caching.set(`publication:${id}`, post);
+    // await Caching.set(`publication:${id}`, post);
     return post;
   }
 
@@ -181,11 +181,11 @@ export class PublicationDAO {
   ): Promise<Publication[]> {
     const res: Publication[] = [];
     for (const row of table) {
-      const cached = await Caching.get<Publication>(`publication:${row.id}`);
-      if (cached) {
-        res.push(cached);
-        continue;
-      }
+      // const cached = await Caching.get<Publication>(`publication:${row.id}`);
+      // if (cached) {
+      //   res.push(cached);
+      //   continue;
+      // }
       const user = await UserDAO.getUserById(row.user_id);
       const outfit = (await OutfitDAO.getOutfitById(row.outfit_id as UUID)) ?? undefined;
       const reactions = await ReactionDAO.getReactionsForPost(row.id);
@@ -199,7 +199,7 @@ export class PublicationDAO {
         reactions,
         hasUserReacted
       );
-      await Caching.set(`publication:${row.id}`, post);
+      // await Caching.set(`publication:${row.id}`, post);
       res.push(post);
     }
     return res;
@@ -244,7 +244,7 @@ export class PublicationDAO {
   static async deletePublication(postId: UUID): Promise<void> {
     await pool.query('DELETE FROM publication WHERE id = $1', [postId]);
     await unlink(`assets/publication/${String(postId)}.png`);
-    await Caching.del(`publication:${postId}`);
+    // await Caching.del(`publication:${postId}`);
   }
 
   static async getOwner(publicationId: UUID): Promise<UUID | null> {
@@ -276,7 +276,7 @@ export class PublicationDAO {
     if (publication.imageBuffer) {
       await this.writePostImage(id, publication.imageBuffer);
     }
-    await Caching.del(`publication:${id}`);
+    // await Caching.del(`publication:${id}`);
   }
 
   static async writePostImage(id: UUID, imageBuffer: Buffer): Promise<void> {

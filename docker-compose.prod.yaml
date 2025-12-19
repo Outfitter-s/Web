@@ -1,6 +1,5 @@
 services:
   web:
-    build: .
     image: anguspllg/outfitter_web:latest
     container_name: outfiter_web
     restart: unless-stopped
