@@ -18,7 +18,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     }
     const [scope, fileName] = parts;
     let pathName = path.resolve('assets', scope, fileName);
-    // let hasUserPostedToday = true;
+    let hasUserPostedToday = true;
     // if (scope === 'publication') {
     //   hasUserPostedToday = await PublicationDAO.hasUserPostedToday(user.id);
     // }
@@ -32,9 +32,9 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       }
     }
     let file = await sharp(pathName);
-    // if (!hasUserPostedToday) {
-    //   file = file.blur(7);
-    // }
+    if (!hasUserPostedToday) {
+      file = file.blur(7);
+    }
     const buffer = await file.toBuffer();
     const body = new Uint8Array(buffer);
     return new Response(body, {
