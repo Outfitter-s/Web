@@ -43,10 +43,8 @@
       <!-- svelte-ignore a11y_missing_attribute -->
       <img src={post.imageUrl} class="w-full block" onerror={onPostImageError} />
       {#if !hasUserPostedToday}
-        <div
-          class="absolute backdrop-blur-md inset-0 p-4 flex flex-col items-center justify-center"
-        >
-          <p class="text-xl text-background text-center font-bold w-fit">
+        <div class="absolute backdrop-blur-md inset-0 flex flex-col items-center justify-center">
+          <p class="text-xl text-background font-bold w-fit">
             {i18n.t('social.post.blurred')}
           </p>
         </div>
