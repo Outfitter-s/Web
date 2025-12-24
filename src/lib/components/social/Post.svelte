@@ -118,6 +118,30 @@
       {DateUtils.formatDate(new Date(post.createdAt))}
     </span>
   </div>
+  <div class="w-full relative">
+    <a
+      class="w-full block relative rounded overflow-hidden"
+      href={resolve('/app/feed/[postId]', { postId: post.id })}
+    >
+      <!-- svelte-ignore a11y_missing_attribute -->
+      <img src={post.images[0]} class="w-full block" onerror={onPostImageError} />
+      {#if !hasUserPostedToday}
+        <div
+          class="absolute backdrop-blur-md p-4 inset-0 flex flex-col items-center justify-center"
+        >
+          <p class="text-xl text-center text-background font-bold w-fit">
+            {i18n.t('social.post.blurred')}
+          </p>
+        </div>
+      {/if}
+    </a>
+    {#if hasUserPostedToday}
+      <Reaction bind:post class="absolute bottom-2 right-2" />
+    {/if}
+  </div>
+  {#if post.description}
+    <p class="text-base font-base font-mono">{post.description}</p>
+  {/if}
 </div>
 
 <style>

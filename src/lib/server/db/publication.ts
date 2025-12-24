@@ -1,4 +1,12 @@
-import type { Outfit, PostReactions, Publication, Reactions, User, UUID } from '$lib/types';
+import {
+  PublicationImagesLengths,
+  type Outfit,
+  type PostReactions,
+  type Publication,
+  type Reactions,
+  type User,
+  type UUID,
+} from '$lib/types';
 import pool from '.';
 import { getEnv } from '../utils';
 import { unlink, writeFile } from 'node:fs/promises';
@@ -16,18 +24,33 @@ export interface PublicationTable {
   created_at: Date;
   outfit_id?: UUID;
 }
+export interface PublicationImageTable {
+  id: UUID;
+  publication_id: UUID;
+}
 
 export class PublicationDAO {
   static convertToPublication(
     row: PublicationTable,
-    user: User,
-    outfit: Outfit | undefined,
-    reactions: PostReactions,
-    userReaction?: Reactions
+    {
+      user,
+      reactions,
+      outfit,
+      userReaction,
+      images,
+    }: {
+      user: User;
+      reactions: PostReactions;
+      outfit?: Outfit | undefined;
+      userReaction?: Reactions;
+      images: string[];
+    }
   ): Publication {
     return {
       id: row.id,
-      imageUrl: `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/publication/${String(row.id)}.png`,
+      images: images.map(
+        (image) => `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/publication/${image}.png`
+      ),
       user,
       description: row.description,
       createdAt: new Date(row.created_at),
@@ -39,7 +62,7 @@ export class PublicationDAO {
 
   static async create(
     userId: UUID,
-    imageBuffer: Buffer,
+    imagesBuffers: Buffer[],
     description: string,
     todaysOutfit: boolean
   ): Promise<Publication> {
@@ -56,8 +79,14 @@ export class PublicationDAO {
     if (!post) {
       throw new Error('Failed to retrieve created publication');
     }
-
-    await this.writePostImage(post.id, imageBuffer);
+    for (const imageBuffer of imagesBuffers.slice(0, PublicationImagesLengths.max)) {
+      const res = await pool.query(
+        'INSERT INTO publication_image (publication_id) VALUES ($1) RETURNING *',
+        [post.id]
+      );
+      const row = res.rows[0];
+      await this.writePostImage(row.id, imageBuffer);
+    }
 
     return post;
   }
@@ -77,7 +106,8 @@ export class PublicationDAO {
     const user = await UserDAO.getUserById(item.user_id);
     const outfit = (await OutfitDAO.getOutfitById(item.outfit_id as UUID)) ?? undefined;
     const reactions = await ReactionDAO.getReactionsForPost(item.id);
-    const post = PublicationDAO.convertToPublication(item, user, outfit, reactions);
+    const images = await this.getPostImages(item.id);
+    const post = PublicationDAO.convertToPublication(item, { user, outfit, reactions, images });
     // await Caching.set(`publication:${id}`, post);
     return post;
   }
@@ -192,13 +222,14 @@ export class PublicationDAO {
       const hasUserReacted = userId
         ? ((await ReactionDAO.getUserReaction(row.id, userId)) ?? undefined)
         : undefined;
-      const post = PublicationDAO.convertToPublication(
-        row,
+      const images = await this.getPostImages(row.id);
+      const post = PublicationDAO.convertToPublication(row, {
         user,
         outfit,
         reactions,
-        hasUserReacted
-      );
+        userReaction: hasUserReacted,
+        images,
+      });
       // await Caching.set(`publication:${row.id}`, post);
       res.push(post);
     }
@@ -242,8 +273,15 @@ export class PublicationDAO {
   }
 
   static async deletePublication(postId: UUID): Promise<void> {
+    for (const image of await this.getPostImages(postId)) {
+      try {
+        await unlink(`assets/publication/${image}.png`);
+      } catch {
+        /* empty */
+      }
+    }
+
     await pool.query('DELETE FROM publication WHERE id = $1', [postId]);
-    await unlink(`assets/publication/${String(postId)}.png`);
     // await Caching.del(`publication:${postId}`);
   }
 
@@ -262,7 +300,6 @@ export class PublicationDAO {
     id: UUID,
     publication: {
       description?: string;
-      imageBuffer?: Buffer;
     }
   ): Promise<void> {
     const existingPublication = await this.getPublicationById(id);
@@ -273,9 +310,6 @@ export class PublicationDAO {
       filterText(publication.description ?? existingPublication.description),
       id,
     ]);
-    if (publication.imageBuffer) {
-      await this.writePostImage(id, publication.imageBuffer);
-    }
     // await Caching.del(`publication:${id}`);
   }
 
@@ -291,5 +325,13 @@ export class PublicationDAO {
     );
     const hasPosted = res.rows.length > 0 && DateUtils.isToday(res.rows[0].created_at);
     return hasPosted;
+  }
+
+  static async getPostImages(publicationId: UUID): Promise<string[]> {
+    const res = await pool.query<PublicationImageTable>(
+      'SELECT * FROM publication_image WHERE publication_id = $1',
+      [publicationId]
+    );
+    return res.rows.map((row) => row.id);
   }
 }

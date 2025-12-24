@@ -18,3 +18,4 @@ run
 !bun.lock
 pg_data
 /assets
+!/assets/profile_pictures/user.png

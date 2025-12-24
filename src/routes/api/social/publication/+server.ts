@@ -1,6 +1,6 @@
 import { PublicationDAO } from '$lib/server/db/publication';
 import { ImageProcessor } from '$lib/server/imageProcessing';
-import { UUID } from '$lib/types';
+import { PublicationImagesLengths, UUID } from '$lib/types';
 import { logger } from '$lib/utils/logger';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import z from 'zod';
@@ -12,27 +12,45 @@ const schema = z.object({
     .refine((val) => val === 'on' || val === undefined)
     .transform((val) => val === 'on')
     .default(false),
-  image: z
-    .instanceof(File)
-    .refine((file) => file.size > 0, { message: 'Missing image when making a post' }),
+  images: z
+    .array(
+      z
+        .instanceof(File)
+        .refine((file) => file.size > 0, { message: 'Missing image when making a post' })
+    )
+    .min(PublicationImagesLengths.min)
+    .max(PublicationImagesLengths.max),
 });
 
 export const POST: RequestHandler = async ({ locals, request }) => {
   try {
     const user = locals.user!;
-    const formData = Object.fromEntries(await request.formData());
-    const form = schema.safeParse(formData);
-    if (!form.success) throw new Error(form.error.issues[0].message);
+    // Read the multipart form data directly so we can preserve multiple files
+    const fd = await request.formData();
+    const formImages = fd.getAll('images[]') as File[];
+    const descriptionVal = String(fd.get('description') ?? '');
+    // keep compatibility with checkbox value 'on'
+    const todaysOutfitRaw = fd.get('todaysOutfit');
+    const todaysOutfitVal = todaysOutfitRaw === 'on' ? 'on' : undefined;
 
-    const { description, image, todaysOutfit } = form.data;
-
-    const imageBuffer = await ImageProcessor.resizeImage(await image.arrayBuffer(), {
-      width: 1024,
+    const form = schema.safeParse({
+      description: descriptionVal,
+      images: formImages,
+      todaysOutfit: todaysOutfitVal,
     });
+    if (!form.success) throw new Error(form.error.issues[0].message);
+    const { description, todaysOutfit, images } = form.data;
+    const processedImages: Buffer[] = [];
+    for (const image of images) {
+      const imageBuffer = await ImageProcessor.resizeImage(await image.arrayBuffer(), {
+        width: 1024,
+      });
+      processedImages.push(imageBuffer);
+    }
 
     const item = await PublicationDAO.create(
       user.id,
-      imageBuffer,
+      processedImages,
       description,
       todaysOutfit ?? false
     );
@@ -56,7 +74,6 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
     const formData = Object.fromEntries(await request.formData());
     const patchSchema = z.object({
       description: schema.shape.description,
-      image: schema.shape.image.optional(),
       id: UUID,
     });
     const form = patchSchema.safeParse(formData);
@@ -68,16 +85,12 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
           .join(',')
       );
 
-    const { description, id, image } = form.data;
+    const { description, id } = form.data;
     const post = await PublicationDAO.getPublicationById(id);
     if (!post || post.user.id !== user.id) {
       throw new Error('errors.social.post.notFound');
     }
-    let imageBuffer: Buffer | undefined = undefined;
-    if (image) {
-      imageBuffer = await ImageProcessor.resizeImage(await image.arrayBuffer());
-    }
-    await PublicationDAO.updatePublication(id, { description, imageBuffer });
+    await PublicationDAO.updatePublication(id, { description });
 
     return json({ success: true });
   } catch (error) {
