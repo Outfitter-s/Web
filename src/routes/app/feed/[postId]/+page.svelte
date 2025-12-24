@@ -120,11 +120,6 @@
       class="relative block -ml-2 max-lg:-mr-2 -mt-2 lg:-mb-2 lg:max-w-1/2 lg:w-full bg-card border border-border rounded-lg overflow-hidden"
     >
       <!-- svelte-ignore a11y_missing_attribute -->
-      <!-- <img
-        src={post.images[0]}
-        class="size-full object-center object-cover aspect-9/12"
-        onerror={onPostImageError}
-      /> -->
       <Carousel.Root class="w-full" setApi={(emblaApi) => (carouselApi = emblaApi)}>
         <Carousel.Content>
           {#each post.images as image}
