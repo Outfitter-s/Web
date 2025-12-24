@@ -1,12 +1,11 @@
 import { UserDAO } from '$lib/server/db/user';
 import bcrypt from 'bcryptjs';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { generateAccessToken } from '$lib/server/auth';
 import { fail, redirect } from '@sveltejs/kit';
 import { validateTOTP } from '$lib/server/totp';
 import { env } from '$env/dynamic/private';
 import { getCookiePrefix } from '$lib/server/utils';
-import type { PageServerLoad } from './$types';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { setError, superValidate, fail, message } from 'sveltekit-superforms';
 import { formSchema } from './schema';

@@ -1,30 +1,33 @@
 import { UserDAO } from '$lib/server/db/user';
 import bcrypt from 'bcryptjs';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 import { generateAccessToken } from '$lib/server/auth';
 import { fail, redirect } from '@sveltejs/kit';
 import { logger } from '$lib/utils/logger';
-import { defs } from '$lib/utils/form';
-import z from 'zod';
 import { env } from '$env/dynamic/private';
 import { getCookiePrefix } from '$lib/server/utils';
+import { zod4 } from 'sveltekit-superforms/adapters';
+import { setError, superValidate, fail } from 'sveltekit-superforms';
+import { formSchema } from './schema';
+
+export const load: PageServerLoad = async () => {
+  return {
+    form: await superValidate(zod4(formSchema)),
+  };
+};
 
 export const actions: Actions = {
-  signUp: async ({ request, cookies }) => {
+  signUp: async (event) => {
+    const { cookies } = event;
+    const form = await superValidate(event, zod4(formSchema));
+    if (!form.valid) return fail(400, { form });
+    const { username, email, password, rememberMe } = form.data;
     try {
-      const formData = Object.fromEntries(await request.formData());
-      const schema = z.object({
-        email: defs.email,
-        username: defs.username,
-        password: defs.password,
-        rememberMe: defs.checkbox,
-      });
-      const form = schema.safeParse(formData);
-      if (!form.success) throw new Error(form.error.issues[0].message);
-
-      const { username, email, password, rememberMe } = form.data;
       await UserDAO.credentialsExists(username, email);
-      // Hash password
+    } catch (e) {
+      return setError(form, 'totp', (e as Error).message);
+    }
+    try {
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(password, salt);
       const createdUser = await UserDAO.createUser(username, email, hash);
@@ -41,7 +44,7 @@ export const actions: Actions = {
       return fail(400, {
         action: 'signUp',
         error: true,
-        message: msg || 'errors.server.connectionRefused',
+        message: msg,
       });
     }
 
