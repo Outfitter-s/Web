@@ -84,12 +84,12 @@ export class UserDAO {
     return user;
   }
 
-  static async getUserByUsername(username: User['username']): Promise<User> {
+  static async getUserByUsername(username: User['username']): Promise<User | null> {
     const userResult = await pool.query<UserTable>('SELECT * FROM users WHERE username = $1', [
       username,
     ]);
     if (userResult.rows.length === 0) {
-      throw new Error('errors.auth.badUsername');
+      return null;
     }
     const user = UserDAO.convertToUser(
       userResult.rows[0],

@@ -12,6 +12,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const { username, attResp } = body;
 
     const user = await UserDAO.getUserByUsername(username);
+    if (!user) throw new Error('errors.auth.badUsername');
 
     const currentChallenge = await Caching.get<string>(`registrationChallenge:${user.id}`);
     if (!currentChallenge) {

@@ -7,6 +7,7 @@ export const load = (async ({ params }) => {
   const { username } = params;
   try {
     const pageUser = await UserDAO.getUserByUsername(username.slice(1));
+    if (!pageUser) throw new Error('errors.auth.badUsername');
     delete pageUser.passwordHash;
     const nbFollowers = await SocialDAO.getNbFollowers(pageUser.id);
     return { pageUser, nbFollowers };
