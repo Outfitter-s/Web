@@ -1,30 +1,35 @@
 import { UserDAO } from '$lib/server/db/user';
 import { resetPasswordRequest } from '$lib/server/mail/transactional';
 import type { Actions } from './$types';
-import { logger } from '$lib/utils/logger';
-import { defs } from '$lib/utils/form';
-import z from 'zod';
+import { zod4 } from 'sveltekit-superforms/adapters';
+import { setError, superValidate, fail, message } from 'sveltekit-superforms';
+import { formSchema } from './schema';
+
+export const load: PageServerLoad = async () => {
+  return {
+    form: await superValidate(zod4(formSchema)),
+  };
+};
 
 export const actions: Actions = {
-  resetPassword: async ({ request, url }) => {
+  resetPassword: async (event) => {
+    const { url } = event;
+    const form = await superValidate(event, zod4(formSchema));
+    if (!form.valid) return fail(400, { form });
+    const { email } = form.data;
+    let id: UUID;
     try {
-      const formData = Object.fromEntries(await request.formData());
-      const schema = z.object({
-        email: defs.email,
-      });
-      const form = schema.safeParse(formData);
-      if (!form.success) throw new Error(form.error.issues[0].message);
-
-      const { email } = form.data;
-      const id = await UserDAO.requestPasswordReset(email);
-
-      await resetPasswordRequest(email, url, id);
+      id = await UserDAO.requestPasswordReset(email);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      logger.error(msg);
-      return { error: true, message: msg, action: 'resetPassword' };
+      return setError(form, 'email', (e as Error).message);
     }
 
-    return { action: 'resetPassword', success: true, message: 'successes.resetPasswordRequest' };
+    try {
+      await resetPasswordRequest(email, url, id);
+    } catch (e) {
+      return fail(400, { form, message: (e as Error).message });
+    }
+
+    return message(form, 'successes.resetPasswordRequest');
   },
 };

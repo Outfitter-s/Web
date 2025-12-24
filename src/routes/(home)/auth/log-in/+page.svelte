@@ -24,7 +24,6 @@
     validators: zod4Client(formSchema),
     resetForm: false,
     onUpdated: ({ form }) => {
-      console.log(form);
       if (form.message) {
         if (form.message?.noTOTPCode === true) {
           totpModalOpen = true;
@@ -66,7 +65,6 @@
       passkeyLoading = false;
     }
   }
-  $inspect($formData);
 </script>
 
 <SEO title="seo.auth.logIn.title" description="seo.auth.logIn.description" />

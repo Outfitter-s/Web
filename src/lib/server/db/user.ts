@@ -150,7 +150,7 @@ export class UserDAO {
     const exists = await UserDAO.isEmailTaken(email);
     if (!exists) throw new Error('errors.auth.passwordReset.noAccountWithEmail');
     const id = crypto.randomUUID();
-    await Caching.set(`passwordReset:${id}`, email, { ttl: 60 * 5 }); // 5 min expiry
+    await Caching.set(`passwordReset:${id}`, email, { ttl: 60 * 60 * 5 }); // 5 min expiry
 
     return id;
   }
