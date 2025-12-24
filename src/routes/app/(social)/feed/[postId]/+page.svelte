@@ -129,22 +129,11 @@
     <div
       class="relative block -ml-2 max-lg:-mr-2 -mt-2 lg:-mb-2 lg:max-w-1/2 lg:w-full bg-card border border-border rounded-lg overflow-hidden"
     >
-      <!-- svelte-ignore a11y_missing_attribute -->
-<<<<<<< HEAD:src/routes/app/(social)/feed/[postId]/+page.svelte
-      <img
-        src={post.imageUrl}
-        class="size-full object-center object-cover aspect-3/4"
-=======
-      <!-- <img
-        src={post.images[0]}
-        class="size-full object-center object-cover aspect-9/12"
->>>>>>> d8638d1 (feat/post-images: Post can have multiple images):src/routes/app/feed/[postId]/+page.svelte
-        onerror={onPostImageError}
-      /> -->
       <Carousel.Root class="w-full" setApi={(emblaApi) => (carouselApi = emblaApi)}>
         <Carousel.Content>
           {#each post.images as image}
             <Carousel.Item>
+              <!-- svelte-ignore a11y_missing_attribute -->
               <img
                 src={image}
                 class="size-full object-center object-cover aspect-9/12"
