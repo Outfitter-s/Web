@@ -1,6 +1,7 @@
 <script lang="ts">
   import * as FormPrimitive from 'formsnap';
   import { cn, type WithoutChild } from '$lib/utils';
+  import i18n from '$lib/i18n';
 
   let {
     ref = $bindable(null),
@@ -23,7 +24,7 @@
       {@render childrenProp({ errors, errorProps })}
     {:else}
       {#each errors as error (error)}
-        <div {...errorProps} class={cn(errorClasses)}>{error}</div>
+        <div {...errorProps} class={cn(errorClasses)}>{i18n.t(error as any)}</div>
       {/each}
     {/if}
   {/snippet}

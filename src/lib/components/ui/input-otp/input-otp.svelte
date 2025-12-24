@@ -16,13 +16,14 @@
   let {
     class: className,
     name = 'totp',
+    'aria-invalid': ariaInvalid,
     nbInputs = 6,
     ...restProps
   }: SvelteHTMLElements['div'] & MyProps = $props();
   let container = $state<HTMLDivElement | null>(null);
-  const classes = {
+  let classes = $derived({
     container: cn('flex flex-row gap-4 items-center justify-between w-full', className?.container),
-  };
+  });
   let activeCellIndex = $state(0);
 
   const formatInputValue = (value: string) => {
@@ -136,13 +137,13 @@
       onpaste={handlePaste}
       maxlength={1}
       class={cn(
-        'border-input aria-invalid:border-destructive dark:bg-input/30 relative flex size-10 items-center justify-center rounded-md border text-center text-sm transition-all outline-none',
-        activeCellIndex === i &&
-          'border-ring ring-ring/50 aria-invalid:border-destructive dark:aria-invalid:ring-destructive/40 aria-invalid:ring-destructive/20 ring-offset-background z-10 ring-[3px]',
+        'border-input aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 dark:bg-input/30 relative flex size-10 items-center justify-center rounded-md border text-center text-sm transition-all outline-none',
+        activeCellIndex === i && 'border-ring ring-ring/50 ring-offset-background z-10 ring-[3px]',
         className?.input
       )}
       min={0}
       max={9}
+      aria-invalid={ariaInvalid}
       required
       oninput={handleInput}
       onkeyup={handleKeyUp}
