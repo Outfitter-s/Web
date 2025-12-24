@@ -21,11 +21,10 @@
   let { open = $bindable(false) }: Props = $props();
 
   let loading = $state(false);
-  let processingImage = $state(false);
   let hasOutfitForToday = $derived(
     ((page.data.outfits as Outfit[]) || []).find((o) => DateUtils.isToday(o.createdAt)) != null
   );
-  let takenPicture = $state<string | null>(null);
+  let takenPictures = $state<string[]>([]);
 
   $effect(() => {
     if (!open) {
@@ -47,11 +46,11 @@
     if (loading) return;
     loading = true;
     const formData = new FormData(event.target as HTMLFormElement);
-    if (takenPicture) {
-      const response = await fetch(takenPicture);
+    for (const picture of takenPictures) {
+      const response = await fetch(picture);
       const blob = await response.blob();
       const file = new File([blob], 'image.png', { type: blob.type });
-      formData.append('image', file);
+      formData.append('images[]', file);
     }
     const res = await fetch('/api/social/publication', {
       method: 'POST',
@@ -82,8 +81,7 @@
       description: '',
       todaysOutfit: true,
     };
-    takenPicture = null;
-    processingImage = false;
+    takenPictures = [];
     loading = false;
   }
 </script>
@@ -94,11 +92,24 @@
       <Dialog.Title>{i18n.t('social.feed.addPublication.title')}</Dialog.Title>
     </Dialog.Header>
     <form onsubmit={submitHandler} class="mt-6 flex flex-col gap-4">
-      <PictureTaker
-        onPictureTaken={(file) => {
-          takenPicture = file;
-        }}
-      />
+      <div
+        class="grid gap-6"
+        style="grid-template-columns: repeat({Math.min(3, takenPictures.length + 1)}, 1fr);"
+      >
+        {#each takenPictures as picture}
+          <!-- svelte-ignore a11y_missing_attribute -->
+          <img
+            src={picture}
+            class="border-border relative w-full shrink-0 overflow-hidden rounded border min-h-50 max-h-[50dvh] h-fit"
+          />
+        {/each}
+        <PictureTaker
+          showPreview={false}
+          onPictureTaken={(file) => {
+            takenPictures.push(file);
+          }}
+        />
+      </div>
 
       <Field.Field>
         <Field.Label for="description"

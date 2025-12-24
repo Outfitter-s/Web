@@ -17,6 +17,7 @@
     error?: Parameters<typeof i18n.t>[0];
     spinner?: boolean;
     pictureTaken?: string;
+    showPreview?: boolean;
     class?: {
       container?: string;
       image?: string;
@@ -32,6 +33,7 @@
     spinner = $bindable(false),
     onPictureModalChange,
     error,
+    showPreview = false,
     class: className,
   }: Props = $props();
 
@@ -159,7 +161,7 @@
   </div>
 {/if}
 
-{#if !pictureTaken}
+{#if !pictureTaken || !showPreview}
   <button
     type="button"
     onclick={openCamera}
