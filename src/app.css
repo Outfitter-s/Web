@@ -114,6 +114,6 @@
   body {
     scrollbar-gutter: stable;
     overscroll-behavior: none;
-    @apply bg-card text-foreground font-sans;
+    @apply bg-background text-foreground font-sans;
   }
 }

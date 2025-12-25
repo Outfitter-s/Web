@@ -16,6 +16,8 @@
   import PictureTaker from '$lib/components/PictureTaker.svelte';
   import * as Dialog from '$lib/components/ui/dialog';
   import { enhance } from '$app/forms';
+  import Globals from '$lib/globals.svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   let { data }: PageProps = $props();
   let post = $derived(data.post);
@@ -65,6 +67,14 @@
       Toaster.error(msg as any);
     }
   }
+
+  onMount(() => {
+    Globals.navBack.backButton.shown = true;
+  });
+
+  onDestroy(() => {
+    Globals.navBack.backButton.shown = false;
+  });
 </script>
 
 <SEO title="seo.social.post.title" description="seo.social.post.description" />
@@ -107,8 +117,8 @@
   </Dialog.Content>
 </Dialog.Root>
 
-<NavBack title="{post.user.username} - {i18n.t('seo.social.post.title')}" />
-<div class="lg:p-2 max-lg:pt-2 lg:pl-4 max-lg:p-4 max-w-375 mx-auto w-full" data-post={post.id}>
+<!-- <NavBack title="{post.user.username} - {i18n.t('seo.social.post.title')}" /> -->
+<div class="lg:p-2 lg:pt-4 lg:pl-4 max-lg:p-4 max-w-375 mx-auto w-full" data-post={post.id}>
   <div class="bg-card relative border-border flex flex-col rounded-lg border lg:flex-row">
     <!-- Image -->
     <div

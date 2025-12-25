@@ -146,7 +146,7 @@
     </div>
   {/if}
 
-  <div class="w-full px-2 flex flex-col gap-12">
+  <div class="w-full flex flex-col gap-12">
     {#each posts as post (post.id)}
       <Post {post} />
     {/each}

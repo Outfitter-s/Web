@@ -1,3 +1,4 @@
+import type { Snippet } from 'svelte';
 import type { EffectiveMode, Mode, Theme } from './theming/index.svelte';
 
 class GlobalsClass {
@@ -8,6 +9,14 @@ class GlobalsClass {
     },
     theme: 'sleek-black',
   });
+
+  nav = $state<{ shown: boolean }>({ shown: true });
+  navComponentReplacement = $state<null | Snippet>(null);
+  navBack = $state<{ shown: boolean; backButton: { shown: boolean; action?: () => void } }>({
+    shown: true,
+    backButton: { shown: false },
+  });
+  pageTitle = $state<string>('');
 }
 
 const Globals = new GlobalsClass();

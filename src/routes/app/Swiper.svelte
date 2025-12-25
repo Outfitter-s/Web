@@ -10,10 +10,11 @@
   import i18n from '$lib/i18n';
   import { cn, hashStringToNumber, getWeather, logger } from '$lib/utils';
   import { fade } from 'svelte/transition';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { invalidateAll } from '$app/navigation';
   import MixAndMatch from './MixAndMatch.svelte';
   import NavBack from '$lib/components/NavBack.svelte';
+  import Globals from '$lib/globals.svelte';
 
   const cId = $props.id(); // Deterministic client ID for outfit generation
 
@@ -211,6 +212,22 @@
   onMount(() => {
     initialWeatherFetch();
   });
+
+  $effect(() => {
+    Globals.navBack.backButton = {
+      shown: mixAndMatchOpen,
+      action: () => {
+        mixAndMatchOpen = false;
+      },
+    };
+  });
+
+  onDestroy(() => {
+    Globals.navBack.backButton = {
+      shown: false,
+      action: undefined,
+    };
+  });
 </script>
 
 <Dialog.Root bind:open={acceptedCard.open} dismissible={false}>
@@ -238,10 +255,6 @@
 </Dialog.Root>
 
 {#if mixAndMatchOpen}
-  <NavBack
-    title={i18n.t('wardrobe.outfitGeneration.mixAndMatch.title')}
-    onclick={() => (mixAndMatchOpen = false)}
-  />
   <MixAndMatch {onSwiped} />
 {:else}
   <!-- This markup is a mess of absolute elements over absolute elements -->

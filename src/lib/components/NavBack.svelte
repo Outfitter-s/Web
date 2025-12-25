@@ -1,59 +1,39 @@
 <script lang="ts">
-  import type { SvelteHTMLElements } from 'svelte/elements';
-  import { cn } from 'tailwind-variants';
   import { Button } from './ui/button';
   import { ChevronLeft } from '@lucide/svelte';
-  import { onMount } from 'svelte';
-
-  interface Props {
-    title: string;
-    onclick?: () => void;
-  }
-
-  let {
-    title,
-    onclick,
-    class: className,
-    ...restProps
-  }: Props & SvelteHTMLElements['div'] = $props();
-  let pageScrollY = $state(0);
-
-  onMount(() => {
-    pageScrollY = window.scrollY;
-    const listenScroll = () => {
-      pageScrollY = window.scrollY;
-    };
-    window.addEventListener('scroll', listenScroll);
-
-    return () => {
-      window.removeEventListener('scroll', listenScroll);
-    };
-  });
+  import Globals from '$lib/globals.svelte';
+  import { cn } from '$lib/utils';
+  import { slide } from 'svelte/transition';
 </script>
 
-<div
-  class={cn(
-    'py-2 sticky top-0 w-full z-10 transition-all',
-    pageScrollY > 10 ? 'px-4' : 'px-2',
-    className
-  )}
-  {...restProps}
->
-  <div class="bg-card border border-border p-2 gap-2 items-center flex flex-row rounded-lg">
-    <Button
-      variant="outline"
-      size="icon"
-      class="size-8"
-      onclick={() => {
-        if (onclick) {
-          onclick();
-        } else {
-          history.back();
-        }
-      }}
-    >
-      <ChevronLeft class="size-5" />
-    </Button>
-    <p class="font-medium text-base sm:text-lg">{@html title}</p>
-  </div>
-</div>
+{#if Globals.navBack.shown}
+  <nav class="bg-foreground text-background dark:text-foreground dark:bg-secondary">
+    <div class="max-w-250 h-16 p-2 flex flex-row w-full justify-start items-center mx-auto">
+      {#if Globals.navBack.backButton.shown}
+        <div class="ltr:mr-2 rtl:mr-0" transition:slide={{ duration: 300, axis: 'x' }}>
+          <Button
+            variant="none"
+            class="p-2 size-12 dark:bg-primary bg-background rounded-full text-foreground dark:text-background"
+            onclick={() => {
+              if (Globals.navBack.backButton.action) {
+                Globals.navBack.backButton.action();
+              } else {
+                history.back();
+              }
+            }}
+          >
+            <ChevronLeft class="size-full" />
+          </Button>
+        </div>
+      {/if}
+      <p
+        class={cn(
+          'font-medium text-lg font-mono',
+          !Globals.navBack.backButton.shown && 'ltr:ml-2 rtl:mr-2'
+        )}
+      >
+        {@html Globals.pageTitle}
+      </p>
+    </div>
+  </nav>
+{/if}
