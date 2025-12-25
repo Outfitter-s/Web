@@ -44,6 +44,8 @@
       }
     },
     "account": {
+      "title": "Account",
+      "description": "Manage your Outfitter account",
       "settings": {
         "title": "Account Settings",
         "description": "Manage your Outfitter account settings, including username, email, password, and security options like TOTP and passkeys."
@@ -290,65 +292,71 @@
   },
   "account": {
     "tabs": {
-      "general": {
-        "title": "General",
-        "description": "Update your general account settings.",
-        "changeUsername": {
-          "title": "Change username",
-          "alerts": {
-            "taken": {
-              "title": "Username taken",
-              "description": "The username {{username}} is already taken."
-            },
-            "available": {
-              "title": "Username available",
-              "description": "The username {{username}} is available!"
+      "settings": "Settings",
+      "legal": "Legal"
+    },
+    "settings": {
+      "tabs": {
+        "general": {
+          "title": "General",
+          "description": "Update your general account settings.",
+          "changeUsername": {
+            "title": "Change username",
+            "alerts": {
+              "taken": {
+                "title": "Username taken",
+                "description": "The username {{username}} is already taken."
+              },
+              "available": {
+                "title": "Username available",
+                "description": "The username {{username}} is available!"
+              }
             }
-          }
+          },
+          "changeLang": {
+            "title": "Language"
+          },
+          "changeEmail": {
+            "title": "Change email"
+          },
+          "theme": {
+            "theme": "Theme",
+            "mode": "Mode"
+          },
+          "logout": "Log out",
+          "danger": {
+            "title": "Danger Zone"
+          },
+          "profilePicture": "Profile Picture"
         },
-        "changeLang": {
-          "title": "Language"
+        "password": {
+          "title": "Password",
+          "description": "Change your password to keep your account secure."
         },
-        "changeEmail": {
-          "title": "Change email"
+        "calendars": {
+          "title": "Calendars",
+          "description": "Manage your calendar integrations and settings.",
+          "createButton": "Create a new calendar link",
+          "revokeButton": "Revoke"
         },
-        "theme": {
-          "theme": "Theme",
-          "mode": "Mode"
+        "TOTP": {
+          "title": "TOTP",
+          "description": "Two-Factor Authentication (2FA) adds an extra layer of security to your account by requiring a second form of verification when logging in."
         },
-        "logout": "Log out",
-        "danger": {
-          "title": "Danger Zone"
-        },
-        "profilePicture": "Profile Picture"
-      },
-      "password": {
-        "title": "Password",
-        "description": "Change your password to keep your account secure."
-      },
-      "calendars": {
-        "title": "Calendars",
-        "description": "Manage your calendar integrations and settings.",
-        "createButton": "Create a new calendar link",
-        "revokeButton": "Revoke"
-      },
-      "TOTP": {
-        "title": "TOTP",
-        "description": "Two-Factor Authentication (2FA) adds an extra layer of security to your account by requiring a second form of verification when logging in."
-      },
-      "passkey": {
-        "title": "Passkey",
-        "description": "A passkey is a secure way to log in to your account without a password. It uses cryptographic keys stored on your device.",
-        "register": {
-          "button": "Register Passkey"
-        },
-        "remove": {
-          "button": "Remove Passkey",
-          "modal": {
-            "confirm": "Remove",
-            "title": "Remove Passkey",
-            "description": "Are you sure you want to remove this passkey? This action cannot be undone.",
-            "cancel": "Cancel"
+        "passkey": {
+          "title": "Passkey",
+          "description": "A passkey is a secure way to log in to your account without a password. It uses cryptographic keys stored on your device.",
+          "register": {
+            "button": "Register Passkey"
+          },
+          "remove": {
+            "button": "Remove Passkey",
+            "modal": {
+              "confirm": "Remove",
+              "title": "Remove Passkey",
+              "description": "Are you sure you want to remove this passkey? This action cannot be undone.",
+              "cancel": "Cancel"
+            }
           }
         }
       }

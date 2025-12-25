@@ -70,7 +70,7 @@
 
 <div
   class="grid gap-x-6 gap-y-4 p-4"
-  style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));"
+  style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));"
 >
   {#each items as item (item.id)}
     {@const selected = selectedItems.has(item.id)}

@@ -27,7 +27,7 @@
       href={resolve('/app/[username]', { username: `@${post.user.username}` })}
       class="flex flex-row items-center gap-2"
     >
-      <ProfilePicture userId={post.user.id} class="scale-120" />
+      <ProfilePicture userId={post.user.id} />
       <p class="ml-1">{post.user.username}</p>
     </a>
 

@@ -26,12 +26,8 @@
 
 <div class="flex min-h-dvh flex-col">
   <NavBack />
-  <div class="bg-secondary grow flex flex-col">
-    <div class="rounded-t-xl bg-background grow flex flex-col">
-      <div class="flex grow flex-col">
-        <svelte:boundary>{@render children()}</svelte:boundary>
-      </div>
-      <Navbar />
-    </div>
-  </div>
+  <main class="flex grow flex-col w-full relative">
+    <svelte:boundary>{@render children()}</svelte:boundary>
+  </main>
+  <Navbar />
 </div>

@@ -102,7 +102,7 @@
   });
 </script>
 
-<div class="mx-auto flex w-full max-w-250 flex-col gap-4 p-2 items-start">
+<section class="flex w-full flex-col gap-4 p-2 items-start">
   <div class="flex flex-row gap-6 items-center">
     <div class="rounded-full border-border border overflow-hidden size-24 bg-card">
       <ProfilePicture userId={pageUser.id} class="size-full" />
@@ -164,4 +164,4 @@
   {#if noMorePosts}
     <p class="text-lg font-medium my-8 text-center w-full">{i18n.t('social.feed.noMorePosts')}</p>
   {/if}
-</div>
+</section>

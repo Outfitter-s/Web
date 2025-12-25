@@ -65,18 +65,20 @@
 <AlertDialog.Root bind:open={removePasskeyModalOpen}>
   <AlertDialog.Content>
     <AlertDialog.Header>
-      <AlertDialog.Title>{i18n.t('account.tabs.passkey.remove.modal.title')}</AlertDialog.Title>
+      <AlertDialog.Title
+        >{i18n.t('account.settings.tabs.passkey.remove.modal.title')}</AlertDialog.Title
+      >
       <AlertDialog.Description>
-        {i18n.t('account.tabs.passkey.remove.modal.description')}
+        {i18n.t('account.settings.tabs.passkey.remove.modal.description')}
       </AlertDialog.Description>
     </AlertDialog.Header>
     <AlertDialog.Footer>
       <AlertDialog.Cancel>
-        {i18n.t('account.tabs.passkey.remove.modal.cancel')}</AlertDialog.Cancel
+        {i18n.t('account.settings.tabs.passkey.remove.modal.cancel')}</AlertDialog.Cancel
       >
       <form action="?/deletePasskey" method="POST" class="w-fit" use:enhance>
         <AlertDialog.Action type="submit">
-          {i18n.t('account.tabs.passkey.remove.modal.confirm')}
+          {i18n.t('account.settings.tabs.passkey.remove.modal.confirm')}
           <ArrowRight class="size-4" />
         </AlertDialog.Action>
       </form>
@@ -86,10 +88,10 @@
 
 {#if user.passkey}
   <Button onclick={() => (removePasskeyModalOpen = true)}>
-    {i18n.t('account.tabs.passkey.remove.button')}
+    {i18n.t('account.settings.tabs.passkey.remove.button')}
   </Button>
 {:else}
   <Button onclick={registerPasskey}>
-    {i18n.t('account.tabs.passkey.register.button')}
+    {i18n.t('account.settings.tabs.passkey.register.button')}
   </Button>
 {/if}

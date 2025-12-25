@@ -22,7 +22,6 @@
     alert?: () => boolean;
   }
   let user = $derived<User | undefined>(page.data.user);
-  let activeRoute = $derived<string>(user ? (page.route.id ?? '/') : '');
 
   let links = $derived<Link[]>([
     ...(user
@@ -71,12 +70,31 @@
           },
         ]
       : [
-          { id: 'home', href: '/', text: i18n.t('nav.home') },
-          { id: 'about', href: '/#about', text: i18n.t('nav.about') },
-          { id: 'sign-up', href: '/auth/sign-up', text: i18n.t('nav.signUp') },
-          { id: 'log-in', href: '/auth/log-in', text: i18n.t('nav.logIn') },
+          { id: 'home', routes: ['/'], href: '/', text: i18n.t('nav.home') },
+          { id: 'about', routes: ['/#about'], href: '/#about', text: i18n.t('nav.about') },
+          {
+            id: 'sign-up',
+            routes: ['/auth/sign-up'],
+            href: '/auth/sign-up',
+            text: i18n.t('nav.signUp'),
+          },
+          {
+            id: 'log-in',
+            routes: ['/auth/log-in'],
+            href: '/auth/log-in',
+            text: i18n.t('nav.logIn'),
+          },
         ]),
   ]);
+
+  const removeLayoutsInRoute = (route: string) => {
+    if (!route) return '/';
+    // Remove anything in parentheses between slashes
+    const reg = new RegExp('/\\([^/]+\\)', 'g');
+    const cleaned = route.replace(reg, '');
+    // If result is empty or just '/', return '/'
+    return cleaned === '' ? '/' : cleaned;
+  };
 
   const routeMatches = (routes: string[] | undefined, activeRoute: string) => {
     if (!routes) return false;
@@ -88,6 +106,10 @@
       return activeRoute === route;
     });
   };
+
+  let activeRoute = $derived<string>(
+    removeLayoutsInRoute(page.route.id ?? '/') + (page.url.hash || '')
+  );
 </script>
 
 {#snippet alertDot()}
@@ -113,7 +135,7 @@
           </div>
         {:else}
           <div
-            class="flex flex-row justify-between w-full items-center gap-2"
+            class="flex flex-row justify-between w-full h-full items-center gap-2"
             in:fly={{ duration: 300, y: '100%' }}
             out:fly={{ duration: 300, y: '-100%' }}
           >
@@ -124,7 +146,8 @@
                 href={link.href}
                 onclick={link.onClick}
                 class={cn(
-                  'p-2 size-12 before:rounded-full before:absolute before:transition-transform relative dark:before:bg-primary before:bg-background before:inset-0 font-mono',
+                  'before:rounded-full before:absolute before:transition-transform relative dark:before:bg-primary h-12 before:bg-background before:inset-0 font-mono items-center',
+                  user ? 'w-12 px-2' : ' px-4',
                   active
                     ? 'before:scale-100 text-primary dark:text-background'
                     : 'before:scale-0 text-background dark:text-foreground'
@@ -134,7 +157,7 @@
                   <!-- svelte-ignore svelte_component_deprecated -->
                   <svelte:component this={link.icon} class="z-10 size-full" />
                 {:else}
-                  <span class="ltr:ml-2 rtl:mr-2">{@html link.text}</span>
+                  <span class="z-10">{@html link.text}</span>
                 {/if}
                 {#if link?.alert && link.alert()}
                   {@render alertDot()}

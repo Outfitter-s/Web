@@ -12,7 +12,9 @@
   import { Button } from '$lib/components/ui/button';
   import Publier from './publier.svelte';
   import { ProfilePicture, Post } from '$lib/components/social';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
+  import Globals from '$lib/globals.svelte';
+  import Backdrop from '$lib/components/ui/dialog/backdrop.svelte';
 
   let posts = $state<Record<FeedType, Publication[]>>({ forYou: [], followed: [] });
   let searchResults = $state<User[]>([]);
@@ -21,6 +23,7 @@
   let noMorePosts = $state<Record<FeedType, boolean>>({ forYou: false, followed: false });
   let activeFeedTab = $state<FeedType>('forYou');
   const POST_LIMIT = 20;
+  let searchOpen = $state(false);
 
   async function searchUser() {
     const searchQuery = (document.querySelector('input') as HTMLInputElement).value;
@@ -73,6 +76,8 @@
       }
     }
     window.addEventListener('scroll', onScroll);
+
+    Globals.navBack.trailing = navTrailing;
     return () => {
       window.removeEventListener('scroll', onScroll);
     };
@@ -81,60 +86,77 @@
   $effect(() => {
     getFeed(activeFeedTab);
   });
+
+  onDestroy(() => {
+    Globals.navBack.trailing = undefined;
+  });
 </script>
 
 <Publier bind:open={publierOpen} />
 <SEO title="seo.social.feed.title" description="seo.social.feed.description" />
 
-<div class="mx-auto flex w-full max-w-250 flex-col">
-  {#if searchResults.length > 0}
-    <!-- svelte-ignore a11y_consider_explicit_label -->
-    <button class="fixed z-0 appearance-none inset-0" onclick={() => (searchResults = [])}></button>
-  {/if}
-  <div class="sticky flex bg-background p-2 flex-col gap-2 top-0 left-0 right-0 z-20 w-full">
-    <!-- Search bar -->
-    <div class="items-center gap-2 flex flex-row w-full">
-      <div class="relative w-full">
-        <InputGroup.Root class="z-10">
-          <InputGroup.Input
-            onkeyup={searchUser}
-            placeholder={i18n.t('social.feed.search.placeholder')}
-          />
-          <InputGroup.Addon>
-            <Search />
-          </InputGroup.Addon>
-        </InputGroup.Root>
-        {#if searchResults.length > 0}
-          <div
-            class="absolute left-2 right-2 top-full mt-1 rounded-lg overflow-hidden bg-card border border-border z-10 flex flex-col"
-            transition:slide={{ axis: 'y', duration: 300 }}
-          >
-            {#each searchResults as user (user.id)}
-              <a
-                href={resolve('/app/[username]', { username: `@${user.username}` })}
-                class="px-4 py-2 cursor-pointer flex flex-row gap-4"
-                animate:flip={{ duration: 300 }}
-              >
-                <div class="size-6 bg-card rounded-full border border-border overflow-hidden">
-                  <ProfilePicture userId={user.id} class="size-full" />
-                </div>
-                {user.username}
-              </a>
-            {/each}
-          </div>
-        {/if}
-      </div>
-      <Button size="icon" class="p-1.5" onclick={() => (publierOpen = !publierOpen)}>
-        <Plus class="size-full" />
-      </Button>
-    </div>
+{#snippet navTrailing()}
+  <Button
+    variant="none"
+    class="p-1! size-auto h-full aspect-square max-h-8 dark:bg-primary bg-background rounded-full text-foreground dark:text-background"
+    onclick={() => (searchOpen = !searchOpen)}
+  >
+    <Search class="size-full" />
+  </Button>
+  <Button
+    variant="none"
+    class="p-1! size-auto h-full aspect-square max-h-8 dark:bg-primary bg-background rounded-full text-foreground dark:text-background"
+    onclick={() => (publierOpen = !publierOpen)}
+  >
+    <Plus class="size-full" />
+  </Button>
+{/snippet}
 
-    <!-- Feed type selector -->
-    <div class="grid grid-cols-2 w-full gap-2">
+{#if searchOpen}
+  <!-- Dismiss backdrop -->
+  <!-- svelte-ignore a11y_consider_explicit_label -->
+  <Backdrop bind:open={searchOpen}></Backdrop>
+  <div class="fixed z-50 top-6 left-4 right-4 items-center gap-2 flex flex-col">
+    <!-- Search bar -->
+    <InputGroup.Root class="z-10 bg-input!">
+      <InputGroup.Input
+        onkeyup={searchUser}
+        placeholder={i18n.t('social.feed.search.placeholder')}
+      />
+      <InputGroup.Addon>
+        <Search />
+      </InputGroup.Addon>
+    </InputGroup.Root>
+    {#if searchResults.length > 0}
+      <div
+        class="rounded-lg overflow-hidden bg-card w-full border border-border flex flex-col"
+        transition:slide={{ axis: 'y', duration: 300 }}
+      >
+        {#each searchResults as user (user.id)}
+          <a
+            href={resolve('/app/[username]', { username: `@${user.username}` })}
+            class="px-4 py-2 cursor-pointer flex flex-row gap-4"
+            animate:flip={{ duration: 300 }}
+          >
+            <div class="size-6 bg-card rounded-full border border-border overflow-hidden">
+              <ProfilePicture userId={user.id} class="size-full" />
+            </div>
+            {user.username}
+          </a>
+        {/each}
+      </div>
+    {/if}
+  </div>
+{/if}
+
+<section class="flex w-full flex-col">
+  <!-- Feed type selector -->
+  <div class="p-2">
+    <div class="grid grid-cols-2 w-full gap-2 bg-card rounded">
       <button
         class={cn(
-          'w-full py-1 rounded',
-          activeFeedTab === 'forYou' ? 'bg-primary text-primary-foreground' : 'bg-card'
+          'w-full py-1 rounded-md',
+          activeFeedTab === 'forYou' && 'bg-primary text-primary-foreground'
         )}
         onclick={() => (activeFeedTab = 'forYou')}
       >
@@ -142,8 +164,8 @@
       </button>
       <button
         class={cn(
-          'w-full py-1 rounded',
-          activeFeedTab === 'followed' ? 'bg-primary text-primary-foreground' : 'bg-card'
+          'w-full py-1 rounded-md',
+          activeFeedTab === 'followed' && 'bg-primary text-primary-foreground'
         )}
         onclick={() => (activeFeedTab = 'followed')}
       >
@@ -170,4 +192,4 @@
   {#if noMorePosts[activeFeedTab]}
     <p class="text-lg font-medium my-8 text-center">{i18n.t('social.feed.noMorePosts')}</p>
   {/if}
-</div>
+</section>

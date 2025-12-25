@@ -118,7 +118,7 @@
 </Dialog.Root>
 
 <!-- <NavBack title="{post.user.username} - {i18n.t('seo.social.post.title')}" /> -->
-<div class="lg:p-2 lg:pt-4 lg:pl-4 max-lg:p-4 max-w-375 mx-auto w-full" data-post={post.id}>
+<section class="lg:p-2 lg:pt-4 lg:pl-4 max-lg:p-4 w-full" data-post={post.id}>
   <div class="bg-card relative border-border flex flex-col rounded-lg border lg:flex-row">
     <!-- Image -->
     <div
@@ -164,7 +164,7 @@
           href={resolve('/app/[username]', { username: `@${post.user.username}` })}
           class="flex flex-row items-center gap-2"
         >
-          <ProfilePicture userId={post.user.id} class="scale-120" />
+          <ProfilePicture userId={post.user.id} />
           <p class="ml-1">{post.user.username}</p>
         </a>
         {#if user?.id === post.user.id}
@@ -244,7 +244,7 @@
       {#if post.outfit}
         <div
           class="grid gap-x-6 w-full gap-y-4 p-4"
-          style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));"
+          style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));"
         >
           {#each post.outfit.items as item (item.id)}
             <OutfitItemCard element="a" {item} />
@@ -253,4 +253,4 @@
       {/if}
     </div>
   </div>
-</div>
+</section>

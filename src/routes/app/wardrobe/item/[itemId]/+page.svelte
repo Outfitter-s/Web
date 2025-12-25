@@ -118,7 +118,7 @@
   </Dialog.Content>
 </Dialog.Root>
 
-<div class="lg:p-2 lg:pt-4 max-lg:p-4 lg:pl-4 mx-auto flex w-full max-w-300">
+<section class="lg:p-2 lg:pt-4 max-lg:p-4 lg:pl-4 flex w-full">
   <div class="bg-card w-full relative border-border flex flex-col rounded-lg border lg:flex-row">
     <!-- Image -->
     <div
@@ -290,4 +290,4 @@
       {/if}
     </div>
   </div>
-</div>
+</section>
