@@ -19,7 +19,6 @@
     resetForm: false,
   });
   const { form: formData, enhance, submitting, message, allErrors } = form;
-  $formData.token = data.token;
 </script>
 
 <SEO title="seo.auth.resetPassword.title" description="seo.auth.resetPassword.description" />

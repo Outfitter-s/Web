@@ -9,11 +9,15 @@
   import { Label } from '$lib/components/ui/label';
   import i18n from '$lib/i18n';
   import { logger } from '$lib/utils/logger';
-  import { AlertCircle, CheckCheck, Monitor, Moon, Sun, Upload } from '@lucide/svelte';
+  import { AlertCircle, CheckCheck, Monitor, Moon, Sun } from '@lucide/svelte';
   import Theming, { availableModes, availableThemes, type Mode } from '$lib/theming/index.svelte';
   import { capitalize } from '$lib/utils';
   import ProfilePicture from '$lib/components/social/ProfilePicture.svelte';
   import Separator from '$lib/components/ui/separator/separator.svelte';
+  import { superForm } from 'sveltekit-superforms';
+  import { zod4Client } from 'sveltekit-superforms/adapters';
+  import { usernameSchema, emailSchema, profilePictureSchema } from './schema';
+  import * as Form from '$lib/components/ui/form';
 
   let currentTheme = $state(page.data.theme);
   let currentLocale = $state(i18n.locale);
@@ -26,11 +30,48 @@
     error: null,
     controller: new AbortController(),
   });
-  let updateEmailLoading = $state(false);
-  let isUpdatingProfilePicture = $state(false);
+
+  const usernameForm = superForm(page.data.usernameForm, {
+    validators: zod4Client(usernameSchema),
+    resetForm: false,
+    onUpdated: ({ form }) => {
+      if (form.valid) {
+        Toaster.success(form.message);
+        initialFormValues.username = form.data.username;
+      }
+    },
+  });
+  const {
+    form: usernameFormData,
+    enhance: usernameEnhance,
+    submitting: usernameSubmitting,
+  } = usernameForm;
+
+  const emailForm = superForm(page.data.emailForm, {
+    validators: zod4Client(emailSchema),
+    resetForm: false,
+    onUpdated: ({ form }) => {
+      if (form.valid) {
+        Toaster.success(form.message);
+        initialFormValues.email = form.data.email;
+      }
+    },
+  });
+  const { form: emailFormData, enhance: emailEnhance, submitting: emailSubmitting } = emailForm;
+
+  const profilePictureForm = superForm(page.data.profilePictureForm, {
+    validators: zod4Client(profilePictureSchema),
+    resetForm: false,
+    onUpdated: ({ form }) => {
+      if (form.valid) {
+        Toaster.success(form.message);
+      }
+    },
+  });
+  const { form: profilePictureFormData, enhance: profilePictureEnhance } = profilePictureForm;
 
   async function onUsernameInput() {
-    const newUsername = formValues.username.trim();
+    const newUsername = $usernameFormData.username.trim();
     if (newUsername !== initialFormValues.username) {
       checkUsernameStatusData.loading = true;
       checkUsernameStatusData.available = await isUsernameTakenFunc(newUsername);
@@ -39,18 +80,6 @@
     }
     checkUsernameStatusData.loading = false;
   }
-
-  $effect(() => {
-    if (page?.form && page.form.action === 'general') {
-      if (page.form.success) {
-        Toaster.success(page.form.message);
-        initialFormValues = { ...formValues };
-      } else {
-        logger.error(page.form.message);
-        Toaster.error(page.form.message);
-      }
-    }
-  });
 
   async function isUsernameTakenFunc(newValue: string) {
     if (newValue.length <= 3) return false;
@@ -81,130 +110,105 @@
   {/if}
 {/snippet}
 
-<div class="grid gap-6 grid-cols-1 md:grid-cols-2">
-  <form
-    action="?/updateUsername"
-    class="space-y-4"
-    method="POST"
-    use:enhance={() => {
-      checkUsernameStatusData.loading = true;
-      return async ({ update }) => {
-        update({ reset: false });
-        checkUsernameStatusData.loading = false;
-      };
-    }}
-  >
-    <div class="space-y-2">
-      <Label for="username">{i18n.t('auth.username')}</Label>
-      <Input name="username" bind:value={formValues.username} oninput={onUsernameInput} />
-    </div>
+<form action="?/updateUsername" class="space-y-4" method="POST" use:usernameEnhance>
+  <Form.Field form={usernameForm} name="username">
+    <Form.Control>
+      {#snippet children({ props })}
+        <Form.Label>{i18n.t('auth.username')}</Form.Label>
+        <Input {...props} oninput={onUsernameInput} bind:value={$usernameFormData.username} />
+      {/snippet}
+    </Form.Control>
+    <Form.FieldErrors />
+  </Form.Field>
 
-    {#if formValues.username !== initialFormValues.username && formValues.username.length > 3}
-      {#if checkUsernameStatusData.available}
-        <Alert.Root variant="success">
-          <AlertCircle />
-          <Alert.Title
-            >{i18n.t(
-              'account.settings.tabs.general.changeUsername.alerts.available.title'
-            )}</Alert.Title
-          >
-          <Alert.Description>
-            <p>
-              {i18n.t('account.settings.tabs.general.changeUsername.alerts.available.description', {
-                username: formValues.username,
-              })}
-            </p>
-          </Alert.Description>
-        </Alert.Root>
-      {:else}
-        <Alert.Root variant="destructive">
-          <CheckCheck />
-          <Alert.Title
-            >{i18n.t(
-              'account.settings.tabs.general.changeUsername.alerts.taken.title'
-            )}</Alert.Title
-          >
-          <Alert.Description>
-            <p>
-              {i18n.t('account.settings.tabs.general.changeUsername.alerts.taken.description', {
-                username: formValues.username,
-              })}
-            </p>
-          </Alert.Description>
-        </Alert.Root>
-      {/if}
+  {#if $usernameFormData.username !== initialFormValues.username && $usernameFormData.username.length > 3}
+    {#if checkUsernameStatusData.available}
+      <Alert.Root variant="success">
+        <CheckCheck />
+        <Alert.Title
+          >{i18n.t('account.tabs.general.changeUsername.alerts.available.title')}</Alert.Title
+        >
+        <Alert.Description>
+          <p>
+            {i18n.t('account.tabs.general.changeUsername.alerts.available.description', {
+              username: $usernameFormData.username,
+            })}
+          </p>
+        </Alert.Description>
+      </Alert.Root>
+    {:else}
+      <Alert.Root variant="destructive">
+        <AlertCircle />
+        <Alert.Title>{i18n.t('account.tabs.general.changeUsername.alerts.taken.title')}</Alert.Title
+        >
+        <Alert.Description>
+          <p>
+            {i18n.t('account.tabs.general.changeUsername.alerts.taken.description', {
+              username: $usernameFormData.username,
+            })}
+          </p>
+        </Alert.Description>
+      </Alert.Root>
     {/if}
+  {/if}
 
-    <Button
-      type="submit"
-      disabled={checkUsernameStatusData.loading ||
-        formValues.username === initialFormValues.username}
-      loading={checkUsernameStatusData.loading}
-    >
-      {i18n.t('account.settings.tabs.general.changeUsername.title')}
-    </Button>
-  </form>
-
-  <form
-    action="?/updateEmail"
-    class="space-y-4"
-    method="POST"
-    use:enhance={() => {
-      updateEmailLoading = true;
-      return async ({ update }) => {
-        update({ reset: false });
-        updateEmailLoading = false;
-      };
-    }}
+  <Button
+    type="submit"
+    disabled={$usernameSubmitting || $usernameFormData.username === initialFormValues.username}
+    loading={$usernameSubmitting}
   >
-    <div class="space-y-2">
-      <Label for="email">{i18n.t('auth.email')}</Label>
-      <Input name="email" bind:value={formValues.email} type="email" />
-    </div>
+    {i18n.t('account.tabs.general.changeUsername.title')}
+  </Button>
+</form>
 
-    <Button
-      type="submit"
-      disabled={updateEmailLoading || formValues.email === initialFormValues.email}
-      loading={updateEmailLoading}
-    >
-      {i18n.t('account.settings.tabs.general.changeEmail.title')}
-    </Button>
-  </form>
-</div>
+<form action="?/updateEmail" class="space-y-4" method="POST" use:emailEnhance>
+  <Form.Field form={emailForm} name="email">
+    <Form.Control>
+      {#snippet children({ props })}
+        <Form.Label>{i18n.t('auth.email')}</Form.Label>
+        <Input {...props} bind:value={$emailFormData.email} />
+      {/snippet}
+    </Form.Control>
+    <Form.FieldErrors />
+  </Form.Field>
+
+  <Button
+    type="submit"
+    disabled={$emailSubmitting || $emailFormData.email === initialFormValues.email}
+    loading={$emailSubmitting}
+  >
+    {i18n.t('account.tabs.general.changeEmail.title')}
+  </Button>
+</form>
 
 <form
   action="?/updateProfilePicture"
   enctype="multipart/form-data"
   class="space-y-4"
   method="POST"
-  use:enhance={() => {
-    isUpdatingProfilePicture = true;
-    return async ({ update }) => {
-      update({ reset: false });
-      isUpdatingProfilePicture = false;
-    };
-  }}
+  use:profilePictureEnhance
 >
-  <Label>{i18n.t('account.settings.tabs.general.profilePicture')}</Label>
-  <label
-    for="updateProfilePictureInput"
-    class="size-20 block rounded-[42%] overflow-hidden relative"
-  >
-    <ProfilePicture userId={page.data.user.id} class="size-full" />
-    <input
-      type="file"
-      name="updateProfilePictureInput"
-      id="updateProfilePictureInput"
-      class="hidden"
-      accept="image/*"
-      onchange={(e) => {
-        (e.target as HTMLInputElement).closest('form')?.submit();
-      }}
-    />
-    <div class="absolute bg-background/50 inset-0 flex flex-col items-center justify-center">
-      <Upload class="size-6" />
-    </div>
-  </label>
+  <Label>{i18n.t('account.tabs.general.profilePicture')}</Label>
+  <Form.Field form={profilePictureForm} name="profilePicture">
+    <Form.Control>
+      {#snippet children({ props })}
+        <Form.Label class="size-20 block">
+          <ProfilePicture userId={page.data.user.id} class="size-full" />
+          <Input
+            {...props}
+            type="file"
+            accept="image/*"
+            onchange={(e) => {
+              (e.target as HTMLInputElement).closest('form')?.submit();
+            }}
+            class="hidden"
+            bind:value={$profilePictureFormData.profilePicture}
+          />
+        </Form.Label>
+      {/snippet}
+    </Form.Control>
+    <Form.FieldErrors />
+  </Form.Field>
 </form>
 
 <Separator />

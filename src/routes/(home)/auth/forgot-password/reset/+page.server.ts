@@ -17,7 +17,12 @@ export const load = (async ({ url }) => {
 
     const email = await Caching.get<string>(`passwordReset:${token}`);
     if (!email) throw new Error('errors.auth.passwordReset.expiredToken');
-    return { token, form: await superValidate(zod4(formSchema)) };
+    return {
+      token,
+      form: await superValidate(zod4(formSchema), {
+        defaults: { token },
+      }),
+    };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     logger.error(message);
