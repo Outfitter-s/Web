@@ -56,9 +56,7 @@
   </div>
 {/snippet}
 
-<nav
-  class="fixed right-0 bottom-0 left-0 z-10 h-14 shrink-0 border-border bg-card grid w-full border-t px-2"
->
+<nav class="sticky right-0 bottom-0 left-0 z-10 h-14 shrink-0 grid w-fullpx-2">
   <div
     class="max-w-250 grid w-full justify-center items-center gap-2 mx-auto"
     style="grid-template-columns: repeat({links.length}, 1fr);"

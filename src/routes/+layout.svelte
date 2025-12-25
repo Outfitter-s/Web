@@ -22,8 +22,8 @@
 <!-- The API is restricted to authenticated users so there is not issue -->
 <AddItem />
 
-<div class="flex min-h-dvh flex-col pb-14">
-  <div class="flex grow flex-col">
+<div class="flex h-dvh flex-col overflow-hidden bg-card p-2 pb-0">
+  <div class="flex grow rounded-xl flex-col overflow-y-auto bg-background no-scrollbar">
     <svelte:boundary>{@render children()}</svelte:boundary>
   </div>
   <Navbar />
