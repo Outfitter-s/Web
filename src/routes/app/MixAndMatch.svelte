@@ -2,13 +2,13 @@
   import { page } from '$app/state';
   import { Button } from '$lib/components/ui/button';
   import { OutfitItemCard } from '$lib/components/wardrobe';
+  import Globals from '$lib/globals.svelte';
   import i18n from '$lib/i18n';
   import { type ClothingItem, clothingItemTypes, type SwiperCard } from '$lib/types';
   import { hashStringToNumber } from '$lib/utils';
   import { ChevronRight } from '@lucide/svelte';
-  import { backInOut } from 'svelte/easing';
+  import { onDestroy, onMount } from 'svelte';
   import { SvelteSet } from 'svelte/reactivity';
-  import { fly } from 'svelte/transition';
 
   interface Props {
     onSwiped: (card: SwiperCard, accepted: boolean) => void;
@@ -40,23 +40,37 @@
     };
     onSwiped(card, true);
   }
+
+  onMount(() => {
+    Globals.navComponentReplacement = createButton;
+  });
+
+  onDestroy(() => {
+    Globals.navComponentReplacement = null;
+  });
 </script>
 
-{#if selectedItems.size > 0}
+{#snippet createButton()}
   <div
-    class="fixed z-10 bottom-16 right-2"
-    transition:fly={{ x: '100%', duration: 400, easing: backInOut }}
+    class="flex flex-row pl-4 h-full items-center justify-between gap-2 w-full text-background dark:text-foreground"
   >
-    <Button class="gap-2 shadow-md" variant="default" onclick={onCreate}>
+    <p class="text-base font-medium font-mono">
       {i18n.t('wardrobe.outfitGeneration.mixAndMatch.createButton')}
+    </p>
+    <Button
+      disabled={selectedItems.size === 0}
+      class="aspect-square w-auto h-full dark:bg-primary bg-background rounded-full text-foreground dark:text-background"
+      variant="default"
+      onclick={onCreate}
+    >
       <ChevronRight class="size-4" />
     </Button>
   </div>
-{/if}
+{/snippet}
 
 <div
   class="grid gap-x-6 gap-y-4 p-4"
-  style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));"
+  style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));"
 >
   {#each items as item (item.id)}
     {@const selected = selectedItems.has(item.id)}

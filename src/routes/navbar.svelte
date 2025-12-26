@@ -4,14 +4,20 @@
   import i18n from '$lib/i18n';
   import { House, Plus, Rss, Shirt, User } from '@lucide/svelte';
   import { itemOpen } from '$lib/components/routes/app/nav';
-  import { slide } from 'svelte/transition';
   import type { Component } from 'svelte';
-  import { DateUtils } from '$lib/utils';
+  import { cn, DateUtils } from '$lib/utils';
   import type { Outfit } from '$lib/types';
+  import { fly } from 'svelte/transition';
+  import { backInOut } from 'svelte/easing';
+  import Globals from '$lib/globals.svelte';
+  import { afterNavigate } from '$app/navigation';
 
   interface Link {
-    href: string;
+    id: string;
+    href?: string;
+    onClick?: () => void;
     text: string;
+    routes?: string[];
     icon?: Component;
     alert?: () => boolean;
   }
@@ -22,7 +28,9 @@
       ? [
           {
             href: '/app',
+            id: 'app',
             text: i18n.t('nav.home'),
+            routes: ['/app'],
             icon: House,
             alert: () => {
               if (!user) return false;
@@ -33,66 +41,132 @@
               return !hasTodayOutfit;
             },
           },
-          { href: '/app/feed', text: i18n.t('nav.feed'), icon: Rss },
-          { href: 'add-item', text: i18n.t('nav.outfits') },
-          { href: '/app/wardrobe', text: i18n.t('nav.wardrobe'), icon: Shirt },
-          { href: '/app/account', text: i18n.t('nav.account'), icon: User },
+          {
+            id: 'feed',
+            href: '/app/feed',
+            routes: ['/app/feed*', '/app/[username]'],
+            text: i18n.t('nav.feed'),
+            icon: Rss,
+          },
+          {
+            id: 'add-item',
+            text: i18n.t('nav.outfits'),
+            icon: Plus,
+            onClick: () => ($itemOpen = !$itemOpen),
+          },
+          {
+            id: 'wardrobe',
+            href: '/app/wardrobe',
+            routes: ['/app/wardrobe*'],
+            text: i18n.t('nav.wardrobe'),
+            icon: Shirt,
+          },
+          {
+            id: 'account',
+            href: '/app/account',
+            routes: ['/app/account*'],
+            text: i18n.t('nav.account'),
+            icon: User,
+          },
         ]
       : [
-          { href: '/', text: i18n.t('nav.home') },
-          { href: '/#about', text: i18n.t('nav.about') },
-          { href: '/auth/sign-up', text: i18n.t('nav.signUp') },
-          { href: '/auth/log-in', text: i18n.t('nav.logIn') },
+          { id: 'home', routes: ['/'], href: '/', text: i18n.t('nav.home') },
+          { id: 'about', routes: ['/#about'], href: '/#about', text: i18n.t('nav.about') },
+          {
+            id: 'sign-up',
+            routes: ['/auth/sign-up'],
+            href: '/auth/sign-up',
+            text: i18n.t('nav.signUp'),
+          },
+          {
+            id: 'log-in',
+            routes: ['/auth/log-in'],
+            href: '/auth/log-in',
+            text: i18n.t('nav.logIn'),
+          },
         ]),
   ]);
+
+  const removeLayoutsInRoute = (route: string) => {
+    if (!route) return '/';
+    // Remove anything in parentheses between slashes
+    const reg = new RegExp('/\\([^/]+\\)', 'g');
+    const cleaned = route.replace(reg, '');
+    // If result is empty or just '/', return '/'
+    return cleaned === '' ? '/' : cleaned;
+  };
+
+  const routeMatches = (routes: string[] | undefined, activeRoute: string) => {
+    if (!routes) return false;
+    return routes.some((route) => {
+      if (route.endsWith('*')) {
+        const baseRoute = route.slice(0, -1);
+        return activeRoute.startsWith(baseRoute);
+      }
+      return activeRoute === route;
+    });
+  };
+
+  let activeRoute = $derived<string>(
+    removeLayoutsInRoute(page.route.id ?? '/') + (page.url.hash || '')
+  );
 </script>
 
 {#snippet alertDot()}
-  <div class="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 size-2">
-    <div class="size-full relativ">
-      <div class="absolute inset-0 bg-destructive rounded-full animate-ping"></div>
-      <div class="absolute inset-0 bg-destructive rounded-full"></div>
-    </div>
+  <div class="absolute top-0 right-0 -translate-x-full translate-y-full size-2">
+    <div class="absolute inset-0 bg-destructive rounded-full animate-ping"></div>
+    <div class="absolute inset-0 bg-destructive rounded-full"></div>
   </div>
 {/snippet}
 
-<nav
-  class="fixed right-0 bottom-0 left-0 z-10 h-14 shrink-0 border-border bg-card grid w-full border-t px-2"
->
-  <div
-    class="max-w-250 grid w-full justify-center items-center gap-2 mx-auto"
-    style="grid-template-columns: repeat({links.length}, 1fr);"
-  >
-    {#each links as link (link.href)}
-      {#if link.href == 'add-item'}
-        <Button
-          variant="none"
-          onclick={() => ($itemOpen = !$itemOpen)}
-          class=" border-border bg-card z-10 mx-auto -translate-y-5 size-14 rounded-full border p-2 shadow-xl"
-        >
-          <Plus class="size-full" />
-        </Button>
-      {:else}
-        <Button
-          variant="none"
-          href={link.href}
-          class="dark:before:bg-accent before:bg-border px-4 font-mono before:absolute before:inset-0 before:z-0 before:scale-0 before:rounded-xs before:transition-all hover:before:scale-100 active:before:scale-100"
-        >
-          <div class="relative">
-            {#if link.icon}
-              <!-- svelte-ignore svelte_component_deprecated -->
-              <svelte:component this={link.icon} class="z-10 size-5" />
-            {:else}
-              <span class="z-10 ltr:ml-2 rtl:mr-2" transition:slide={{ duration: 300, axis: 'x' }}
-                >{@html link.text}</span
-              >
-            {/if}
-            {#if link?.alert && link.alert()}
-              {@render alertDot()}
-            {/if}
+<div class="fixed right-0 bottom-0 left-0 p-4 z-10 w-full overflow-hidden">
+  {#if Globals.nav.shown || Globals.navComponentReplacement}
+    <nav class="pt-0 w-full" transition:fly={{ y: 100, duration: 500, easing: backInOut }}>
+      <div
+        class="max-w-250 overflow-hidden h-16 rounded-full p-2 bg-foreground dark:bg-secondary w-full mx-auto"
+      >
+        {#if Globals.navComponentReplacement}
+          <div
+            class="w-full h-full"
+            in:fly={{ duration: 300, y: '100%' }}
+            out:fly={{ duration: 300, y: '-100%' }}
+          >
+            {@render Globals.navComponentReplacement()}
           </div>
-        </Button>
-      {/if}
-    {/each}
-  </div>
-</nav>
+        {:else}
+          <div
+            class="flex flex-row justify-between w-full h-full items-center gap-2"
+            in:fly={{ duration: 300, y: '100%' }}
+            out:fly={{ duration: 300, y: '-100%' }}
+          >
+            {#each links as link (link.id)}
+              {@const active = routeMatches(link.routes, activeRoute)}
+              <Button
+                variant="none"
+                href={link.href}
+                onclick={link.onClick}
+                class={cn(
+                  'before:rounded-full before:absolute before:transition-transform relative dark:before:bg-primary h-12 before:bg-background before:inset-0 font-mono items-center',
+                  user ? 'w-12 px-2' : ' px-4',
+                  active
+                    ? 'before:scale-100 text-primary dark:text-background'
+                    : 'before:scale-0 text-background dark:text-foreground'
+                )}
+              >
+                {#if link.icon}
+                  <!-- svelte-ignore svelte_component_deprecated -->
+                  <svelte:component this={link.icon} class="z-10 size-full" />
+                {:else}
+                  <span class="z-10">{@html link.text}</span>
+                {/if}
+                {#if link?.alert && link.alert()}
+                  {@render alertDot()}
+                {/if}
+              </Button>
+            {/each}
+          </div>
+        {/if}
+      </div>
+    </nav>
+  {/if}
+</div>

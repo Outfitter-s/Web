@@ -4,16 +4,27 @@
   import { Button } from '$lib/components/ui/button';
   import { Toaster } from '$lib/components/Toast/toast';
   import { CLOTHING_STYLES, OutfitPreviewZ, type SwiperCard, type Weather } from '$lib/types';
-  import { ArrowRight } from '@lucide/svelte';
+  import {
+    ArrowRight,
+    CloudRainWind,
+    Dices,
+    Glasses,
+    Snowflake,
+    Sparkles,
+    Sun,
+    ThermometerSnowflake,
+  } from '@lucide/svelte';
   import confetti from 'canvas-confetti';
   import z from 'zod';
   import i18n from '$lib/i18n';
   import { cn, hashStringToNumber, getWeather, logger } from '$lib/utils';
   import { fade } from 'svelte/transition';
-  import { onMount } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
   import { invalidateAll } from '$app/navigation';
   import MixAndMatch from './MixAndMatch.svelte';
-  import NavBack from '$lib/components/NavBack.svelte';
+  import Globals from '$lib/globals.svelte';
+  import { FormalIcon } from '$lib/components/domainIcons';
+  import Comfort from '$lib/components/domainIcons/Comfort.svelte';
 
   const cId = $props.id(); // Deterministic client ID for outfit generation
 
@@ -73,9 +84,23 @@
     weather: {
       options: Object.keys(weatherPresets),
       hint: wether ? getClosestWeatherPreset(wether) : null,
+      icons: {
+        sunny: Sun,
+        rainy: CloudRainWind,
+        cold: ThermometerSnowflake,
+        snowy: Snowflake,
+      },
     },
     style: {
       options: [...CLOTHING_STYLES],
+      icons: {
+        default: Dices,
+        comfort: Comfort,
+        new: Sparkles,
+        style: Glasses,
+        formal: FormalIcon,
+      },
+      hint: 'default',
     },
   });
   let multiStageAnswers = $state<{
@@ -211,6 +236,22 @@
   onMount(() => {
     initialWeatherFetch();
   });
+
+  $effect(() => {
+    Globals.navBack.backButton = {
+      shown: mixAndMatchOpen,
+      action: () => {
+        mixAndMatchOpen = false;
+      },
+    };
+  });
+
+  onDestroy(() => {
+    Globals.navBack.backButton = {
+      shown: false,
+      action: undefined,
+    };
+  });
 </script>
 
 <Dialog.Root bind:open={acceptedCard.open} dismissible={false}>
@@ -238,10 +279,6 @@
 </Dialog.Root>
 
 {#if mixAndMatchOpen}
-  <NavBack
-    title={i18n.t('wardrobe.outfitGeneration.mixAndMatch.title')}
-    onclick={() => (mixAndMatchOpen = false)}
-  />
   <MixAndMatch {onSwiped} />
 {:else}
   <!-- This markup is a mess of absolute elements over absolute elements -->
@@ -302,10 +339,27 @@
                 </h1>
                 <div class="grid gap-2 grid-cols-2 w-full">
                   {#each question.options as opt (opt)}
+                    {@const selected = 'hint' in question && question.hint === opt}
+                    {@const Icon =
+                      'icons' in question && question.icons[opt as keyof typeof question.icons]}
                     <Button
                       onclick={() => completeQuestion(id as keyof typeof multistageQuestions, opt)}
-                      variant={'hint' in question && question.hint === opt ? 'default' : 'outline'}
+                      variant="none"
+                      class={cn(
+                        'h-24 flex flex-col p-4 gap-2 rounded-xl',
+                        selected ? 'bg-primary text-background' : 'bg-card text-foreground'
+                      )}
                     >
+                      {#if Icon}
+                        <div
+                          class={cn(
+                            'size-10 p-2 rounded-full flex items-center text-primary bg-secondary justify-center',
+                            selected ? 'invert-100' : ''
+                          )}
+                        >
+                          <Icon class="size-full" />
+                        </div>
+                      {/if}
                       {i18n.t(
                         `wardrobe.outfitGeneration.initialQuestions.${id}.options.${opt}` as any
                       )}
@@ -316,9 +370,24 @@
             {/each}
           </div>
 
-          <div class="px-2 w-full">
-            <Button class="w-full" onclick={() => (mixAndMatchOpen = true)}>
-              {i18n.t('wardrobe.outfitGeneration.mixAndMatch.button')}
+          <div class="px-2 w-full relative rounded-full overflow-hidden">
+            <div class="absolute bg-primary size-2 top-2 right-20 rounded-full"></div>
+            <div class="absolute bg-primary size-2 bottom-2 left-20 rounded-full"></div>
+            <div class="absolute bg-primary size-2 top-4 left-1/2 rounded-full"></div>
+
+            <Button
+              class="w-full backdrop-blur-md h-14 relative rounded-full p-2 bg-secondary/50 flex flex-row items-center justify-center group ltr:pr-14 rtl:pl-14"
+              variant="none"
+              onclick={() => setTimeout(() => (mixAndMatchOpen = true), 350)}
+            >
+              <span>{i18n.t('wardrobe.outfitGeneration.mixAndMatch.button')}</span>
+              <div
+                class="bg-primary absolute top-2 bottom-2 ease-out right-2 duration-300 text-background shrink-0 rounded-full w-10 h-10 group-focus:w-[calc(100%-1rem)] transition-all p-2"
+              >
+                <ArrowRight
+                  class="size-full ease-back-in group-focus:-rotate-180 transition-all duration-300"
+                />
+              </div>
             </Button>
           </div>
         </div>

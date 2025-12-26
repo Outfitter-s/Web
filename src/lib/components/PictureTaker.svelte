@@ -24,7 +24,7 @@
   }
 
   let {
-    width = 320,
+    width = 512,
     height = 0,
     onPictureTaken,
     pictureTaken = $bindable(),
@@ -125,9 +125,7 @@
         return;
       }
       if (!takePictureStates.streaming) {
-        height =
-          takePictureStates.videoElement.videoHeight /
-          (takePictureStates.videoElement.videoWidth / width);
+        height = takePictureStates.videoElement.videoHeight * (4 / 3);
 
         takePictureStates.videoElement.setAttribute('width', width.toString());
         takePictureStates.videoElement.setAttribute('height', height.toString());
@@ -159,12 +157,30 @@
   </div>
 {/if}
 
-{#if !pictureTaken}
+<div class="relative mx-auto shrink-0 overflow-hidden rounded-md aspect-3/4 w-auto h-[50dvh]">
+  {#if pictureTaken}
+    <div class={cn('size-full', className?.container)}>
+      {#if spinner}
+        <div
+          class="bg-input/30 absolute inset-0 flex flex-col items-center justify-center backdrop-blur-xs"
+          transition:fade|local={{ duration: 200 }}
+        >
+          <Spinner class="size-6" />
+        </div>
+      {/if}
+      <img
+        src={pictureTaken}
+        alt=""
+        class={cn('size-full object-cover object-center', className?.image)}
+        transition:slide={{ axis: 'y', duration: 200 }}
+      />
+    </div>
+  {/if}
   <button
     type="button"
     onclick={openCamera}
     class={cn(
-      'border-muted hover:border-input hover:bg-input/30 relative flex min-h-25 grow cursor-pointer flex-col items-center justify-center gap-4 rounded-md border-2 border-dashed text-center text-sm transition-colors w-full',
+      'border-muted hover:border-input h-full absolute inset-0 z-10 hover:bg-input/30 flex grow cursor-pointer flex-col items-center justify-center gap-4 rounded-md border-2 border-dashed text-center text-sm transition-colors w-full',
       error ? 'border-destructive hover:border-destructive' : '',
       className?.container
     )}
@@ -177,26 +193,4 @@
   {#if error}
     <Field.Error>{i18n.t(error)}</Field.Error>
   {/if}
-{:else}
-  <div
-    class={cn(
-      'border-border relative mx-auto w-full shrink-0 overflow-hidden rounded border min-h-50 max-h-[50dvh] h-fit',
-      className?.container
-    )}
-  >
-    {#if spinner}
-      <div
-        class="bg-input/30 absolute inset-0 flex flex-col items-center justify-center backdrop-blur-xs"
-        transition:fade|local={{ duration: 200 }}
-      >
-        <Spinner class="size-6" />
-      </div>
-    {/if}
-    <img
-      src={pictureTaken}
-      alt=""
-      class={cn('w-full', className?.image)}
-      transition:slide={{ axis: 'y', duration: 200 }}
-    />
-  </div>
-{/if}
+</div>

@@ -144,8 +144,6 @@ export class i18n {
       return translation.replace(/\{{([a-zA-Z0-9]+)\}}/g, (_, index) =>
         String(params?.[index] || '')
       );
-    } else {
-      console.warn(`Translation for key "${key}" not found`);
     }
     return key;
   };

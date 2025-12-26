@@ -8,9 +8,7 @@
   }
 
   let { userId, class: className, ...restProps }: Props & SvelteHTMLElements['img'] = $props();
-  let classes = $derived(
-    cn('rounded-full size-6 bg-primary overflow-hidden border border-border', className)
-  );
+  let classes = $derived(cn('rounded-[42%] size-6 bg-primary overflow-hidden', className));
 </script>
 
 <img src="/assets/profile_pictures/{userId}.png" alt="" class={classes} {...restProps} />

@@ -80,7 +80,7 @@
 {#if !chosenOutfit}
   <Swiper />
 {:else}
-  <section class="relative max-w-250 mx-auto w-full flex h-full grow flex-col overflow-hidden">
+  <section class="relative flex h-full grow flex-col overflow-hidden">
     <Empty.Root>
       <Empty.Header>
         <Empty.Media variant="icon">

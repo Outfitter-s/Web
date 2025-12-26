@@ -4,6 +4,6 @@
   let { children }: LayoutProps = $props();
 </script>
 
-<div class="w-full p-4 md:p-8">
+<div class="max-w-250 w-full mx-auto grow flex flex-col">
   {@render children()}
 </div>

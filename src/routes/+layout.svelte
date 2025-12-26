@@ -3,13 +3,15 @@
   import { SEO, Toaster } from '$lib/components';
   import Navbar from './navbar.svelte';
   import Globals from '$lib/globals.svelte';
-  import { onMount } from 'svelte';
   import AddItem from '$lib/components/routes/app/nav/add_item.svelte';
+  import { page } from '$app/state';
+  import NavBack from '$lib/components/NavBack.svelte';
 
   let { children, data } = $props();
 
-  onMount(() => {
+  $effect(() => {
     Globals.theme = data.theme;
+    Globals.navBack.shown = page.url.pathname.startsWith('/app');
   });
 </script>
 
@@ -22,9 +24,10 @@
 <!-- The API is restricted to authenticated users so there is not issue -->
 <AddItem />
 
-<div class="flex min-h-dvh flex-col pb-14">
-  <div class="flex grow flex-col">
+<div class="flex min-h-dvh flex-col">
+  <NavBack />
+  <main class="flex grow flex-col w-full relative pb-24">
     <svelte:boundary>{@render children()}</svelte:boundary>
-  </div>
+  </main>
   <Navbar />
 </div>
