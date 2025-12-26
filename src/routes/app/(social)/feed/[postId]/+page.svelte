@@ -15,11 +15,8 @@
   import { Textarea } from '$lib/components/ui/textarea';
   import * as Dialog from '$lib/components/ui/dialog';
   import { enhance } from '$app/forms';
-<<<<<<< HEAD:src/routes/app/(social)/feed/[postId]/+page.svelte
   import Globals from '$lib/globals.svelte';
   import { onDestroy, onMount } from 'svelte';
-=======
->>>>>>> d2d4f79105fb867f741c2121e61c15dd2b4d1f90:src/routes/app/feed/[postId]/+page.svelte
   import * as Carousel from '$lib/components/ui/carousel';
   import type { CarouselAPI } from '$lib/components/ui/carousel/context';
 
