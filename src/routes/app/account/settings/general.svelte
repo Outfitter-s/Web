@@ -9,12 +9,10 @@
   import { Label } from '$lib/components/ui/label';
   import i18n from '$lib/i18n';
   import { logger } from '$lib/utils/logger';
-  import { AlertCircle, CheckCheck, LogOut, Monitor, Moon, Sun } from '@lucide/svelte';
+  import { AlertCircle, CheckCheck, Monitor, Moon, Sun } from '@lucide/svelte';
   import Theming, { availableModes, availableThemes, type Mode } from '$lib/theming/index.svelte';
   import { capitalize } from '$lib/utils';
-  import { Hr } from '$lib/components';
   import ProfilePicture from '$lib/components/social/ProfilePicture.svelte';
-  import { resolve } from '$app/paths';
 
   let currentTheme = $state(page.data.theme);
   let currentLocale = $state(i18n.locale);
@@ -104,11 +102,13 @@
       <Alert.Root variant="success">
         <AlertCircle />
         <Alert.Title
-          >{i18n.t('account.tabs.general.changeUsername.alerts.available.title')}</Alert.Title
+          >{i18n.t(
+            'account.settings.tabs.general.changeUsername.alerts.available.title'
+          )}</Alert.Title
         >
         <Alert.Description>
           <p>
-            {i18n.t('account.tabs.general.changeUsername.alerts.available.description', {
+            {i18n.t('account.settings.tabs.general.changeUsername.alerts.available.description', {
               username: formValues.username,
             })}
           </p>
@@ -117,11 +117,12 @@
     {:else}
       <Alert.Root variant="destructive">
         <CheckCheck />
-        <Alert.Title>{i18n.t('account.tabs.general.changeUsername.alerts.taken.title')}</Alert.Title
+        <Alert.Title
+          >{i18n.t('account.settings.tabs.general.changeUsername.alerts.taken.title')}</Alert.Title
         >
         <Alert.Description>
           <p>
-            {i18n.t('account.tabs.general.changeUsername.alerts.taken.description', {
+            {i18n.t('account.settings.tabs.general.changeUsername.alerts.taken.description', {
               username: formValues.username,
             })}
           </p>
@@ -135,7 +136,7 @@
     disabled={checkUsernameStatusData.loading || formValues.username === initialFormValues.username}
     loading={checkUsernameStatusData.loading}
   >
-    {i18n.t('account.tabs.general.changeUsername.title')}
+    {i18n.t('account.settings.tabs.general.changeUsername.title')}
   </Button>
 </form>
 
@@ -161,7 +162,7 @@
     disabled={updateEmailLoading || formValues.email === initialFormValues.email}
     loading={updateEmailLoading}
   >
-    {i18n.t('account.tabs.general.changeEmail.title')}
+    {i18n.t('account.settings.tabs.general.changeEmail.title')}
   </Button>
 </form>
 
@@ -178,7 +179,7 @@
     };
   }}
 >
-  <Label>{i18n.t('account.tabs.general.profilePicture')}</Label>
+  <Label>{i18n.t('account.settings.tabs.general.profilePicture')}</Label>
   <label for="updateProfilePictureInput" class="size-20 block">
     <ProfilePicture userId={page.data.user.id} class="size-full" />
     <input
@@ -196,7 +197,7 @@
 
 <div class="grid md:grid-cols-3 grid-cols-2 gap-4">
   <div class="flex flex-col gap-2">
-    <Label for="modeSelect">{i18n.t('account.tabs.general.theme.mode')}</Label>
+    <Label for="modeSelect">{i18n.t('account.settings.tabs.general.theme.mode')}</Label>
     <Select.Root
       type="single"
       name="modeSelect"
@@ -228,7 +229,7 @@
     </Select.Root>
   </div>
   <div class="flex flex-col gap-2">
-    <Label for="themeSelect">{i18n.t('account.tabs.general.theme.theme')}</Label>
+    <Label for="themeSelect">{i18n.t('account.settings.tabs.general.theme.theme')}</Label>
     <Select.Root
       type="single"
       name="themeSelect"
@@ -248,7 +249,7 @@
     </Select.Root>
   </div>
   <div class="flex flex-col gap-2">
-    <Label for="langSelect">{i18n.t('account.tabs.general.changeLang.title')}</Label>
+    <Label for="langSelect">{i18n.t('account.settings.tabs.general.changeLang.title')}</Label>
     <Select.Root
       type="single"
       name="langSelect"
@@ -267,13 +268,4 @@
       </Select.Content>
     </Select.Root>
   </div>
-</div>
-
-<Hr class={{ container: 'mb-0' }} text={i18n.t('account.tabs.general.danger.title')} />
-
-<div class="grid grid-cols-3 gap-4">
-  <Button variant="destructive" href={resolve('/auth/log-out')} class="gap-2">
-    <LogOut class="size-4" />
-    {i18n.t('account.tabs.general.logout')}
-  </Button>
 </div>

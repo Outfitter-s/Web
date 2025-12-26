@@ -52,7 +52,7 @@
 
 <div
   class={cn(
-    'relative flex flex-row overflow-hidden h-[calc(100svh-var(--spacing)*14)]',
+    'relative flex flex-row overflow-hidden h-screen',
     reverse && 'flex-row-reverse',
     className
   )}
@@ -67,7 +67,7 @@
     </div>
   {/if}
   {#if !isMobile.current}
-    <div class="flex h-full w-[650px] shrink-0 flex-col items-center justify-center p-18">
+    <div class="flex h-full w-165 shrink-0 flex-col items-center justify-center p-18">
       {@render children?.()}
     </div>
 

@@ -1,10 +1,11 @@
 <script lang="ts">
   import { page } from '$app/state';
+  import Globals from '$lib/globals.svelte';
   import i18n from '$lib/i18n';
 
   interface Props {
-    title: Parameters<typeof i18n.t>[0];
-    description?: Parameters<typeof i18n.t>[0];
+    title: Parameters<typeof i18n.t>[0] | string;
+    description?: Parameters<typeof i18n.t>[0] | string;
     image?: string;
   }
 
@@ -15,6 +16,9 @@
   }: Props = $props();
   let derivedTitle = $derived(i18n.t(title as any) + ' | ' + i18n.t('seo.titleSuffix'));
   let derivedDescription = $derived(i18n.t(description as any));
+  $effect(() => {
+    Globals.pageTitle = i18n.t(title as any);
+  });
 </script>
 
 <svelte:head>

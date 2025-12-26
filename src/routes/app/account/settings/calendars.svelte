@@ -67,7 +67,7 @@
         type="submit"
         loading={isDeletingRowId === row.id}
         disabled={!!isDeletingRowId}
-        aria-label={i18n.t('account.tabs.calendars.revokeButton')}
+        aria-label={i18n.t('account.settings.tabs.calendars.revokeButton')}
         class="p-2 shrink-0"
       >
         <Trash2 class="size-full" /></Button
@@ -89,6 +89,6 @@
   }}
 >
   <Button variant="default" loading={isCreatingToken} disabled={isCreatingToken} type="submit">
-    {i18n.t('account.tabs.calendars.createButton')}
+    {i18n.t('account.settings.tabs.calendars.createButton')}
   </Button>
 </form>

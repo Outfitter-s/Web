@@ -7,7 +7,7 @@
   import type { Publication } from '$lib/types';
   import { logger } from '$lib/utils';
   import { slide } from 'svelte/transition';
-  import { Spinner } from '$lib/components';
+  import { SEO, Spinner } from '$lib/components';
   import { onMount } from 'svelte';
 
   let posts = $state<Publication[]>([]);
@@ -17,8 +17,10 @@
   const POST_LIMIT = 20;
   let { data }: PageProps = $props();
   // svelte-ignore state_referenced_locally
-  let user = $state(data.user);
+  let user = $derived(data.user);
   let pageUser = $derived(data.pageUser);
+  // svelte-ignore state_referenced_locally
+  let lastPageUsername = $state(pageUser.username);
   let nbFollowers = $derived(data.nbFollowers);
   let isFollowingAction = $state(false);
   let youFollow = $derived(user.following.includes(pageUser.id));
@@ -100,9 +102,24 @@
   $effect(() => {
     getFeed();
   });
+
+  $effect(() => {
+    // Reset feed when pageUser changes
+    if (lastPageUsername === pageUser.username) return;
+    lastPageUsername = pageUser.username;
+    posts = [];
+    offset = 0;
+    noMorePosts = false;
+    getFeed();
+  });
 </script>
 
-<div class="mx-auto flex w-full max-w-250 flex-col gap-4 p-2 items-start">
+<SEO
+  title={i18n.t('seo.social.profile.title', { username: pageUser.username })}
+  description={i18n.t('seo.social.profile.description', { username: pageUser.username })}
+/>
+
+<section class="flex w-full flex-col gap-4 p-2 items-start">
   <div class="flex flex-row gap-6 items-center">
     <div class="rounded-full border-border border overflow-hidden size-24 bg-card">
       <ProfilePicture userId={pageUser.id} class="size-full" />
@@ -146,7 +163,7 @@
     </div>
   {/if}
 
-  <div class="w-full px-2 flex flex-col gap-12">
+  <div class="w-full flex flex-col gap-12">
     {#each posts as post (post.id)}
       <Post {post} />
     {/each}
@@ -164,4 +181,4 @@
   {#if noMorePosts}
     <p class="text-lg font-medium my-8 text-center w-full">{i18n.t('social.feed.noMorePosts')}</p>
   {/if}
-</div>
+</section>

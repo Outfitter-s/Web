@@ -3,7 +3,7 @@
   import { Calendar, Palette, Shirt, Pencil, Save, X, Trash2 } from '@lucide/svelte';
   import ColorDot from '$lib/components/colorDot.svelte';
   import { Button } from '$lib/components/ui/button';
-  import { NavBack, SEO } from '$lib/components';
+  import { SEO } from '$lib/components';
   import i18n from '$lib/i18n';
   import type { PageProps } from './$types';
   import * as Select from '$lib/components/ui/select';
@@ -17,6 +17,8 @@
   import { invalidateAll } from '$app/navigation';
   import * as Dialog from '$lib/components/ui/dialog';
   import { enhance } from '$app/forms';
+  import Globals from '$lib/globals.svelte';
+  import { onDestroy, onMount } from 'svelte';
 
   let { data, form }: PageProps = $props();
   let item = $derived(data.item);
@@ -32,6 +34,14 @@
       logger.error('Log in error:', form.message);
       Toaster.error(form.message as any);
     }
+  });
+
+  onMount(() => {
+    Globals.navBack.backButton.shown = true;
+  });
+
+  onDestroy(() => {
+    Globals.navBack.backButton.shown = false;
   });
 
   async function saveItemChanges() {
@@ -108,8 +118,7 @@
   </Dialog.Content>
 </Dialog.Root>
 
-<NavBack title="{item.name} - {i18n.t('seo.wardrobe.item.title')}" />
-<div class="lg:p-2 max-lg:pt-2 max-lg:p-4 lg:pl-4 mx-auto flex w-full max-w-300">
+<section class="lg:p-2 lg:pt-4 max-lg:p-4 lg:pl-4 flex w-full">
   <div class="bg-card w-full relative border-border flex flex-col rounded-lg border lg:flex-row">
     <!-- Image -->
     <div
@@ -281,4 +290,4 @@
       {/if}
     </div>
   </div>
-</div>
+</section>

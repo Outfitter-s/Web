@@ -1,67 +1,42 @@
 <script lang="ts">
-  import * as Tabs from '$lib/components/ui/tabs';
-  import * as Card from '$lib/components/ui/card';
-  import Totp from './totp.svelte';
   import i18n from '$lib/i18n';
   import { SEO } from '$lib/components';
-  import Password from './password.svelte';
-  import General from './general.svelte';
-  import Passkey from './passkey.svelte';
-  import Calendars from './calendars.svelte';
+  import { resolve } from '$app/paths';
+  import { Scale, Settings } from '@lucide/svelte';
+  import { ProfilePicture } from '$lib/components/social';
+  import { page } from '$app/state';
 
-  let entries = $derived([
+  const sections = [
     {
-      name: 'General',
-      component: General,
-      title: i18n.t('account.tabs.general.title'),
-      description: i18n.t('account.tabs.general.description'),
+      title: i18n.t('account.tabs.settings'),
+      href: resolve('/app/account/settings'),
+      icon: Settings,
     },
     {
-      name: 'Password',
-      component: Password,
-      title: i18n.t('account.tabs.password.title'),
-      description: i18n.t('account.tabs.password.description'),
+      title: i18n.t('account.tabs.legal'),
+      href: resolve('/legal/privacy-policy'),
+      icon: Scale,
     },
-    {
-      name: 'Calendars',
-      component: Calendars,
-      title: i18n.t('account.tabs.calendars.title'),
-      description: i18n.t('account.tabs.calendars.description'),
-    },
-    {
-      name: 'TOTP',
-      component: Totp,
-      title: i18n.t('account.tabs.TOTP.title'),
-      description: i18n.t('account.tabs.TOTP.description'),
-    },
-    {
-      name: 'Passkey',
-      component: Passkey,
-      title: i18n.t('account.tabs.passkey.title'),
-      description: i18n.t('account.tabs.passkey.description'),
-    },
-  ]);
+  ];
 </script>
 
-<SEO title={'seo.account.settings.title'} description="seo.account.settings.description" />
+<SEO title={'seo.account.title'} description="seo.account.description" />
 
-<Tabs.Root value={entries[0].name} class="mx-auto flex w-full max-w-250 flex-col gap-4 p-2">
-  <Tabs.List class="mx-auto">
-    {#each entries as e (e.name)}
-      <Tabs.Trigger value={e.name}>{e.title}</Tabs.Trigger>
-    {/each}
-  </Tabs.List>
-  {#each entries as e (e.name)}
-    <Tabs.Content value={e.name}>
-      <Card.Root>
-        <Card.Header>
-          <Card.Title>{e.title}</Card.Title>
-          <Card.Description>{e.description}</Card.Description>
-        </Card.Header>
-        <Card.Content class="grid gap-6">
-          <e.component />
-        </Card.Content>
-      </Card.Root>
-    </Tabs.Content>
+<div class="mx-auto text-center flex flex-col gap-6 p-12">
+  <ProfilePicture userId={page.data.user.id} class="size-32" />
+  <h1 class="font-mono text-3xl font-semibold">{page.data.user.username}</h1>
+  <p class="text-muted-foreground text-sm">{page.data.user.email}</p>
+</div>
+
+<div class="grid grid-cols-2 p-4 gap-4">
+  {#each sections as { href, title, icon: Icon } (href)}
+    <a {href} class="bg-card rounded-xl p-6 flex flex-col gap-2">
+      <div
+        class="size-10 p-2 rounded-full flex items-center text-primary bg-secondary justify-center"
+      >
+        <Icon class="size-full" />
+      </div>
+      <span class="font-mono text-lg">{title}</span>
+    </a>
   {/each}
-</Tabs.Root>
+</div>

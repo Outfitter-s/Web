@@ -29,14 +29,14 @@
     <button
       onclick={() => changeSection('items')}
       class={cn(
-        'border-border bg-card rounded-lg border px-4 py-1 font-mono transition-all',
+        'bg-card rounded-full px-4 py-1 font-mono transition-all',
         activeSection === 'items' && 'bg-primary text-primary-foreground border-primary'
       )}>{i18n.t('wardrobe.itemList.items.title')}</button
     >
     <button
       onclick={() => changeSection('outfits')}
       class={cn(
-        'border-border bg-card rounded-lg border px-4 py-1 font-mono transition-all',
+        'bg-card rounded-full px-4 py-1 font-mono transition-all',
         activeSection === 'outfits' && 'bg-primary text-primary-foreground border-primary'
       )}>{i18n.t('wardrobe.itemList.outfits.title')}</button
     >
@@ -48,7 +48,7 @@
       {#if page.data.items.length > 0}
         <div
           class="grid gap-x-6 gap-y-4 p-4"
-          style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"
+          style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));"
         >
           {#each page.data.items as item (item.id)}
             <OutfitItemCard
@@ -80,7 +80,7 @@
       {#if page.data.outfits.length > 0}
         <div
           class="grid gap-8 p-2 h-full grow overflow-hidden"
-          style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));"
+          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));"
         >
           {#each page.data.outfits as outfit (outfit.id)}
             <OutfitCard
