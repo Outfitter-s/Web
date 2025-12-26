@@ -7,7 +7,7 @@
   import type { Publication } from '$lib/types';
   import { logger } from '$lib/utils';
   import { slide } from 'svelte/transition';
-  import { Spinner } from '$lib/components';
+  import { SEO, Spinner } from '$lib/components';
   import { onMount } from 'svelte';
 
   let posts = $state<Publication[]>([]);
@@ -17,8 +17,10 @@
   const POST_LIMIT = 20;
   let { data }: PageProps = $props();
   // svelte-ignore state_referenced_locally
-  let user = $state(data.user);
+  let user = $derived(data.user);
   let pageUser = $derived(data.pageUser);
+  // svelte-ignore state_referenced_locally
+  let lastPageUsername = $state(pageUser.username);
   let nbFollowers = $derived(data.nbFollowers);
   let isFollowingAction = $state(false);
   let youFollow = $derived(user.following.includes(pageUser.id));
@@ -100,7 +102,22 @@
   $effect(() => {
     getFeed();
   });
+
+  $effect(() => {
+    // Reset feed when pageUser changes
+    if (lastPageUsername === pageUser.username) return;
+    lastPageUsername = pageUser.username;
+    posts = [];
+    offset = 0;
+    noMorePosts = false;
+    getFeed();
+  });
 </script>
+
+<SEO
+  title={i18n.t('seo.social.profile.title', { username: pageUser.username })}
+  description={i18n.t('seo.social.profile.description', { username: pageUser.username })}
+/>
 
 <section class="flex w-full flex-col gap-4 p-2 items-start">
   <div class="flex flex-row gap-6 items-center">

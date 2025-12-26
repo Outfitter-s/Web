@@ -44,7 +44,7 @@
           {
             id: 'feed',
             href: '/app/feed',
-            routes: ['/app/feed*', '/app/@*'],
+            routes: ['/app/feed*', '/app/[username]'],
             text: i18n.t('nav.feed'),
             icon: Rss,
           },
@@ -119,7 +119,7 @@
   </div>
 {/snippet}
 
-<div class="sticky right-0 bottom-0 left-0 p-4 z-10 w-full overflow-hidden">
+<div class="fixed right-0 bottom-0 left-0 p-4 z-10 w-full overflow-hidden">
   {#if Globals.nav.shown || Globals.navComponentReplacement}
     <nav class="pt-0 w-full" transition:fly={{ y: 100, duration: 500, easing: backInOut }}>
       <div

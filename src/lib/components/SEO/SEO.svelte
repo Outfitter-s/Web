@@ -4,8 +4,8 @@
   import i18n from '$lib/i18n';
 
   interface Props {
-    title: Parameters<typeof i18n.t>[0];
-    description?: Parameters<typeof i18n.t>[0];
+    title: Parameters<typeof i18n.t>[0] | string;
+    description?: Parameters<typeof i18n.t>[0] | string;
     image?: string;
   }
 

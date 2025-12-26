@@ -25,7 +25,7 @@
 {#snippet content()}
   <div
     class={cn(
-      '-ml-2 bg-primary -mt-2 -mr-2 inline-block aspect-9/12 rounded-lg border border-border overflow-hidden',
+      '-ml-2 bg-primary -mt-2 -mr-2 inline-block aspect-3/4 rounded-lg border border-border overflow-hidden',
       className?.image
     )}
   >

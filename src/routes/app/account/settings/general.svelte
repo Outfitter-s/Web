@@ -9,12 +9,10 @@
   import { Label } from '$lib/components/ui/label';
   import i18n from '$lib/i18n';
   import { logger } from '$lib/utils/logger';
-  import { AlertCircle, CheckCheck, LogOut, Monitor, Moon, Sun } from '@lucide/svelte';
+  import { AlertCircle, CheckCheck, Monitor, Moon, Sun } from '@lucide/svelte';
   import Theming, { availableModes, availableThemes, type Mode } from '$lib/theming/index.svelte';
   import { capitalize } from '$lib/utils';
-  import { Hr } from '$lib/components';
   import ProfilePicture from '$lib/components/social/ProfilePicture.svelte';
-  import { resolve } from '$app/paths';
 
   let currentTheme = $state(page.data.theme);
   let currentLocale = $state(i18n.locale);
@@ -270,13 +268,4 @@
       </Select.Content>
     </Select.Root>
   </div>
-</div>
-
-<Hr class={{ container: 'mb-0' }} text={i18n.t('account.settings.tabs.general.danger.title')} />
-
-<div class="grid grid-cols-3 gap-4">
-  <Button variant="destructive" href={resolve('/auth/log-out')} class="gap-2">
-    <LogOut class="size-4" />
-    {i18n.t('account.settings.tabs.general.logout')}
-  </Button>
 </div>

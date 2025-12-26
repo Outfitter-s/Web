@@ -92,17 +92,15 @@ export class ImageProcessor {
     imageBuffer: ArrayBuffer,
     {
       width = 512,
-      height = undefined,
-      aspectRatio = 9 / 12,
+      aspectRatio = 3 / 4,
     }: { width?: number; height?: number; aspectRatio?: number } = {}
   ): Promise<Buffer> {
-    if (height === null) {
-      height = Math.floor(width / aspectRatio);
-    }
-    const image = await sharp(imageBuffer)
-      .png()
-      .resize(width, height, { fit: 'inside' })
-      .toBuffer();
-    return image;
+    const image = sharp(imageBuffer);
+    // If the image is smaller than the target size, just apply the aspect ratio, trimming as needed
+    const metadata = await image.metadata();
+    width = Math.min(width, metadata.width || width);
+    const height = Math.round(width / aspectRatio);
+    // Always resize and crop to the target aspect ratio and width
+    return image.resize(width, height, { fit: 'cover', position: 'centre' }).png().toBuffer();
   }
 }

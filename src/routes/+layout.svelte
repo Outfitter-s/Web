@@ -26,7 +26,7 @@
 
 <div class="flex min-h-dvh flex-col">
   <NavBack />
-  <main class="flex grow flex-col w-full relative">
+  <main class="flex grow flex-col w-full relative pb-24">
     <svelte:boundary>{@render children()}</svelte:boundary>
   </main>
   <Navbar />

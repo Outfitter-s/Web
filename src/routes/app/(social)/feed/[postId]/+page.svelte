@@ -141,15 +141,13 @@
       <!-- svelte-ignore a11y_missing_attribute -->
       <img
         src={post.imageUrl}
-        class="size-full object-center object-cover aspect-9/12"
+        class="size-full object-center object-cover aspect-3/4"
         onerror={onPostImageError}
       />
       {#if hasUserPostedToday}
         <Reaction bind:post class="absolute bottom-2 right-2 z-10" />
       {:else}
-        <div
-          class="absolute rounded-lg p-4 backdrop-blur-md inset-0 flex flex-col items-center justify-center"
-        >
+        <div class="absolute p-4 inset-0 flex flex-col items-center justify-center">
           <p class="text-xl text-center text-background font-bold w-fit">
             {i18n.t('social.post.blurred')}
           </p>

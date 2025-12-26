@@ -21,7 +21,6 @@
   let { open = $bindable(false) }: Props = $props();
 
   let loading = $state(false);
-  let processingImage = $state(false);
   let hasOutfitForToday = $derived(
     ((page.data.outfits as Outfit[]) || []).find((o) => DateUtils.isToday(o.createdAt)) != null
   );
@@ -83,7 +82,6 @@
       todaysOutfit: true,
     };
     takenPicture = null;
-    processingImage = false;
     loading = false;
   }
 </script>

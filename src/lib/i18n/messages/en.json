@@ -71,6 +71,10 @@
       "post": {
         "title": "Post",
         "description": "View a stylish outfit or clothing item shared by a user in the Outfitter community feed."
+      },
+      "profile": {
+        "title": "{{username}}'s Profile",
+        "description": "Explore {{username}}'s profile on Outfitter to see their wardrobe, stylish outfits, and clothing items."
       }
     }
   },

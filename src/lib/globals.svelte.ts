@@ -1,4 +1,4 @@
-import type { Snippet } from 'svelte';
+import type { Component, Snippet } from 'svelte';
 import type { EffectiveMode, Mode, Theme } from './theming/index.svelte';
 
 class GlobalsClass {
@@ -15,10 +15,11 @@ class GlobalsClass {
   navBack = $state<{
     shown: boolean;
     backButton: { shown: boolean; action?: () => void };
-    trailing?: Snippet<[{ heightPercent: number }]>;
+    trailing: { icon: Component; href?: string; onclick?: () => void }[];
   }>({
     shown: true,
     backButton: { shown: false },
+    trailing: [],
   });
   pageTitle = $state<string>('');
 }
