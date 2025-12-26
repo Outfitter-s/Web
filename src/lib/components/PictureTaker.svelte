@@ -159,24 +159,29 @@
   </div>
 {/if}
 
-<div class="relative mx-auto shrink-0 overflow-hidden rounded-md aspect-3/4 w-auto h-[50dvh]">
+<div
+  class={cn(
+    'relative mx-auto shrink-0 overflow-hidden rounded-md aspect-3/4 w-auto h-[50dvh]',
+    className?.container
+  )}
+>
   {#if pictureTaken}
-    <div class={cn('size-full', className?.container)}>
-      {#if spinner}
-        <div
-          class="bg-input/30 absolute inset-0 flex flex-col items-center justify-center backdrop-blur-xs"
-          transition:fade|local={{ duration: 200 }}
-        >
-          <Spinner class="size-6" />
-        </div>
-      {/if}
+    {#if spinner}
+      <div
+        class="bg-input/30 absolute inset-0 flex flex-col items-center justify-center backdrop-blur-xs"
+        transition:fade|local={{ duration: 200 }}
+      >
+        <Spinner class="size-6" />
+      </div>
+    {/if}
+    {#if showPreview}
       <img
         src={pictureTaken}
         alt=""
         class={cn('size-full object-cover object-center', className?.image)}
         transition:slide={{ axis: 'y', duration: 200 }}
       />
-    </div>
+    {/if}
   {/if}
   <button
     type="button"

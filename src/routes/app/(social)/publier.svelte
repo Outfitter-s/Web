@@ -9,7 +9,7 @@
   import Textarea from '$lib/components/ui/textarea/textarea.svelte';
   import { Switch } from '$lib/components/ui/switch';
   import { Label } from '$lib/components/ui/label';
-  import type { Outfit } from '$lib/types';
+  import { PublicationImagesLengths, type Outfit } from '$lib/types';
   import { DateUtils } from '$lib/utils';
   import { page } from '$app/state';
   import PictureTaker from '$lib/components/PictureTaker.svelte';
@@ -94,22 +94,26 @@
     <form onsubmit={submitHandler} class="mt-6 flex flex-col gap-4">
       <div
         class="grid gap-6"
-        style="grid-template-columns: repeat({Math.min(3, takenPictures.length + 1)}, 1fr);"
+        style="grid-template-columns: repeat({Math.min(3, takenPictures.length)}, 1fr);"
       >
         {#each takenPictures as picture}
           <!-- svelte-ignore a11y_missing_attribute -->
           <img
             src={picture}
-            class="border-border relative w-full shrink-0 overflow-hidden rounded border min-h-50 max-h-[50dvh] h-fit"
+            class="border-border aspect-3/4 relative w-max mx-auto shrink-0 overflow-hidden max-h-[20dvh] rounded-lg border h-fit"
           />
         {/each}
+      </div>
+      {#if takenPictures.length < PublicationImagesLengths.max}
         <PictureTaker
           showPreview={false}
+          class={{ container: 'w-full h-24 aspect-auto' }}
           onPictureTaken={(file) => {
             takenPictures.push(file);
+            takenPictures.slice(0, PublicationImagesLengths.max - 1);
           }}
         />
-      </div>
+      {/if}
 
       <Field.Field>
         <Field.Label for="description"
