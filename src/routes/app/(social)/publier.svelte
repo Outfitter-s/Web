@@ -9,7 +9,7 @@
   import Textarea from '$lib/components/ui/textarea/textarea.svelte';
   import { Switch } from '$lib/components/ui/switch';
   import { Label } from '$lib/components/ui/label';
-  import type { Outfit } from '$lib/types';
+  import { PublicationImagesLengths, type Outfit } from '$lib/types';
   import { DateUtils } from '$lib/utils';
   import { page } from '$app/state';
   import PictureTaker from '$lib/components/PictureTaker.svelte';
@@ -24,7 +24,7 @@
   let hasOutfitForToday = $derived(
     ((page.data.outfits as Outfit[]) || []).find((o) => DateUtils.isToday(o.createdAt)) != null
   );
-  let takenPicture = $state<string | null>(null);
+  let takenPictures = $state<string[]>([]);
 
   $effect(() => {
     if (!open) {
@@ -46,11 +46,11 @@
     if (loading) return;
     loading = true;
     const formData = new FormData(event.target as HTMLFormElement);
-    if (takenPicture) {
-      const response = await fetch(takenPicture);
+    for (const picture of takenPictures) {
+      const response = await fetch(picture);
       const blob = await response.blob();
       const file = new File([blob], 'image.png', { type: blob.type });
-      formData.append('image', file);
+      formData.append('images[]', file);
     }
     const res = await fetch('/api/social/publication', {
       method: 'POST',
@@ -81,7 +81,7 @@
       description: '',
       todaysOutfit: true,
     };
-    takenPicture = null;
+    takenPictures = [];
     loading = false;
   }
 </script>
@@ -92,11 +92,32 @@
       <Dialog.Title>{i18n.t('social.feed.addPublication.title')}</Dialog.Title>
     </Dialog.Header>
     <form onsubmit={submitHandler} class="mt-6 flex flex-col gap-4">
-      <PictureTaker
-        onPictureTaken={(file) => {
-          takenPicture = file;
-        }}
-      />
+      <div
+        class="grid gap-6"
+        style="grid-template-columns: repeat({Math.max(
+          1,
+          Math.min(3, takenPictures.length)
+        )}, 1fr);"
+      >
+        {#each takenPictures as picture}
+          <!-- svelte-ignore a11y_missing_attribute -->
+          <img
+            src={picture}
+            class="border-border aspect-3/4 relative w-max mx-auto shrink-0 overflow-hidden max-h-[20dvh] rounded-lg border h-fit"
+          />
+        {/each}
+      </div>
+      {#if takenPictures.length < PublicationImagesLengths.max}
+        <PictureTaker
+          showPreview={false}
+          class={{ container: 'w-full h-24 aspect-auto' }}
+          onPictureTaken={(file) => {
+            if (takenPictures.length < PublicationImagesLengths.max) {
+              takenPictures = [...takenPictures, file].slice(0, PublicationImagesLengths.max);
+            }
+          }}
+        />
+      {/if}
 
       <Field.Field>
         <Field.Label for="description"
