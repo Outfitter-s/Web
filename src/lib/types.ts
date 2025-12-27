@@ -158,9 +158,10 @@ export type PostReactions = {
 };
 
 // Post - publication
+export const PublicationImagesLengths = { min: 1, max: 6 };
 export const PublicationZ = z.object({
   id: UUID.or(z.string()),
-  imageUrl: z.url(),
+  images: z.array(z.url()).min(PublicationImagesLengths.min).max(PublicationImagesLengths.max),
   user: UserZ,
   description: z.string(),
   outfit: OutfitZ.optional(),

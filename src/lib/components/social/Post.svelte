@@ -5,7 +5,6 @@
   import { type Publication } from '$lib/types';
   import { DateUtils } from '$lib/utils';
   import { ProfilePicture } from '.';
-  import Spinner from '../Spinner';
   import Reaction from './Reaction.svelte';
 
   interface Props {
@@ -52,11 +51,6 @@
 
     return `path('M ${w + safe_r} 0 L ${containerWidth - safeR} 0 A ${safeR} ${safeR} 0 0 1 ${containerWidth} ${safeR} V ${containerHeight} A 0 0 0 0 1 ${containerWidth - safeR} ${containerHeight} H ${safeR} A 0 0 0 0 1 0 ${containerHeight} V ${h + safe_r} A ${safe_r} ${safe_r} 0 0 1 ${safe_r} ${h} H ${w - safe_r} A ${safe_r} ${safe_r} 0 0 0 ${w} ${h - safe_r} V ${safe_r} A ${safe_r} ${safe_r} 0 0 1 ${w + safe_r} 0 Z')`;
   });
-
-  function onPostImageError(event: Event) {
-    const img = event.target as HTMLImageElement;
-    img.src = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/1255/image-not-found.svg';
-  }
 </script>
 
 <div class="flex flex-col w-full gap-2 relative" data-post={post.id} bind:this={containerRef}>
@@ -77,9 +71,8 @@
     <a class="size-full block relative" href={resolve('/app/feed/[postId]', { postId: post.id })}>
       <!-- svelte-ignore a11y_missing_attribute -->
       <img
-        src={post.imageUrl}
-        class="w-full block"
-        onerror={onPostImageError}
+        src={post.images[0]}
+        class="w-full block h-full object-contain object-center"
         onload={() => (imageLoaded = true)}
       />
       {#if !imageLoaded}
@@ -100,7 +93,7 @@
     class="absolute bottom-0 left-0 right-0 p-2 pb-0 pt-16 bg-linear-to-b from-transparent to-background pointer-events-none"
   >
     {#if post.description}
-      <p class="text-base font-base font-mono line-clamp-2">
+      <p class="text-base font-medium font-mono line-clamp-2">
         {post.description}
       </p>
     {/if}

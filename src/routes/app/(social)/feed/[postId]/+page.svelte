@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { NavBack, SEO } from '$lib/components';
+  import { SEO } from '$lib/components';
   import { resolve } from '$app/paths';
   import i18n from '$lib/i18n';
   import { ProfilePicture, Reaction } from '$lib/components/social';
@@ -10,14 +10,15 @@
   import { fade } from 'svelte/transition';
   import { invalidateAll } from '$app/navigation';
   import { Toaster } from '$lib/components/Toast/toast';
-  import { logger } from '$lib/utils';
+  import { cn, logger } from '$lib/utils';
   import * as Field from '$lib/components/ui/field';
   import { Textarea } from '$lib/components/ui/textarea';
-  import PictureTaker from '$lib/components/PictureTaker.svelte';
   import * as Dialog from '$lib/components/ui/dialog';
   import { enhance } from '$app/forms';
   import Globals from '$lib/globals.svelte';
   import { onDestroy, onMount } from 'svelte';
+  import * as Carousel from '$lib/components/ui/carousel';
+  import type { CarouselAPI } from '$lib/components/ui/carousel/context';
 
   let { data }: PageProps = $props();
   let post = $derived(data.post);
@@ -27,24 +28,23 @@
   // svelte-ignore state_referenced_locally
   let editedPost = $state({ ...post });
   let deletePostConfirmOpen = $state(false);
-  let editedPostImage = $state<string | null>(null);
   let isDeletingPost = $state(false);
+  let carouselCurrentIndex = $state(0);
+  let carouselApi = $state<CarouselAPI>();
 
-  function onPostImageError(event: Event) {
-    const img = event.target as HTMLImageElement;
-    img.src = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/1255/image-not-found.svg';
-  }
+  $effect(() => {
+    if (carouselApi) {
+      carouselCurrentIndex = carouselApi.selectedScrollSnap() + 1;
+      carouselApi.on('select', () => {
+        carouselCurrentIndex = carouselApi!.selectedScrollSnap() + 1;
+      });
+    }
+  });
 
   async function saveChanges() {
     if (user?.id !== post.user.id || !editModeEnabled) return;
     try {
       const formData = new FormData();
-      if (editedPostImage) {
-        const response = await fetch(editedPostImage);
-        const blob = await response.blob();
-        const image = new File([blob], 'picture.png', { type: blob.type });
-        formData.append('image', image);
-      }
       for (const [key, value] of Object.entries({
         id: post.id,
         description: editedPost.description,
@@ -117,40 +117,49 @@
   </Dialog.Content>
 </Dialog.Root>
 
-<!-- <NavBack title="{post.user.username} - {i18n.t('seo.social.post.title')}" /> -->
 <section class="lg:p-2 lg:pt-4 lg:pl-4 max-lg:p-4 w-full" data-post={post.id}>
   <div class="bg-card relative border-border flex flex-col rounded-lg border lg:flex-row">
     <!-- Image -->
     <div
-      class="relative block -ml-2 max-lg:-mr-2 -mt-2 lg:-mb-2 lg:max-w-1/2 lg:w-full bg-primary border border-border rounded-lg overflow-hidden"
+      class="relative block -ml-2 max-lg:-mr-2 -mt-2 lg:-mb-2 lg:max-w-1/2 lg:w-full bg-card border border-border rounded-lg overflow-hidden"
     >
-      {#if editModeEnabled}
-        <div class="absolute inset-0">
-          <PictureTaker
-            class={{
-              container:
-                'border-0 max-h-max min-h-0 h-full backdrop-blur-xs hover:backdrop-blur-md transition-all bg-card/70 hover:bg-card/70',
-              image: 'h-full',
-            }}
-            onPictureTaken={(file) => {
-              editedPostImage = file;
-            }}
-          />
-        </div>
-      {/if}
-      <!-- svelte-ignore a11y_missing_attribute -->
-      <img
-        src={post.imageUrl}
-        class="size-full object-center object-cover aspect-3/4"
-        onerror={onPostImageError}
-      />
+      <Carousel.Root class="w-full" setApi={(emblaApi) => (carouselApi = emblaApi)}>
+        <Carousel.Content>
+          {#each post.images as image}
+            <Carousel.Item>
+              <!-- svelte-ignore a11y_missing_attribute -->
+              <img src={image} class="size-full object-center object-cover aspect-3/4" />
+            </Carousel.Item>
+          {/each}
+        </Carousel.Content>
+      </Carousel.Root>
       {#if hasUserPostedToday}
         <Reaction bind:post class="absolute bottom-2 right-2 z-10" />
       {:else}
-        <div class="absolute p-4 inset-0 flex flex-col items-center justify-center">
-          <p class="text-xl text-center text-background font-bold w-fit">
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <p class="text-xl font-bold text-center text-background w-fit">
             {i18n.t('social.post.blurred')}
           </p>
+        </div>
+      {/if}
+
+      {#if post.images.length > 1}
+        <div class="absolute flex flex-row gap-2 bottom-4 left-1/2 -translate-x-1/2">
+          {#each Array(post.images.length), i}
+            {@const active = i === carouselCurrentIndex - 1}
+            <!-- svelte-ignore a11y_consider_explicit_label -->
+            <button
+              class={cn(
+                'h-2 rounded-full duration-300 transition-all',
+                active ? 'bg-primary w-6' : 'bg-primary/50 w-2'
+              )}
+              onclick={() => {
+                if (carouselApi) {
+                  carouselApi.scrollTo(i);
+                }
+              }}
+            ></button>
+          {/each}
         </div>
       {/if}
     </div>

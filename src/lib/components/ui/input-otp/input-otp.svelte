@@ -130,7 +130,7 @@
   {...restProps}
 >
   <input type="hidden" {name} />
-  {#each new Array(nbInputs) as _, i}
+  {#each new Array(nbInputs), i}
     <input
       type="text"
       onpaste={handlePaste}
