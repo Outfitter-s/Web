@@ -13,6 +13,7 @@
   import { DateUtils } from '$lib/utils';
   import { page } from '$app/state';
   import PictureTaker from '$lib/components/PictureTaker.svelte';
+  import { X } from '@lucide/svelte';
 
   interface Props {
     open?: boolean;
@@ -84,6 +85,10 @@
     takenPictures = [];
     loading = false;
   }
+
+  function deletePicture(index: number) {
+    takenPictures = takenPictures.filter((_, i) => i !== index);
+  }
 </script>
 
 <Dialog.Root bind:open>
@@ -91,7 +96,7 @@
     <Dialog.Header>
       <Dialog.Title>{i18n.t('social.feed.addPublication.title')}</Dialog.Title>
     </Dialog.Header>
-    <form onsubmit={submitHandler} class="mt-6 flex flex-col gap-4">
+    <form onsubmit={submitHandler} class="mt- w-full flex flex-col gap-4">
       <div
         class="grid gap-6"
         style="grid-template-columns: repeat({Math.max(
@@ -99,12 +104,20 @@
           Math.min(3, takenPictures.length)
         )}, 1fr);"
       >
-        {#each takenPictures as picture}
-          <!-- svelte-ignore a11y_missing_attribute -->
-          <img
-            src={picture}
-            class="border-border aspect-3/4 relative w-max mx-auto shrink-0 overflow-hidden max-h-[20dvh] rounded-lg border h-fit"
-          />
+        {#each takenPictures as picture, i}
+          <button
+            class="border-border aspect-3/4 relative mx-auto shrink-0 overflow-hidden max-h-[20dvh] rounded-lg border h-fit"
+            type="button"
+            onclick={() => deletePicture(i)}
+          >
+            <!-- svelte-ignore a11y_missing_attribute -->
+            <img src={picture} class="size-full object-cover" />
+            <div
+              class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 size-8 rounded-full bg-background/50 backdrop-blur-md p-2"
+            >
+              <X class="size-full" />
+            </div>
+          </button>
         {/each}
       </div>
       {#if takenPictures.length < PublicationImagesLengths.max}
@@ -139,7 +152,9 @@
       {/if}
 
       <Dialog.Footer>
-        <Button type="submit" {loading}>{i18n.t('social.feed.addPublication.submit')}</Button>
+        <Button type="submit" {loading} disabled={takenPictures.length === 0}
+          >{i18n.t('social.feed.addPublication.submit')}</Button
+        >
       </Dialog.Footer>
     </form>
   </Dialog.Content>

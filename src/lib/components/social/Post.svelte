@@ -72,6 +72,7 @@
       <!-- svelte-ignore a11y_missing_attribute -->
       <img
         src={post.images[0]}
+        draggable="false"
         class="w-full block h-full object-contain object-center"
         onload={() => (imageLoaded = true)}
       />
