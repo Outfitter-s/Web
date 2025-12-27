@@ -96,7 +96,7 @@
     <Dialog.Header>
       <Dialog.Title>{i18n.t('social.feed.addPublication.title')}</Dialog.Title>
     </Dialog.Header>
-    <form onsubmit={submitHandler} class="mt- w-full flex flex-col gap-4">
+    <form onsubmit={submitHandler} class="mt-6 w-full flex flex-col gap-4">
       <div
         class="grid gap-6"
         style="grid-template-columns: repeat({Math.max(
