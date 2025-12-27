@@ -48,7 +48,7 @@ export class PublicationDAO {
   ): Publication {
     return {
       id: row.id,
-      images: images.map(
+      images: (images.length > 0 ? images : ['NOT_FOUND']).map(
         (image) => `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/publication/${image}.png`
       ),
       user,

@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { PublicationDAO } from '$lib/server/db/publication';
 import sharp from 'sharp';
@@ -24,7 +23,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     const fileExists = existsSync(pathName);
     if (!fileExists) {
       if (scope === 'profile_pictures') {
-        pathName = path.resolve('assets', scope, 'user.png');
+        pathName = path.resolve('assets', 'defaults', 'user.svg');
       } else {
         throw new Error('File does not exist');
       }
@@ -39,6 +38,13 @@ export const GET: RequestHandler = async ({ params, locals }) => {
       status: 200,
     });
   } catch {
-    throw error(404);
+    const file = await sharp(path.resolve('assets', 'defaults', 'not_found.svg')).toBuffer();
+    const body = new Uint8Array(file);
+    return new Response(body, {
+      status: 404,
+      headers: {
+        'Content-Type': 'image/svg+xml',
+      },
+    });
   }
 };

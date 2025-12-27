@@ -15,11 +15,8 @@
   import { Textarea } from '$lib/components/ui/textarea';
   import * as Dialog from '$lib/components/ui/dialog';
   import { enhance } from '$app/forms';
-<<<<<<< HEAD:src/routes/app/(social)/feed/[postId]/+page.svelte
   import Globals from '$lib/globals.svelte';
   import { onDestroy, onMount } from 'svelte';
-=======
->>>>>>> d2d4f79105fb867f741c2121e61c15dd2b4d1f90:src/routes/app/feed/[postId]/+page.svelte
   import * as Carousel from '$lib/components/ui/carousel';
   import type { CarouselAPI } from '$lib/components/ui/carousel/context';
 
@@ -43,11 +40,6 @@
       });
     }
   });
-
-  function onPostImageError(event: Event) {
-    const img = event.target as HTMLImageElement;
-    img.src = 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/1255/image-not-found.svg';
-  }
 
   async function saveChanges() {
     if (user?.id !== post.user.id || !editModeEnabled) return;
@@ -125,7 +117,6 @@
   </Dialog.Content>
 </Dialog.Root>
 
-<!-- <NavBack title="{post.user.username} - {i18n.t('seo.social.post.title')}" /> -->
 <section class="lg:p-2 lg:pt-4 lg:pl-4 max-lg:p-4 w-full" data-post={post.id}>
   <div class="bg-card relative border-border flex flex-col rounded-lg border lg:flex-row">
     <!-- Image -->
@@ -137,11 +128,7 @@
           {#each post.images as image}
             <Carousel.Item>
               <!-- svelte-ignore a11y_missing_attribute -->
-              <img
-                src={image}
-                class="size-full object-center object-cover aspect-9/12"
-                onerror={onPostImageError}
-              />
+              <img src={image} class="size-full object-center object-cover aspect-9/12" />
             </Carousel.Item>
           {/each}
         </Carousel.Content>
@@ -150,7 +137,7 @@
         <Reaction bind:post class="absolute bottom-2 right-2 z-10" />
       {:else}
         <div class="absolute inset-0 flex flex-col items-center justify-center">
-          <p class="text-xl font-bold text-background w-fit">
+          <p class="text-xl font-bold text-center text-background w-fit">
             {i18n.t('social.post.blurred')}
           </p>
         </div>
