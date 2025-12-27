@@ -128,7 +128,7 @@
           {#each post.images as image}
             <Carousel.Item>
               <!-- svelte-ignore a11y_missing_attribute -->
-              <img src={image} class="size-full object-center object-cover aspect-9/12" />
+              <img src={image} class="size-full object-center object-cover aspect-3/4" />
             </Carousel.Item>
           {/each}
         </Carousel.Content>
@@ -143,23 +143,25 @@
         </div>
       {/if}
 
-      <div class="absolute flex flex-row gap-2 bottom-4 left-1/2 -translate-x-1/2">
-        {#each Array(post.images.length), i}
-          {@const active = i === carouselCurrentIndex - 1}
-          <!-- svelte-ignore a11y_consider_explicit_label -->
-          <button
-            class={cn(
-              'h-2 rounded-full duration-300 transition-all',
-              active ? 'bg-primary w-6' : 'bg-primary/50 w-2'
-            )}
-            onclick={() => {
-              if (carouselApi) {
-                carouselApi.scrollTo(i);
-              }
-            }}
-          ></button>
-        {/each}
-      </div>
+      {#if post.images.length > 1}
+        <div class="absolute flex flex-row gap-2 bottom-4 left-1/2 -translate-x-1/2">
+          {#each Array(post.images.length), i}
+            {@const active = i === carouselCurrentIndex - 1}
+            <!-- svelte-ignore a11y_consider_explicit_label -->
+            <button
+              class={cn(
+                'h-2 rounded-full duration-300 transition-all',
+                active ? 'bg-primary w-6' : 'bg-primary/50 w-2'
+              )}
+              onclick={() => {
+                if (carouselApi) {
+                  carouselApi.scrollTo(i);
+                }
+              }}
+            ></button>
+          {/each}
+        </div>
+      {/if}
     </div>
 
     <!-- Details -->

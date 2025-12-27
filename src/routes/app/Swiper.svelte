@@ -298,7 +298,7 @@
         >
           <!-- Steps circles -->
           <div class="flex items-center justify-center px-2">
-            {#each Array(nbQuestions) as _, index}
+            {#each Array(nbQuestions), index}
               <button
                 onclick={() => {
                   if (index < multiStageAnswers.currentIndex)

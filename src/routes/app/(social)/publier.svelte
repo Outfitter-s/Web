@@ -94,7 +94,10 @@
     <form onsubmit={submitHandler} class="mt-6 flex flex-col gap-4">
       <div
         class="grid gap-6"
-        style="grid-template-columns: repeat({Math.min(3, takenPictures.length)}, 1fr);"
+        style="grid-template-columns: repeat({Math.max(
+          1,
+          Math.min(3, takenPictures.length)
+        )}, 1fr);"
       >
         {#each takenPictures as picture}
           <!-- svelte-ignore a11y_missing_attribute -->
@@ -109,8 +112,9 @@
           showPreview={false}
           class={{ container: 'w-full h-24 aspect-auto' }}
           onPictureTaken={(file) => {
-            takenPictures.push(file);
-            takenPictures.slice(0, PublicationImagesLengths.max - 1);
+            if (takenPictures.length < PublicationImagesLengths.max) {
+              takenPictures = [...takenPictures, file].slice(0, PublicationImagesLengths.max);
+            }
           }}
         />
       {/if}

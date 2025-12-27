@@ -184,7 +184,7 @@
                   in:slide={{ delay: 400, axis: 'x', duration: 300 }}
                   out:slide={{ axis: 'x', duration: 300 }}
                 >
-                  {#each new Array(10) as _, i (i)}
+                  {#each new Array(10), i (i)}
                     <div class="flex w-2 shrink-0 flex-row items-center justify-center">
                       <span class="bg-muted-foreground size-1 rounded-full"></span>
                     </div>
