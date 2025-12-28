@@ -198,8 +198,6 @@
         {/await}
       </div>
 
-      <!-- <Hr text={i18n.t('auth.totp.settings.setup.confirmCode')} /> -->
-
       <form
         action="?/setUpTOTP"
         class="mt-6 flex flex-col gap-4"

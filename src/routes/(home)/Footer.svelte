@@ -1,4 +1,5 @@
 <script>
+  import { Separator } from '$lib/components/ui/separator';
   import i18n from '$lib/i18n';
 
   let links = $derived([
@@ -38,7 +39,7 @@
 </script>
 
 <footer class="pb-16 pt-8 md:pt-16 md:pb-32">
-  <hr class="border-border" />
+  <Separator />
   <div class="mx-auto max-w-5xl px-6">
     {#each links as row}
       <div class="my-8 flex flex-wrap justify-center gap-6 text-sm">

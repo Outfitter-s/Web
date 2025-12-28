@@ -41,7 +41,7 @@ export const GET: RequestHandler = async ({ params, locals }) => {
     const file = await sharp(path.resolve('assets', 'defaults', 'not_found.svg')).toBuffer();
     const body = new Uint8Array(file);
     return new Response(body, {
-      status: 404,
+      status: 200,
       headers: {
         'Content-Type': 'image/svg+xml',
       },

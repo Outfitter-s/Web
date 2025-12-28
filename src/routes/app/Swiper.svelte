@@ -347,7 +347,9 @@
                       variant="none"
                       class={cn(
                         'h-24 flex flex-col p-4 gap-2 rounded-xl text-foreground',
-                        selected ? 'dark:bg-primary bg-secondary' : 'bg-card'
+                        selected
+                          ? 'dark:bg-primary bg-secondary dark:text-background text-foreground'
+                          : 'bg-card'
                       )}
                     >
                       {#if Icon}

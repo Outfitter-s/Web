@@ -62,7 +62,7 @@
 <section class="flex w-full flex-col">
   <!-- Feed type selector -->
   <div class="p-2">
-    <div class="grid grid-cols-2 w-full gap-2 bg-card rounded">
+    <div class="grid grid-cols-2 w-full gap-2 bg-card rounded-md">
       <button
         class={cn(
           'w-full py-1 rounded-md',

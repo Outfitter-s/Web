@@ -21,16 +21,18 @@
     class: className,
     href,
     ...restProps
-  }: Props & (SvelteHTMLElements['div'] | SvelteHTMLElements['button']) = $props();
+  }: Props & SvelteHTMLElements['div'] = $props();
 </script>
 
-<!-- TODO: Fix props typing -->
-<IndentCard class="rounded-xl" imageUrl={item.imageUrl} {href} {...restProps}>
+<IndentCard
+  radius="sm"
+  class={{ container: className?.container, image: 'rounded-xl' }}
+  imageUrl={item.imageUrl}
+  {href}
+  {...restProps}
+>
   <span
-    class={cn(
-      'font-medium max-w-full text-base font-mono text-nowrap line-clamp-1',
-      className?.name
-    )}
+    class={cn('font-medium max-w-full text-sm font-mono text-nowrap line-clamp-1', className?.name)}
   >
     {capitalize(item.name)}
   </span>
