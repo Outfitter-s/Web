@@ -11,7 +11,6 @@ import {
   emailSchema,
   passwordSchema,
   removeTokenSchema,
-  unlinkTOTPSchema,
   profilePictureSchema,
 } from './schema';
 import { zod4 } from 'sveltekit-superforms/adapters';
@@ -30,6 +29,7 @@ export const load = (async ({ locals }) => {
   return { rows, usernameForm, emailForm, profilePictureForm };
 }) satisfies PageServerLoad;
 
+// TODO: make use of new sveltekit-superforms form handling
 export const actions: Actions = {
   updateUsername: async (event) => {
     const { locals } = event;
@@ -125,7 +125,6 @@ export const actions: Actions = {
     const { totp } = formData as {
       totp: string;
     };
-    // unlinkTOTPSchema
 
     try {
       if (!user.totpSecret) throw new Error('errors.auth.totp.notEnabled');

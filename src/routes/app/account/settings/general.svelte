@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
   import { page } from '$app/state';
   import { Toaster } from '$lib/components/Toast/toast';
   import * as Alert from '$lib/components/ui/alert';
@@ -9,7 +8,7 @@
   import { Label } from '$lib/components/ui/label';
   import i18n from '$lib/i18n';
   import { logger } from '$lib/utils/logger';
-  import { AlertCircle, CheckCheck, Monitor, Moon, Sun } from '@lucide/svelte';
+  import { AlertCircle, CheckCheck, Monitor, Moon, Sun, Upload } from '@lucide/svelte';
   import Theming, { availableModes, availableThemes, type Mode } from '$lib/theming/index.svelte';
   import { capitalize } from '$lib/utils';
   import ProfilePicture from '$lib/components/social/ProfilePicture.svelte';
@@ -110,76 +109,83 @@
   {/if}
 {/snippet}
 
-<form action="?/updateUsername" class="space-y-4" method="POST" use:usernameEnhance>
-  <Form.Field form={usernameForm} name="username">
-    <Form.Control>
-      {#snippet children({ props })}
-        <Form.Label>{i18n.t('auth.username')}</Form.Label>
-        <Input {...props} oninput={onUsernameInput} bind:value={$usernameFormData.username} />
-      {/snippet}
-    </Form.Control>
-    <Form.FieldErrors />
-  </Form.Field>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <form action="?/updateUsername" class="space-y-4" method="POST" use:usernameEnhance>
+    <Form.Field form={usernameForm} name="username">
+      <Form.Control>
+        {#snippet children({ props })}
+          <Form.Label>{i18n.t('auth.username')}</Form.Label>
+          <Input {...props} oninput={onUsernameInput} bind:value={$usernameFormData.username} />
+        {/snippet}
+      </Form.Control>
+      <Form.FieldErrors />
+    </Form.Field>
 
-  {#if $usernameFormData.username !== initialFormValues.username && $usernameFormData.username.length > 3}
-    {#if checkUsernameStatusData.available}
-      <Alert.Root variant="success">
-        <CheckCheck />
-        <Alert.Title
-          >{i18n.t('account.tabs.general.changeUsername.alerts.available.title')}</Alert.Title
-        >
-        <Alert.Description>
-          <p>
-            {i18n.t('account.tabs.general.changeUsername.alerts.available.description', {
-              username: $usernameFormData.username,
-            })}
-          </p>
-        </Alert.Description>
-      </Alert.Root>
-    {:else}
-      <Alert.Root variant="destructive">
-        <AlertCircle />
-        <Alert.Title>{i18n.t('account.tabs.general.changeUsername.alerts.taken.title')}</Alert.Title
-        >
-        <Alert.Description>
-          <p>
-            {i18n.t('account.tabs.general.changeUsername.alerts.taken.description', {
-              username: $usernameFormData.username,
-            })}
-          </p>
-        </Alert.Description>
-      </Alert.Root>
+    {#if $usernameFormData.username !== initialFormValues.username && $usernameFormData.username.length > 3}
+      {#if checkUsernameStatusData.available}
+        <Alert.Root variant="success">
+          <CheckCheck />
+          <Alert.Title
+            >{i18n.t(
+              'account.settings.tabs.general.changeUsername.alerts.available.title'
+            )}</Alert.Title
+          >
+          <Alert.Description>
+            <p>
+              {i18n.t('account.settings.tabs.general.changeUsername.alerts.available.description', {
+                username: $usernameFormData.username,
+              })}
+            </p>
+          </Alert.Description>
+        </Alert.Root>
+      {:else}
+        <Alert.Root variant="destructive">
+          <AlertCircle />
+          <Alert.Title
+            >{i18n.t(
+              'account.settings.tabs.general.changeUsername.alerts.taken.title'
+            )}</Alert.Title
+          >
+          <Alert.Description>
+            <p>
+              {i18n.t('account.settings.tabs.general.changeUsername.alerts.taken.description', {
+                username: $usernameFormData.username,
+              })}
+            </p>
+          </Alert.Description>
+        </Alert.Root>
+      {/if}
     {/if}
-  {/if}
 
-  <Button
-    type="submit"
-    disabled={$usernameSubmitting || $usernameFormData.username === initialFormValues.username}
-    loading={$usernameSubmitting}
-  >
-    {i18n.t('account.tabs.general.changeUsername.title')}
-  </Button>
-</form>
+    <Button
+      type="submit"
+      disabled={$usernameSubmitting || $usernameFormData.username === initialFormValues.username}
+      loading={$usernameSubmitting}
+    >
+      {i18n.t('account.settings.tabs.general.changeUsername.title')}
+    </Button>
+  </form>
 
-<form action="?/updateEmail" class="space-y-4" method="POST" use:emailEnhance>
-  <Form.Field form={emailForm} name="email">
-    <Form.Control>
-      {#snippet children({ props })}
-        <Form.Label>{i18n.t('auth.email')}</Form.Label>
-        <Input {...props} bind:value={$emailFormData.email} />
-      {/snippet}
-    </Form.Control>
-    <Form.FieldErrors />
-  </Form.Field>
+  <form action="?/updateEmail" class="space-y-4" method="POST" use:emailEnhance>
+    <Form.Field form={emailForm} name="email">
+      <Form.Control>
+        {#snippet children({ props })}
+          <Form.Label>{i18n.t('auth.email')}</Form.Label>
+          <Input {...props} bind:value={$emailFormData.email} />
+        {/snippet}
+      </Form.Control>
+      <Form.FieldErrors />
+    </Form.Field>
 
-  <Button
-    type="submit"
-    disabled={$emailSubmitting || $emailFormData.email === initialFormValues.email}
-    loading={$emailSubmitting}
-  >
-    {i18n.t('account.tabs.general.changeEmail.title')}
-  </Button>
-</form>
+    <Button
+      type="submit"
+      disabled={$emailSubmitting || $emailFormData.email === initialFormValues.email}
+      loading={$emailSubmitting}
+    >
+      {i18n.t('account.settings.tabs.general.changeEmail.title')}
+    </Button>
+  </form>
+</div>
 
 <form
   action="?/updateProfilePicture"
@@ -188,11 +194,11 @@
   method="POST"
   use:profilePictureEnhance
 >
-  <Label>{i18n.t('account.tabs.general.profilePicture')}</Label>
+  <Label>{i18n.t('account.settings.tabs.general.profilePicture')}</Label>
   <Form.Field form={profilePictureForm} name="profilePicture">
     <Form.Control>
       {#snippet children({ props })}
-        <Form.Label class="size-20 block">
+        <Form.Label class="size-20 block relative rounded-[42%] overflow-hidden">
           <ProfilePicture userId={page.data.user.id} class="size-full" />
           <Input
             {...props}
@@ -204,6 +210,11 @@
             class="hidden"
             bind:value={$profilePictureFormData.profilePicture}
           />
+          <div
+            class="absolute inset-0 flex flex-col bg-background/50 pointer-events-none items-center justify-center"
+          >
+            <Upload class="size-6" />
+          </div>
         </Form.Label>
       {/snippet}
     </Form.Control>
