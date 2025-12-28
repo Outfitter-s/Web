@@ -4,8 +4,9 @@ import { Caching } from '$lib/server/db/caching';
 import { logger } from '$lib/utils/logger';
 import { UserDAO } from '$lib/server/db/user';
 import bcrypt from 'bcryptjs';
-import { defs } from '$lib/utils/form';
-import z from 'zod';
+import { zod4 } from 'sveltekit-superforms/adapters';
+import { superValidate, fail, message } from 'sveltekit-superforms';
+import { formSchema } from './schema';
 
 export const load = (async ({ url }) => {
   try {
@@ -16,7 +17,12 @@ export const load = (async ({ url }) => {
 
     const email = await Caching.get<string>(`passwordReset:${token}`);
     if (!email) throw new Error('errors.auth.passwordReset.expiredToken');
-    return { email, token };
+    return {
+      token,
+      form: await superValidate(zod4(formSchema), {
+        defaults: { token },
+      }),
+    };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     logger.error(message);
@@ -25,37 +31,28 @@ export const load = (async ({ url }) => {
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-  resetPassword: async ({ request }) => {
+  resetPassword: async (event) => {
+    const form = await superValidate(event, zod4(formSchema));
+    if (!form.valid) return fail(400, { form });
+    const { password, token, confirmPassword } = form.data;
+    const email = await Caching.get<string>(`passwordReset:${token}`);
+    if (!email) return fail(400, { form, message: 'errors.auth.passwordReset.expiredToken' });
+    if (password !== confirmPassword)
+      return message(form, 'errors.auth.passwordReset.passwordsDontMatch');
+
     try {
-      const formData = Object.fromEntries(await request.formData());
-      const schema = z.object({
-        password: defs.password,
-        confirmPassword: defs.password,
-        token: z.string().min(1, 'errors.auth.passwordReset.noToken'),
-      });
-      const form = schema.safeParse(formData);
-      if (!form.success) throw new Error(form.error.issues[0].message);
-
-      const { password, confirmPassword, token } = form.data;
-      const email = await Caching.get<string>(`passwordReset:${token}`);
-      if (!email) throw new Error('errors.auth.passwordReset.expiredToken');
-
-      if (password !== confirmPassword)
-        throw new Error('errors.auth.passwordReset.passwordsDontMatch');
-
-      // Hash password
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(password, salt);
 
       const user = await UserDAO.getUserByEmail(email);
 
       await UserDAO.updateUser(user.id, { passwordHash: hash });
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      logger.error(msg);
-      return { action: 'resetPassword', error: true, message: msg };
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      logger.error('Error resetting password :', msg);
+      return message(form, msg);
     }
 
-    return { action: 'resetPassword', success: true, message: 'successes.resetPassword' };
+    return message(form, 'successes.resetPassword');
   },
 };

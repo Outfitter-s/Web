@@ -4,75 +4,82 @@ import { validateTOTP } from '$lib/server/totp';
 import { logger } from '$lib/utils/logger';
 import { fail, type Actions } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
-import { defs } from '$lib/utils/form';
-import z from 'zod';
 import { ICSTokenDAO } from '$lib/server/db/ICSToken';
 import type { PageServerLoad } from './$types';
-import { UUID } from '$lib/types';
+import {
+  usernameSchema,
+  emailSchema,
+  passwordSchema,
+  removeTokenSchema,
+  profilePictureSchema,
+} from './schema';
+import { zod4 } from 'sveltekit-superforms/adapters';
+import { setError, superValidate, fail, message } from 'sveltekit-superforms';
 
 export const load = (async ({ locals }) => {
   const user = locals.user!;
   const rows = await ICSTokenDAO.getAllForUser(user.id);
-  return { rows };
+  const usernameForm = await superValidate(zod4(usernameSchema), {
+    defaults: { username: user.username },
+  });
+  const emailForm = await superValidate(zod4(emailSchema), {
+    defaults: { email: user.email },
+  });
+  const profilePictureForm = await superValidate(zod4(profilePictureSchema));
+  return { rows, usernameForm, emailForm, profilePictureForm };
 }) satisfies PageServerLoad;
 
+// TODO: make use of new sveltekit-superforms form handling
 export const actions: Actions = {
-  updateUsername: async ({ locals, request }) => {
+  updateUsername: async (event) => {
+    const { locals } = event;
+    const usernameForm = await superValidate(event, zod4(usernameSchema));
+    if (!usernameForm.valid) return fail(400, { usernameForm });
+
+    const { username } = usernameForm.data;
     const user = locals.user!;
 
+    const isUsernameTaken = await UserDAO.userExists(username);
+    if (isUsernameTaken && username !== user.username)
+      return setError(usernameForm, 'username', 'errors.auth.usernameTaken');
     try {
-      const formData = Object.fromEntries(await request.formData());
-      const schema = z.object({
-        username: defs.username,
-      });
-      const form = schema.safeParse(formData);
-      if (!form.success) throw new Error(form.error.issues[0].message);
-      const { username } = form.data;
-      const isUsernameTaken = await UserDAO.userExists(username);
-      if (isUsernameTaken && username !== user.username)
-        throw new Error('errors.auth.usernameTaken');
       await UserDAO.updateUser(user.id, { username });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       logger.error(msg);
-      return fail(400, { action: 'general', error: true, message: msg });
+      return setError(usernameForm, 'username', msg);
     }
 
-    return { action: 'general', success: true, message: 'successes.usernameUpdated' };
+    return message(usernameForm, 'successes.usernameUpdated');
   },
-  updateEmail: async ({ locals, request }) => {
+  updateEmail: async (event) => {
+    const { locals } = event;
+    const emailForm = await superValidate(event, zod4(emailSchema));
+    if (!emailForm.valid) return fail(400, { emailForm });
+
+    const { email } = emailForm.data;
     const user = locals.user!;
 
+    const isEmailTaken = await UserDAO.isEmailTaken(email);
+    if (isEmailTaken && email !== user.username)
+      return setError(emailForm, 'email', 'errors.auth.emailInUse');
+
     try {
-      const formData = Object.fromEntries(await request.formData());
-      const schema = z.object({
-        email: defs.email,
-      });
-      const form = schema.safeParse(formData);
-      if (!form.success) throw new Error(form.error.issues[0].message);
-      const { email } = form.data;
-      const isEmailTaken = await UserDAO.isEmailTaken(email);
-      if (isEmailTaken && email !== user.username) throw new Error('errors.auth.usernameTaken');
       await UserDAO.updateUser(user.id, { email });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       logger.error(msg);
-      return fail(400, { action: 'general', error: true, message: msg });
+      return setError(emailForm, 'email', msg);
     }
 
-    return { action: 'general', success: true, message: 'successes.emailUpdated' };
+    return message(emailForm, 'successes.emailUpdated');
   },
   changePassword: async ({ locals, request }) => {
     const user = locals.user!;
 
     try {
       const formData = Object.fromEntries(await request.formData());
-      const schema = z.object({
-        currentPassword: defs.password,
-        newPassword: defs.password,
-        confirmPassword: defs.password,
-      });
-      const form = schema.safeParse(formData);
+      const form = passwordSchema.safeParse(formData);
       if (!form.success) throw new Error(form.error.issues[0].message);
       const { currentPassword, newPassword, confirmPassword } = form.data;
 
@@ -118,6 +125,7 @@ export const actions: Actions = {
     const { totp } = formData as {
       totp: string;
     };
+    // unlinkTOTPSchema
 
     try {
       if (!user.totpSecret) throw new Error('errors.auth.totp.notEnabled');
@@ -154,27 +162,31 @@ export const actions: Actions = {
       });
     }
   },
-  updateProfilePicture: async ({ locals, request }) => {
-    const user = locals.user!;
-    const formData = Object.fromEntries(await request.formData());
-    const { updateProfilePictureInput: image } = formData as {
-      updateProfilePictureInput: File;
-    };
-    try {
-      if (image.type.split('/')[0] !== 'image') {
-        throw new Error('errors.account.settings.invalidProfilePicture');
-      }
-      const imageBuffer = Buffer.from(await image.arrayBuffer());
+  updateProfilePicture: async (event) => {
+    const { locals } = event;
+    const profilePictureForm = await superValidate(event, zod4(profilePictureSchema));
+    if (!profilePictureForm.valid) return fail(400, { profilePictureForm });
 
+    const { profilePicture } = profilePictureForm.data;
+    const user = locals.user!;
+    if (profilePicture.type.split('/')[0] !== 'image')
+      return setError(
+        profilePictureForm,
+        'profilePicture',
+        'errors.account.settings.invalidProfilePicture'
+      );
+
+    try {
+      const imageBuffer = Buffer.from(await profilePicture.arrayBuffer());
       await UserDAO.updateProfilePicture(user.id, imageBuffer);
-      return { success: true, action: 'general', message: 'successes.profilePictureUpdated' };
     } catch (error) {
-      return fail(500, {
-        action: 'general',
-        error: true,
-        message: error instanceof Error ? error.message : String(error),
-      });
+      return setError(
+        profilePictureForm,
+        'profilePicture',
+        error instanceof Error ? error.message : String(error)
+      );
     }
+    return message(profilePictureForm, 'successes.profilePictureUpdated');
   },
   createToken: async ({ locals }) => {
     const user = locals.user!;
@@ -195,12 +207,9 @@ export const actions: Actions = {
   revokeToken: async ({ locals, request }) => {
     const user = locals.user!;
     const formData = Object.fromEntries(await request.formData());
-    const schema = z.object({
-      tokenId: UUID,
-    });
 
     try {
-      const form = schema.safeParse(formData);
+      const form = removeTokenSchema.safeParse(formData);
       if (!form.success) throw new Error(form.error.issues[0].message);
       const { tokenId } = form.data;
       const userTokens = await ICSTokenDAO.getAllForUser(user.id);
