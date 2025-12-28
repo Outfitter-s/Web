@@ -2,10 +2,12 @@
   import type { ClothingItem } from '$lib/types';
   import { capitalize, cn } from '$lib/utils';
   import type { SvelteHTMLElements } from 'svelte/elements';
+  import IndentCard from '../IndentCard.svelte';
 
   interface Props {
     item: ClothingItem;
     element?: 'a' | 'button' | 'div';
+    href?: string;
     class?: {
       container?: string;
       image?: string;
@@ -17,35 +19,21 @@
     item,
     element = 'div',
     class: className,
+    href,
     ...restProps
-  }: Props &
-    (SvelteHTMLElements['a'] | SvelteHTMLElements['div'] | SvelteHTMLElements['button']) = $props();
+  }: Props & SvelteHTMLElements['div'] = $props();
 </script>
 
-{#snippet content()}
-  <div
-    class={cn(
-      '-ml-2 bg-primary -mt-2 -mr-2 inline-block aspect-3/4 rounded-lg border border-border overflow-hidden',
-      className?.image
-    )}
-  >
-    <img src={item.imageUrl} alt={item.name} class="size-full object-contain" draggable="false" />
-  </div>
-  <div
-    class={cn('p-2 w-full text-center font-medium text-sm font-mono text-wrap', className?.name)}
-  >
-    <span>{capitalize(item.name)}</span>
-  </div>
-{/snippet}
-
-<svelte:element
-  this={element}
-  class={cn(
-    'flex flex-col h-fit rounded-lg bg-card border border-border items-center select-none',
-    className?.container
-  )}
-  draggable="false"
+<IndentCard
+  radius="sm"
+  class={{ container: className?.container, image: 'rounded-xl' }}
+  imageUrl={item.imageUrl}
+  {href}
   {...restProps}
 >
-  {@render content()}
-</svelte:element>
+  <span
+    class={cn('font-medium max-w-full text-sm font-mono text-nowrap line-clamp-1', className?.name)}
+  >
+    {capitalize(item.name)}
+  </span>
+</IndentCard>

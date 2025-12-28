@@ -346,8 +346,10 @@
                       onclick={() => completeQuestion(id as keyof typeof multistageQuestions, opt)}
                       variant="none"
                       class={cn(
-                        'h-24 flex flex-col p-4 gap-2 rounded-xl',
-                        selected ? 'bg-primary text-background' : 'bg-card text-foreground'
+                        'h-24 flex flex-col p-4 gap-2 rounded-xl text-foreground',
+                        selected
+                          ? 'dark:bg-primary bg-secondary dark:text-background text-foreground'
+                          : 'bg-card'
                       )}
                     >
                       {#if Icon}

@@ -10,7 +10,6 @@
   import { fly } from 'svelte/transition';
   import { backInOut } from 'svelte/easing';
   import Globals from '$lib/globals.svelte';
-  import { afterNavigate } from '$app/navigation';
 
   interface Link {
     id: string;
@@ -123,7 +122,7 @@
   {#if Globals.nav.shown || Globals.navComponentReplacement}
     <nav class="pt-0 w-full" transition:fly={{ y: 100, duration: 500, easing: backInOut }}>
       <div
-        class="max-w-250 overflow-hidden h-16 rounded-full p-2 bg-foreground dark:bg-secondary w-full mx-auto"
+        class="max-w-250 overflow-hidden shadow relative h-16 rounded-full p-2 bg-foreground dark:bg-secondary w-full mx-auto"
       >
         {#if Globals.navComponentReplacement}
           <div

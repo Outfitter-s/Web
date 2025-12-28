@@ -9,10 +9,11 @@
   import { Label } from '$lib/components/ui/label';
   import i18n from '$lib/i18n';
   import { logger } from '$lib/utils/logger';
-  import { AlertCircle, CheckCheck, Monitor, Moon, Sun } from '@lucide/svelte';
+  import { AlertCircle, CheckCheck, Monitor, Moon, Sun, Upload } from '@lucide/svelte';
   import Theming, { availableModes, availableThemes, type Mode } from '$lib/theming/index.svelte';
   import { capitalize } from '$lib/utils';
   import ProfilePicture from '$lib/components/social/ProfilePicture.svelte';
+  import Separator from '$lib/components/ui/separator/separator.svelte';
 
   let currentTheme = $state(page.data.theme);
   let currentLocale = $state(i18n.locale);
@@ -80,91 +81,96 @@
   {/if}
 {/snippet}
 
-<form
-  action="?/updateUsername"
-  class="space-y-4"
-  method="POST"
-  use:enhance={() => {
-    checkUsernameStatusData.loading = true;
-    return async ({ update }) => {
-      update({ reset: false });
-      checkUsernameStatusData.loading = false;
-    };
-  }}
->
-  <div class="space-y-2">
-    <Label for="username">{i18n.t('auth.username')}</Label>
-    <Input name="username" bind:value={formValues.username} oninput={onUsernameInput} />
-  </div>
+<div class="grid gap-6 grid-cols-1 md:grid-cols-2">
+  <form
+    action="?/updateUsername"
+    class="space-y-4"
+    method="POST"
+    use:enhance={() => {
+      checkUsernameStatusData.loading = true;
+      return async ({ update }) => {
+        update({ reset: false });
+        checkUsernameStatusData.loading = false;
+      };
+    }}
+  >
+    <div class="space-y-2">
+      <Label for="username">{i18n.t('auth.username')}</Label>
+      <Input name="username" bind:value={formValues.username} oninput={onUsernameInput} />
+    </div>
 
-  {#if formValues.username !== initialFormValues.username && formValues.username.length > 3}
-    {#if checkUsernameStatusData.available}
-      <Alert.Root variant="success">
-        <AlertCircle />
-        <Alert.Title
-          >{i18n.t(
-            'account.settings.tabs.general.changeUsername.alerts.available.title'
-          )}</Alert.Title
-        >
-        <Alert.Description>
-          <p>
-            {i18n.t('account.settings.tabs.general.changeUsername.alerts.available.description', {
-              username: formValues.username,
-            })}
-          </p>
-        </Alert.Description>
-      </Alert.Root>
-    {:else}
-      <Alert.Root variant="destructive">
-        <CheckCheck />
-        <Alert.Title
-          >{i18n.t('account.settings.tabs.general.changeUsername.alerts.taken.title')}</Alert.Title
-        >
-        <Alert.Description>
-          <p>
-            {i18n.t('account.settings.tabs.general.changeUsername.alerts.taken.description', {
-              username: formValues.username,
-            })}
-          </p>
-        </Alert.Description>
-      </Alert.Root>
+    {#if formValues.username !== initialFormValues.username && formValues.username.length > 3}
+      {#if checkUsernameStatusData.available}
+        <Alert.Root variant="success">
+          <AlertCircle />
+          <Alert.Title
+            >{i18n.t(
+              'account.settings.tabs.general.changeUsername.alerts.available.title'
+            )}</Alert.Title
+          >
+          <Alert.Description>
+            <p>
+              {i18n.t('account.settings.tabs.general.changeUsername.alerts.available.description', {
+                username: formValues.username,
+              })}
+            </p>
+          </Alert.Description>
+        </Alert.Root>
+      {:else}
+        <Alert.Root variant="destructive">
+          <CheckCheck />
+          <Alert.Title
+            >{i18n.t(
+              'account.settings.tabs.general.changeUsername.alerts.taken.title'
+            )}</Alert.Title
+          >
+          <Alert.Description>
+            <p>
+              {i18n.t('account.settings.tabs.general.changeUsername.alerts.taken.description', {
+                username: formValues.username,
+              })}
+            </p>
+          </Alert.Description>
+        </Alert.Root>
+      {/if}
     {/if}
-  {/if}
 
-  <Button
-    type="submit"
-    disabled={checkUsernameStatusData.loading || formValues.username === initialFormValues.username}
-    loading={checkUsernameStatusData.loading}
+    <Button
+      type="submit"
+      disabled={checkUsernameStatusData.loading ||
+        formValues.username === initialFormValues.username}
+      loading={checkUsernameStatusData.loading}
+    >
+      {i18n.t('account.settings.tabs.general.changeUsername.title')}
+    </Button>
+  </form>
+
+  <form
+    action="?/updateEmail"
+    class="space-y-4"
+    method="POST"
+    use:enhance={() => {
+      updateEmailLoading = true;
+      return async ({ update }) => {
+        update({ reset: false });
+        updateEmailLoading = false;
+      };
+    }}
   >
-    {i18n.t('account.settings.tabs.general.changeUsername.title')}
-  </Button>
-</form>
+    <div class="space-y-2">
+      <Label for="email">{i18n.t('auth.email')}</Label>
+      <Input name="email" bind:value={formValues.email} type="email" />
+    </div>
 
-<form
-  action="?/updateEmail"
-  class="space-y-4"
-  method="POST"
-  use:enhance={() => {
-    updateEmailLoading = true;
-    return async ({ update }) => {
-      update({ reset: false });
-      updateEmailLoading = false;
-    };
-  }}
->
-  <div class="space-y-2">
-    <Label for="email">{i18n.t('auth.email')}</Label>
-    <Input name="email" bind:value={formValues.email} type="email" />
-  </div>
-
-  <Button
-    type="submit"
-    disabled={updateEmailLoading || formValues.email === initialFormValues.email}
-    loading={updateEmailLoading}
-  >
-    {i18n.t('account.settings.tabs.general.changeEmail.title')}
-  </Button>
-</form>
+    <Button
+      type="submit"
+      disabled={updateEmailLoading || formValues.email === initialFormValues.email}
+      loading={updateEmailLoading}
+    >
+      {i18n.t('account.settings.tabs.general.changeEmail.title')}
+    </Button>
+  </form>
+</div>
 
 <form
   action="?/updateProfilePicture"
@@ -180,7 +186,10 @@
   }}
 >
   <Label>{i18n.t('account.settings.tabs.general.profilePicture')}</Label>
-  <label for="updateProfilePictureInput" class="size-20 block">
+  <label
+    for="updateProfilePictureInput"
+    class="size-20 block rounded-[42%] overflow-hidden relative"
+  >
     <ProfilePicture userId={page.data.user.id} class="size-full" />
     <input
       type="file"
@@ -192,8 +201,13 @@
         (e.target as HTMLInputElement).closest('form')?.submit();
       }}
     />
+    <div class="absolute bg-background/50 inset-0 flex flex-col items-center justify-center">
+      <Upload class="size-6" />
+    </div>
   </label>
 </form>
+
+<Separator />
 
 <div class="grid md:grid-cols-3 grid-cols-2 gap-4">
   <div class="flex flex-col gap-2">

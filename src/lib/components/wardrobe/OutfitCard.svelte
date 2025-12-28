@@ -72,7 +72,7 @@
 
 {#snippet content()}
   {#if showDate}
-    <div class="border-border relative w-fit bg-card rounded-lg border px-2 py-1">
+    <div class="relative w-fit bg-card rounded-full px-4 py-2 shadow-sm">
       <p class="font-medium text-base">
         {DateUtils.formatDate(outfit.createdAt)}
       </p>

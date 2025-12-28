@@ -47,8 +47,8 @@
     {#if activeSection === 'items'}
       {#if page.data.items.length > 0}
         <div
-          class="grid gap-x-6 gap-y-4 p-4"
-          style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));"
+          class="grid gap-2 p-2"
+          style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));"
         >
           {#each page.data.items as item (item.id)}
             <OutfitItemCard

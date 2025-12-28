@@ -118,7 +118,7 @@
 </Dialog.Root>
 
 <section class="lg:p-2 lg:pt-4 lg:pl-4 max-lg:p-4 w-full" data-post={post.id}>
-  <div class="bg-card relative border-border flex flex-col rounded-lg border lg:flex-row">
+  <div class="bg-card relative flex flex-col rounded-lg lg:flex-row">
     <!-- Image -->
     <div
       class="relative block -ml-2 max-lg:-mr-2 -mt-2 lg:-mb-2 lg:max-w-1/2 lg:w-full bg-card border border-border rounded-lg overflow-hidden"

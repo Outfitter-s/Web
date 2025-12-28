@@ -68,22 +68,19 @@
   </div>
 {/snippet}
 
-<div
-  class="grid gap-x-6 gap-y-4 p-4"
-  style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));"
->
+<div class="grid gap-4 p-2" style="grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));">
   {#each items as item (item.id)}
     {@const selected = selectedItems.has(item.id)}
     {@const seed = hashStringToNumber(item.id) / (item.id.length * 1000)}
     {@const rotate =
       (Math.sin(seed * 34) * 43758 - Math.floor(Math.sin(seed * 34) * 43758)) * 4 - 2}
     {@const scale =
-      (Math.sin(seed * 57) * 43758 - Math.floor(Math.sin(seed * 57) * 43758)) * 0.05 + 0.85}
+      (Math.sin(seed * 57) * 43758 - Math.floor(Math.sin(seed * 57) * 43758)) * 0.05 + 0.8}
     <OutfitItemCard
       {item}
       element="button"
       onclick={() => toggleSelect(item.id)}
-      class={{ container: `transition-all ${selected && 'ring-2 ring-primary'}` }}
+      class={{ container: `transition-all` }}
       style="transform: rotate({selected ? rotate : 0}deg) scale({selected ? scale : 1});"
     />
   {/each}
