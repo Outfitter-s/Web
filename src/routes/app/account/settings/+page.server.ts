@@ -125,6 +125,7 @@ export const actions: Actions = {
     const { totp } = formData as {
       totp: string;
     };
+    // unlinkTOTPSchema
 
     try {
       if (!user.totpSecret) throw new Error('errors.auth.totp.notEnabled');
