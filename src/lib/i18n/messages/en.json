@@ -587,5 +587,8 @@
       "title": "Outfit for {{date}}",
       "description": "Check out the outfit at {{url}}"
     }
+  },
+  "wrapped": {
+    "cta": "See your Outfitter wrapped"
   }
 }
