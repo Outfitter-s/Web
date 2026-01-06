@@ -51,6 +51,7 @@
     if (form && form.action === 'newComment') {
       if (form.success) {
         newComment.open = false;
+        newComment.commentId = null;
         Toaster.success('successes.social.comment.added');
       } else {
         logger.error(form.message);
@@ -179,7 +180,15 @@
         };
       }}
     >
-      <Textarea name="content" rows={2} />
+      <Textarea
+        name="content"
+        rows={2}
+        placeholder={i18n.t(
+          newComment.commentId
+            ? 'social.post.comments.reply.placeholder'
+            : 'social.post.comments.addComment.placeholder'
+        )}
+      />
       <Dialog.Footer class="mt-auto">
         <Button
           type="button"
