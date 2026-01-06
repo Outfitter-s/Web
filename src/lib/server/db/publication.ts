@@ -1,5 +1,6 @@
 import {
   PublicationImagesLengths,
+  type Comment,
   type Outfit,
   type PostReactions,
   type Publication,
@@ -15,6 +16,7 @@ import { OutfitDAO } from './outfit';
 import { ReactionDAO } from './reaction';
 import { filterText } from '../socialFilter';
 import { DateUtils } from '$lib/utils';
+import { CommentDAO } from './comment';
 // import { Caching } from './caching';
 
 export interface PublicationTable {
@@ -38,12 +40,14 @@ export class PublicationDAO {
       outfit,
       userReaction,
       images,
+      comments,
     }: {
       user: User;
       reactions: PostReactions;
       outfit?: Outfit | undefined;
       userReaction?: Reactions;
       images: string[];
+      comments?: Comment[];
     }
   ): Publication {
     return {
@@ -57,6 +61,7 @@ export class PublicationDAO {
       outfit,
       reactions,
       userReaction,
+      comments: comments ?? [],
     };
   }
 
@@ -107,7 +112,14 @@ export class PublicationDAO {
     const outfit = (await OutfitDAO.getOutfitById(item.outfit_id as UUID)) ?? undefined;
     const reactions = await ReactionDAO.getReactionsForPost(item.id);
     const images = await this.getPostImages(item.id);
-    const post = PublicationDAO.convertToPublication(item, { user, outfit, reactions, images });
+    const comments = await CommentDAO.getCommentsForPost(item.id);
+    const post = PublicationDAO.convertToPublication(item, {
+      user,
+      outfit,
+      reactions,
+      images,
+      comments,
+    });
     // await Caching.set(`publication:${id}`, post);
     return post;
   }

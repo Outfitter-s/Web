@@ -155,19 +155,15 @@ export interface Comment {
 }
 
 export const CommentZ: z.ZodType<Comment> = z.lazy(() =>
-  z
-    .object({
-      id: UUID.or(z.string()),
-      postId: UUID.nullable(),
-      commentId: UUID.nullable(),
-      content: z.string().min(1).max(500),
-      createdAt: DateZ,
-      user: UserZ,
-      replies: z.array(CommentZ).default([]),
-    })
-    .refine((data) => data.postId !== null || data.commentId !== null, {
-      message: 'Either postId or commentId must be provided',
-    })
+  z.object({
+    id: UUID.or(z.string()),
+    postId: UUID,
+    commentId: UUID.nullable(),
+    content: z.string().min(1).max(500),
+    createdAt: DateZ,
+    user: UserZ,
+    replies: z.array(CommentZ).default([]),
+  })
 );
 
 // Post - reaction
@@ -201,6 +197,7 @@ export const PublicationZ = z.object({
   }),
   userReaction: z.enum(reactions).optional(),
   createdAt: DateZ,
+  comments: z.array(CommentZ).default([]),
 });
 export type Publication = z.infer<typeof PublicationZ>;
 export const feedTypes = ['forYou', 'followed'];

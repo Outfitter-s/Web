@@ -1,11 +1,12 @@
 import { type Comment, type User, type UUID } from '$lib/types';
 import pool from '.';
 import { filterText } from '../socialFilter';
+import { PublicationDAO } from './publication';
 import { UserDAO } from './user';
 
 export interface CommentTable {
   id: UUID;
-  post_id: UUID | null;
+  publication_id: UUID | null;
   comment_id: UUID | null;
   user_id: UUID;
   content: string;
@@ -16,7 +17,7 @@ export class CommentDAO {
   static convertToComment(row: CommentTable, user: User, replies?: Comment[]): Comment {
     return {
       id: row.id,
-      postId: row.post_id,
+      postId: row.publication_id,
       commentId: row.comment_id,
       content: row.content,
       createdAt: row.created_at,
@@ -27,11 +28,26 @@ export class CommentDAO {
 
   static async create(
     content: Comment['content'],
+    userId: User['id'],
     { postId, commentId }: { postId?: Comment['postId']; commentId?: Comment['commentId'] }
   ): Promise<Comment> {
+    if (!postId && !commentId) {
+      throw new Error('Either postId or commentId must be provided');
+    }
+    if (postId) {
+      const post = await PublicationDAO.getPublicationById(postId);
+      if (!post) {
+        throw new Error('errors.social.post.notFound');
+      }
+    } else {
+      const parentComment = await this.getComment(commentId!);
+      if (!parentComment) {
+        throw new Error('errors.social.post.comments.parentComment.notFound');
+      }
+    }
     const res = await pool.query<CommentTable>(
-      'INSERT INTO comment (post_id, comment_id, content, created_at) VALUES ($1, $2, $3) RETURNING *',
-      [postId ?? null, commentId ?? null, filterText(content)]
+      'INSERT INTO comment (publication_id, user_id, comment_id, content) VALUES ($1, $2, $3, $4) RETURNING *',
+      [postId ?? null, userId, commentId ?? null, filterText(content)]
     );
     return (await this.getComment(res.rows[0].id)) as Comment;
   }
@@ -61,7 +77,7 @@ export class CommentDAO {
 
   static async getCommentsForPost(postId: Comment['postId']): Promise<Comment[]> {
     const res = await pool.query<CommentTable>(
-      'SELECT id FROM comment WHERE post_id = $1 AND comment_id IS NULL ORDER BY created_at ASC',
+      'SELECT id FROM comment WHERE publication_id = $1 AND comment_id IS NULL ORDER BY created_at ASC',
       [postId]
     );
     const comments: Comment[] = [];
