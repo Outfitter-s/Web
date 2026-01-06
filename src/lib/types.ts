@@ -143,6 +143,33 @@ export interface SwiperCard {
   outfit: OutfitPreview | Outfit;
 }
 
+// Post - comment
+export interface Comment {
+  id: UUID | string;
+  postId: UUID | null;
+  commentId: UUID | null;
+  content: string;
+  createdAt: Date;
+  user: User;
+  replies: Comment[];
+}
+
+export const CommentZ: z.ZodType<Comment> = z.lazy(() =>
+  z
+    .object({
+      id: UUID.or(z.string()),
+      postId: UUID.nullable(),
+      commentId: UUID.nullable(),
+      content: z.string().min(1).max(500),
+      createdAt: DateZ,
+      user: UserZ,
+      replies: z.array(CommentZ).default([]),
+    })
+    .refine((data) => data.postId !== null || data.commentId !== null, {
+      message: 'Either postId or commentId must be provided',
+    })
+);
+
 // Post - reaction
 export const reactions = ['love', 'like', 'haha', 'wow', 'sad'] as const;
 export type Reactions = (typeof reactions)[number];
