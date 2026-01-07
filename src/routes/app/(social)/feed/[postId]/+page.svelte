@@ -6,11 +6,11 @@
   import { OutfitItemCard } from '$lib/components/wardrobe';
   import type { PageProps } from './$types';
   import { Button } from '$lib/components/ui/button';
-  import { Pencil, Save, Trash2, X } from '@lucide/svelte';
+  import { Pencil, Plus, Save, Trash2, X } from '@lucide/svelte';
   import { fade } from 'svelte/transition';
   import { invalidateAll } from '$app/navigation';
   import { Toaster } from '$lib/components/Toast/toast';
-  import { cn, logger } from '$lib/utils';
+  import { cn, DateUtils, logger } from '$lib/utils';
   import * as Field from '$lib/components/ui/field';
   import { Textarea } from '$lib/components/ui/textarea';
   import * as Dialog from '$lib/components/ui/dialog';
@@ -19,8 +19,9 @@
   import { onDestroy, onMount } from 'svelte';
   import * as Carousel from '$lib/components/ui/carousel';
   import type { CarouselAPI } from '$lib/components/ui/carousel/context';
+  import type { Comment } from '$lib/types';
 
-  let { data }: PageProps = $props();
+  let { data, form }: PageProps = $props();
   let post = $derived(data.post);
   let user = $derived(data.user);
   let hasUserPostedToday = $derived(data.hasUserPostedToday);
@@ -31,6 +32,11 @@
   let isDeletingPost = $state(false);
   let carouselCurrentIndex = $state(0);
   let carouselApi = $state<CarouselAPI>();
+  let newComment = $state<{ open: boolean; processing: boolean; commentId: null | Comment['id'] }>({
+    open: false,
+    processing: false,
+    commentId: null,
+  });
 
   $effect(() => {
     if (carouselApi) {
@@ -38,6 +44,19 @@
       carouselApi.on('select', () => {
         carouselCurrentIndex = carouselApi!.selectedScrollSnap() + 1;
       });
+    }
+  });
+
+  $effect(() => {
+    if (form && form.action === 'newComment') {
+      if (form.success) {
+        newComment.open = false;
+        newComment.commentId = null;
+        Toaster.success('successes.social.comment.added');
+      } else {
+        logger.error(form.message);
+        Toaster.error(form.message as any);
+      }
     }
   });
 
@@ -75,6 +94,21 @@
   onDestroy(() => {
     Globals.navBack.backButton.shown = false;
   });
+
+  const getCommentFromId = (id: Comment['id']): Comment | null => {
+    function findComment(comments: Comment[]): Comment | null {
+      for (const comment of comments) {
+        if (comment.id === id) return comment;
+
+        for (const reply of comment.replies) {
+          const found = findComment([reply]);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+    return findComment(post.comments);
+  };
 </script>
 
 <SEO title="seo.social.post.title" description="seo.social.post.description" />
@@ -117,13 +151,106 @@
   </Dialog.Content>
 </Dialog.Root>
 
+<!-- New comment dialog -->
+<Dialog.Root bind:open={newComment.open}>
+  <Dialog.Content>
+    <Dialog.Header>
+      {#if newComment.commentId}
+        <Dialog.Title
+          >{i18n.t('social.post.comments.reply.title', {
+            username: getCommentFromId(newComment.commentId)?.user.username,
+          })}</Dialog.Title
+        >
+      {:else}
+        <Dialog.Title>{i18n.t('social.post.comments.addComment.title')}</Dialog.Title>
+      {/if}
+    </Dialog.Header>
+    <form
+      class="mt-6 flex flex-col gap-4 h-full grow"
+      method="POST"
+      action="?/newComment"
+      use:enhance={(e) => {
+        newComment.processing = true;
+        if (newComment.commentId) {
+          e.formData.append('parentCommentId', newComment.commentId);
+        }
+        return async ({ update }) => {
+          await update({ reset: false });
+          newComment.processing = false;
+        };
+      }}
+    >
+      <Textarea
+        name="content"
+        rows={2}
+        placeholder={i18n.t(
+          newComment.commentId
+            ? 'social.post.comments.reply.placeholder'
+            : 'social.post.comments.addComment.placeholder'
+        )}
+      />
+      <Dialog.Footer class="mt-auto">
+        <Button
+          type="button"
+          variant="outline"
+          disabled={newComment.processing}
+          onclick={() => (newComment.open = false)}>{i18n.t('social.post.comments.cancel')}</Button
+        >
+        <Button type="submit" disabled={newComment.processing} loading={newComment.processing}
+          >{i18n.t(
+            newComment.commentId
+              ? 'social.post.comments.reply.button'
+              : 'social.post.comments.addComment.button'
+          )}</Button
+        >
+      </Dialog.Footer>
+    </form>
+  </Dialog.Content>
+</Dialog.Root>
+
+{#snippet comment(c: Comment)}
+  <div class="flex flex-col">
+    <div class="flex flex-row gap-2">
+      <ProfilePicture userId={c.user.id} class="size-8 shrink-0" />
+      <div class="flex flex-col">
+        <a
+          href={resolve('/app/[username]', { username: `@${c.user.username}` })}
+          class="font-medium text-xs">{c.user.username}</a
+        >
+        <p class="text-base font-normal wrap-normal">{c.content}</p>
+        <div class="flex flex-row gap-2 items-center">
+          <span class="text-xs text-muted-foreground">{DateUtils.formatDate(c.createdAt)}</span>
+          <Button
+            variant="link"
+            size="sm"
+            onclick={() => {
+              newComment.commentId = c.id;
+              newComment.open = true;
+            }}
+          >
+            {i18n.t('social.post.comments.reply.button')}
+          </Button>
+        </div>
+      </div>
+    </div>
+    <!-- Replies -->
+    {#if c.replies.length > 0}
+      <div class="flex flex-col mt-4 pl-4 ml-4 border-l border-border gap-4">
+        {#each c.replies as reply (reply.id)}
+          {@render comment(reply)}
+        {/each}
+      </div>
+    {/if}
+  </div>
+{/snippet}
+
 <section class="lg:p-2 lg:pt-4 lg:pl-4 max-lg:p-4 w-full" data-post={post.id}>
   <div class="bg-card relative flex flex-col rounded-lg lg:flex-row">
     <!-- Image -->
     <div
       class="relative block -ml-2 max-lg:-mr-2 -mt-2 lg:-mb-2 lg:max-w-1/2 lg:w-full bg-card border border-border rounded-lg overflow-hidden"
     >
-      <Carousel.Root class="w-full" setApi={(emblaApi) => (carouselApi = emblaApi)}>
+      <Carousel.Root class="size-full" setApi={(emblaApi) => (carouselApi = emblaApi)}>
         <Carousel.Content>
           {#each post.images as image}
             <Carousel.Item>
@@ -259,5 +386,22 @@
         </div>
       {/if}
     </div>
+  </div>
+
+  <div class="p-2 flex flex-col rounded-lg gap-4 relative bg-card mt-6">
+    {#each post.comments as c (c.id)}
+      {@render comment(c)}
+    {:else}
+      <p class="text-center text-sm text-muted-foreground">
+        {i18n.t('social.post.comments.noComments')}
+      </p>
+    {/each}
+    <Button
+      class={cn(post.comments.length === 0 && 'mx-auto')}
+      onclick={() => (newComment.open = true)}
+    >
+      <Plus class="size-4" />
+      {i18n.t('social.post.comments.addComment.button')}
+    </Button>
   </div>
 </section>

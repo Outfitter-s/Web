@@ -143,6 +143,29 @@ export interface SwiperCard {
   outfit: OutfitPreview | Outfit;
 }
 
+// Post - comment
+export interface Comment {
+  id: UUID | string;
+  postId: UUID | null;
+  commentId: UUID | null;
+  content: string;
+  createdAt: Date;
+  user: User;
+  replies: Comment[];
+}
+
+export const CommentZ: z.ZodType<Comment> = z.lazy(() =>
+  z.object({
+    id: UUID.or(z.string()),
+    postId: UUID,
+    commentId: UUID.nullable(),
+    content: z.string().trim().min(1).max(500),
+    createdAt: DateZ,
+    user: UserZ,
+    replies: z.array(CommentZ).default([]),
+  })
+);
+
 // Post - reaction
 export const reactions = ['love', 'like', 'haha', 'wow', 'sad'] as const;
 export type Reactions = (typeof reactions)[number];
@@ -174,6 +197,7 @@ export const PublicationZ = z.object({
   }),
   userReaction: z.enum(reactions).optional(),
   createdAt: DateZ,
+  comments: z.array(CommentZ).default([]),
 });
 export type Publication = z.infer<typeof PublicationZ>;
 export const feedTypes = ['forYou', 'followed'];

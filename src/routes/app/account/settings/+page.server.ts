@@ -2,7 +2,7 @@ import { PasskeyDAO } from '$lib/server/db/passkey';
 import { UserDAO } from '$lib/server/db/user';
 import { validateTOTP } from '$lib/server/totp';
 import { logger } from '$lib/utils/logger';
-import { fail, type Actions } from '@sveltejs/kit';
+import { type Actions } from '@sveltejs/kit';
 import bcrypt from 'bcryptjs';
 import { ICSTokenDAO } from '$lib/server/db/ICSToken';
 import type { PageServerLoad } from './$types';

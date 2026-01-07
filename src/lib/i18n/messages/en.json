@@ -197,6 +197,9 @@
       },
       "post": {
         "edited": "Post edited successfully."
+      },
+      "comment": {
+        "added": "Comment added successfully."
       }
     }
   },
@@ -532,7 +535,23 @@
         "confirm": "Delete",
         "cancel": "Cancel"
       },
-      "blurred": "Post a picture of your outfit to see this content"
+      "blurred": "Post a picture of your outfit to see this content",
+      "comments": {
+        "noComments": "No comments yet. Be the first to comment!",
+        "cancel": "Cancel",
+        "addComment": {
+          "title": "Add a comment",
+          "placeholder": "Add a comment...",
+          "submit": "Post Comment",
+          "button": "Add Comment"
+        },
+        "reply": {
+          "button": "Reply",
+          "placeholder": "Write a reply...",
+          "submit": "Post Reply",
+          "title": "Reply to {{username}}"
+        }
+      }
     }
   },
   "homepage": {

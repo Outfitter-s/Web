@@ -1,5 +1,6 @@
 import {
   PublicationImagesLengths,
+  type Comment,
   type Outfit,
   type PostReactions,
   type Publication,
@@ -15,7 +16,7 @@ import { OutfitDAO } from './outfit';
 import { ReactionDAO } from './reaction';
 import { filterText } from '../socialFilter';
 import { DateUtils } from '$lib/utils';
-// import { Caching } from './caching';
+import { CommentDAO } from './comment';
 
 export interface PublicationTable {
   id: UUID;
@@ -38,12 +39,14 @@ export class PublicationDAO {
       outfit,
       userReaction,
       images,
+      comments,
     }: {
       user: User;
       reactions: PostReactions;
       outfit?: Outfit | undefined;
       userReaction?: Reactions;
       images: string[];
+      comments?: Comment[];
     }
   ): Publication {
     return {
@@ -57,6 +60,7 @@ export class PublicationDAO {
       outfit,
       reactions,
       userReaction,
+      comments: comments ?? [],
     };
   }
 
@@ -91,11 +95,10 @@ export class PublicationDAO {
     return post;
   }
 
-  static async getPublicationById(id: UUID): Promise<Publication | null> {
-    // const cached = await Caching.get<Publication>(`publication:${id}`);
-    // if (cached) {
-    //   return cached;
-    // }
+  static async getPublicationById(
+    id: Publication['id'],
+    userId?: User['id']
+  ): Promise<Publication | null> {
     const res = await pool.query<PublicationTable>('SELECT * FROM publication WHERE id = $1', [id]);
 
     if (res.rows.length === 0) {
@@ -106,9 +109,18 @@ export class PublicationDAO {
     const user = await UserDAO.getUserById(item.user_id);
     const outfit = (await OutfitDAO.getOutfitById(item.outfit_id as UUID)) ?? undefined;
     const reactions = await ReactionDAO.getReactionsForPost(item.id);
+    let userReaction: null | Reactions = null;
+    if (userId) userReaction = await ReactionDAO.getUserReaction(item.id, userId);
     const images = await this.getPostImages(item.id);
-    const post = PublicationDAO.convertToPublication(item, { user, outfit, reactions, images });
-    // await Caching.set(`publication:${id}`, post);
+    const comments = await CommentDAO.getCommentsForPost(item.id);
+    const post = PublicationDAO.convertToPublication(item, {
+      user,
+      outfit,
+      reactions,
+      images,
+      comments,
+      userReaction: userReaction ?? undefined,
+    });
     return post;
   }
 
@@ -193,7 +205,16 @@ export class PublicationDAO {
       const negativeScore = p.reactions
         ? negativeReactionsTypes.reduce((sum, type) => sum + (p.reactions?.[type] ?? 0), 0)
         : 0;
-      const popularity = positiveScore - negativeScore;
+
+      // Calculate total number of comments including replies
+      const countComments = (comments: Comment[]): number => {
+        return comments.reduce((total, comment) => total + 1 + countComments(comment.replies), 0);
+      };
+      const commentsCount = countComments(p.comments);
+
+      // Comments are weighted higher than reactions to represent deeper engagement
+      const popularity = positiveScore - negativeScore + commentsCount * 2;
+
       const ageInHours = (Date.now() - p.createdAt.getTime()) / (1000 * 60 * 60);
       const recency = 1 / (1 + ageInHours); // More recent posts have higher recency
       return 1.2 * recency + 0.8 * popularity;
@@ -211,27 +232,8 @@ export class PublicationDAO {
   ): Promise<Publication[]> {
     const res: Publication[] = [];
     for (const row of table) {
-      // const cached = await Caching.get<Publication>(`publication:${row.id}`);
-      // if (cached) {
-      //   res.push(cached);
-      //   continue;
-      // }
-      const user = await UserDAO.getUserById(row.user_id);
-      const outfit = (await OutfitDAO.getOutfitById(row.outfit_id as UUID)) ?? undefined;
-      const reactions = await ReactionDAO.getReactionsForPost(row.id);
-      const hasUserReacted = userId
-        ? ((await ReactionDAO.getUserReaction(row.id, userId)) ?? undefined)
-        : undefined;
-      const images = await this.getPostImages(row.id);
-      const post = PublicationDAO.convertToPublication(row, {
-        user,
-        outfit,
-        reactions,
-        userReaction: hasUserReacted,
-        images,
-      });
-      // await Caching.set(`publication:${row.id}`, post);
-      res.push(post);
+      const post = await PublicationDAO.getPublicationById(row.id, userId);
+      if (post) res.push(post);
     }
     return res;
   }
@@ -282,7 +284,6 @@ export class PublicationDAO {
     }
 
     await pool.query('DELETE FROM publication WHERE id = $1', [postId]);
-    // await Caching.del(`publication:${postId}`);
   }
 
   static async getOwner(publicationId: UUID): Promise<UUID | null> {
@@ -310,7 +311,6 @@ export class PublicationDAO {
       filterText(publication.description ?? existingPublication.description),
       id,
     ]);
-    // await Caching.del(`publication:${id}`);
   }
 
   static async writePostImage(id: UUID, imageBuffer: Buffer): Promise<void> {
