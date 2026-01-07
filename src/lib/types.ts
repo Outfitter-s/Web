@@ -159,7 +159,7 @@ export const CommentZ: z.ZodType<Comment> = z.lazy(() =>
     id: UUID.or(z.string()),
     postId: UUID,
     commentId: UUID.nullable(),
-    content: z.string().min(1).max(500),
+    content: z.string().trim().min(1).max(500),
     createdAt: DateZ,
     user: UserZ,
     replies: z.array(CommentZ).default([]),

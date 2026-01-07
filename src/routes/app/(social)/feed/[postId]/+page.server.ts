@@ -34,7 +34,7 @@ export const actions: Actions = {
 
   newComment: async ({ locals, params, request }) => {
     const schema = z.object({
-      content: z.string().min(1, 'errors.social.post.comments.addComment.empty'),
+      content: z.string().trim().min(1).max(500),
       parentCommentId: z.string().optional(),
     });
     const user = locals.user!;

@@ -62,29 +62,71 @@ export class CommentDAO {
     return this.convertToComment(res.rows[0], associatedUser, replies);
   }
 
+  private static async buildCommentTree(
+    rows: CommentTable[],
+    rootParentId: Comment['id'] | null
+  ): Promise<Comment[]> {
+    const childrenByParent = new Map<Comment['id'] | null, CommentTable[]>();
+    for (const row of rows) {
+      const parentId = (row.comment_id as Comment['id'] | null) ?? null;
+      const existing = childrenByParent.get(parentId);
+      if (existing) {
+        existing.push(row);
+      } else {
+        childrenByParent.set(parentId, [row]);
+      }
+    }
+    const buildForParent = async (parentId: Comment['id'] | null): Promise<Comment[]> => {
+      const children = childrenByParent.get(parentId) ?? [];
+      const result: Comment[] = [];
+      for (const childRow of children) {
+        const replies = await buildForParent(childRow.id);
+        const associatedUser = await UserDAO.getUserById(childRow.user_id);
+        const comment = this.convertToComment(childRow, associatedUser, replies);
+        result.push(comment);
+      }
+      return result;
+    };
+    return buildForParent(rootParentId);
+  }
   static async getRepliesToComment(commentId: Comment['id']): Promise<Comment[]> {
     const res = await pool.query<CommentTable>(
-      'SELECT id FROM comment WHERE comment_id = $1 ORDER BY created_at ASC',
+      `
+      WITH RECURSIVE comment_tree AS (
+        SELECT *
+        FROM comment
+        WHERE comment_id = $1
+        UNION ALL
+        SELECT c.*
+        FROM comment c
+        INNER JOIN comment_tree ct ON c.comment_id = ct.id
+      )
+      SELECT *
+      FROM comment_tree
+      ORDER BY created_at ASC
+      `,
       [commentId]
     );
-    const replies: Comment[] = [];
-    for (const commentId of res.rows) {
-      const comment = await this.getComment(commentId.id);
-      if (comment) replies.push(comment);
-    }
-    return replies;
+    return this.buildCommentTree(res.rows, commentId);
   }
-
   static async getCommentsForPost(postId: Comment['postId']): Promise<Comment[]> {
     const res = await pool.query<CommentTable>(
-      'SELECT id FROM comment WHERE publication_id = $1 AND comment_id IS NULL ORDER BY created_at ASC',
+      `
+      WITH RECURSIVE comment_tree AS (
+        SELECT *
+        FROM comment
+        WHERE publication_id = $1 AND comment_id IS NULL
+        UNION ALL
+        SELECT c.*
+        FROM comment c
+        INNER JOIN comment_tree ct ON c.comment_id = ct.id
+      )
+      SELECT *
+      FROM comment_tree
+      ORDER BY created_at ASC
+      `,
       [postId]
     );
-    const comments: Comment[] = [];
-    for (const commentId of res.rows) {
-      const comment = await this.getComment(commentId.id);
-      if (comment) comments.push(comment);
-    }
-    return comments;
+    return this.buildCommentTree(res.rows, null);
   }
 }
