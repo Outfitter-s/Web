@@ -22,7 +22,7 @@
         "svelte-adapter-bun": "^1.0.1",
         "sveltekit-superforms": "^2.29.1",
         "tailwind-merge": "^3.4.0",
-        "zod": "^4.3.2",
+        "zod": "^4.3.5",
       },
       "devDependencies": {
         "@eslint/compat": "^1.4.1",
@@ -1557,7 +1557,7 @@
 
     "zimmerframe": ["zimmerframe@1.1.4", "", {}, "sha512-B58NGBEoc8Y9MWWCQGl/gq9xBCe4IiKM0a2x7GZdQKOW5Exr8S1W24J6OgM1njK8xCRGvAJIL/MxXHf6SkmQKQ=="],
 
-    "zod": ["zod@4.3.2", "", {}, "sha512-b8L8yn4rIVfiXyHAmnr52/ZEpDumlT0bmxiq3Ws1ybrinhflGpt12Hvv54kYnEsGPRs6o/Ka3/ppA2OWY21IVg=="],
+    "zod": ["zod@4.3.5", "", {}, "sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g=="],
 
     "zod-v3-to-json-schema": ["zod-v3-to-json-schema@4.0.0", "", { "peerDependencies": { "zod": "^3.25 || ^4.0.14" } }, "sha512-KixLrhX/uPmRFnDgsZrzrk4x5SSJA+PmaE5adbfID9+3KPJcdxqRobaHU397EfWBqfQircrjKqvEqZ/mW5QH6w=="],
 
