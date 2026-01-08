@@ -80,7 +80,7 @@ export const ClothingItemZ = z.object({
   imageUrl: z.url(),
   type: z.enum(clothingItemTypes),
   color: z.enum(clothingItemColors),
-  pattern: z.enum(clothingItempatterns).nullable(),
+  pattern: z.enum(clothingItempatterns),
   createdAt: DateZ,
   name: z.string().min(1).max(100),
   description: z.string().max(500).nullable(),

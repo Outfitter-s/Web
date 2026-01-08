@@ -11,7 +11,7 @@ export interface ClothingItemTable {
   description: string;
   type: ClothingItem['type'];
   color: ClothingItem['color'];
-  pattern: ClothingItem['pattern'] | null;
+  pattern: ClothingItem['pattern'];
   created_at: Date;
 }
 
@@ -25,7 +25,7 @@ export class ClothingItemDAO {
       imageUrl: `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/clothing_item/${String(row.id)}.png`,
       type: row.type as ClothingItem['type'],
       color: row.color as ClothingItem['color'],
-      pattern: (row.pattern ?? null) as ClothingItem['pattern'] | null,
+      pattern: row.pattern as ClothingItem['pattern'],
       description: String(row.description ?? ''),
       name: String(row.name ?? ''),
       createdAt: new Date(row.created_at),
@@ -41,7 +41,7 @@ export class ClothingItemDAO {
     description: ClothingItem['description'],
     type: ClothingItem['type'],
     color: ClothingItem['color'],
-    pattern: ClothingItem['pattern'] | null
+    pattern: ClothingItem['pattern']
   ): Promise<ClothingItem> {
     const res = await pool.query<ClothingItemTable>(
       'INSERT INTO clothing_item (user_id, name, description, type, color, pattern) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
