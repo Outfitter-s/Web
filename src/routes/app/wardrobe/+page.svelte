@@ -9,6 +9,7 @@
   import { SEO } from '$lib/components';
   import OutfitCard from '$lib/components/wardrobe/OutfitCard.svelte';
   import { resolve } from '$app/paths';
+  import Wrapped from './wrapped.svelte';
   import { OutfitItemCard } from '$lib/components/wardrobe';
 
   const sections = ['items', 'outfits'] as const;
@@ -24,6 +25,7 @@
 <SEO title="seo.wardrobe.title" description="seo.wardrobe.description" />
 
 <div class="flex grow flex-col">
+  <Wrapped />
   <!-- Header -->
   <div class="flex shrink-0 flex-row flex-nowrap gap-4 p-2 pb-0">
     <button
