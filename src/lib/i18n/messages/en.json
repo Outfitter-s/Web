@@ -396,6 +396,7 @@
         "name": "Name",
         "type": "Type",
         "color": "Color",
+        "pattern": "Pattern",
         "description": "Description",
         "image": {
           "label": "Take a picture"

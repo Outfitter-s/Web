@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { logger } from '$lib/utils/logger';
 import { ClothingItemDAO } from '$lib/server/db/clothingItem';
-import { clothingItemColors, clothingItemTypes } from '$lib/types';
+import { clothingItemColors, clothingItemTypes, clothingItemMotifs } from '$lib/types';
 import z from 'zod';
 import { json } from '@sveltejs/kit';
 import { ImageProcessor } from '$lib/server/imageProcessing';
@@ -11,6 +11,7 @@ const schema = z.object({
   description: z.string().max(500).optional(),
   type: z.enum(clothingItemTypes),
   color: z.enum(clothingItemColors),
+  motif: z.enum(clothingItemMotifs).optional(),
   image: z
     .instanceof(File)
     .refine((file) => file.size > 0, { message: 'errors.clothing.item.missingImage' }),
@@ -29,7 +30,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
           .join(',')
       );
 
-    const { name, description, type, color, image } = form.data;
+    const { name, description, type, color, motif, image } = form.data;
 
     const imageBuffer = await ImageProcessor.resizeImage(await image.arrayBuffer());
 
@@ -39,7 +40,8 @@ export const POST: RequestHandler = async ({ locals, request }) => {
       name,
       description || null,
       type,
-      color
+      color,
+      motif ?? null
     );
     return json({ success: true, item });
   } catch (error) {
@@ -61,6 +63,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
     const newSchema = schema.extend({
       id: z.string().min(1),
       image: z.instanceof(File).optional(),
+      motif: z.enum(clothingItemMotifs).optional(),
     });
     const form = newSchema.safeParse(formData);
     if (!form.success)
@@ -71,8 +74,25 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
           .join(',')
       );
 
-    const { name, description, type, color, image, id } = form.data;
+    const { name, description, type, color, image, id, motif } = form.data;
     const item = await ClothingItemDAO.getClothingItemById(id);
+    if (!item || item.userId !== user.id) {
+      throw new Error('errors.clothing.item.notFound');
+    }
+    await ClothingItemDAO.updateClothingItem({
+      ...item,
+      name,
+      description: description || '',
+      type,
+      color,
+      motif: motif ?? null,
+    });
+    if (image) {
+      const imageBuffer = await ImageProcessor.resizeImage(await image.arrayBuffer());
+      await ClothingItemDAO.writeClothingItemImage(item.id, imageBuffer);
+    }
+
+    return json({ success: true });
     if (!item || item.userId !== user.id) {
       throw new Error('errors.clothing.item.notFound');
     }

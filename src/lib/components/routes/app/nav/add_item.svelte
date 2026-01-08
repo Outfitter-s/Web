@@ -6,8 +6,10 @@
   import {
     clothingItemColors,
     clothingItemTypes,
+    clothingItemMotifs,
     type ClothingItemColor,
     type ClothingItemType,
+    type ClothingItemMotif,
   } from '$lib/types';
   import { logger } from '$lib/utils/logger';
   import * as Field from '$lib/components/ui/field';
@@ -36,12 +38,14 @@
     description: string;
     color: ClothingItemColor;
     type: ClothingItemType;
+    motif: ClothingItemMotif;
   };
   let formValues = $state<FormValues>({
     name: '',
     description: '',
     color: clothingItemColors[0],
     type: clothingItemTypes[0],
+    motif: clothingItemMotifs[0],
   });
 
   async function onImageUpload() {
@@ -63,6 +67,7 @@
       if (res.ok) {
         if (result.type) formValues.type = result.type;
         if (result.color) formValues.color = result.color;
+        if (result.motif) formValues.motif = result.motif;
         if (result.type && result.color)
           formValues.name = `${capitalize(result.color)} ${result.type}`;
         const buffer = result.buffer;
@@ -89,6 +94,7 @@
     const file = new File([blob], 'picture.png', { type: blob.type });
     const formData = new FormData(event.target as HTMLFormElement);
     formData.append('image', file);
+    formData.append('motif', String(formValues.motif));
     const res = await fetch('/api/wardrobe/item', {
       method: 'POST',
       body: formData,
@@ -115,6 +121,7 @@
       description: '',
       color: clothingItemColors[0],
       type: clothingItemTypes[0],
+      motif: clothingItemMotifs[0],
     };
     pictureTaken = undefined;
     processingImage = false;
@@ -173,7 +180,7 @@
         {/if}
       </Field.Field>
 
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-3 gap-2">
         <Field.Field data-invalid={fieldsErrors.includes('type')}>
           <Field.Label for="type">{i18n.t('wardrobe.createItem.fields.type')}</Field.Label>
           <Select.Root
@@ -219,6 +226,26 @@
           </Select.Root>
           {#if fieldsErrors.includes('color')}
             <Field.Error>{i18n.t('errors.clothing.item.color')}</Field.Error>
+          {/if}
+        </Field.Field>
+
+        <Field.Field data-invalid={fieldsErrors.includes('motif')}>
+          <Field.Label for="motif">{i18n.t('wardrobe.createItem.fields.motif')}</Field.Label>
+          <Select.Root
+            type="single"
+            name="motif"
+            bind:value={formValues.motif}
+            onValueChange={() => resetFormError('motif')}
+          >
+            <Select.Trigger>{capitalize(formValues.motif)}</Select.Trigger>
+            <Select.Content>
+              {#each clothingItemMotifs as motif (motif)}
+                <Select.Item value={motif}>{capitalize(motif)}</Select.Item>
+              {/each}
+            </Select.Content>
+          </Select.Root>
+          {#if fieldsErrors.includes('motif')}
+            <Field.Error>{i18n.t('errors.clothing.item.motif')}</Field.Error>
           {/if}
         </Field.Field>
       </div>

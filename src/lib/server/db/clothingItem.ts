@@ -11,6 +11,7 @@ export interface ClothingItemTable {
   description: string;
   type: ClothingItem['type'];
   color: ClothingItem['color'];
+  motif: ClothingItem['motif'] | null;
   created_at: Date;
 }
 
@@ -24,6 +25,7 @@ export class ClothingItemDAO {
       imageUrl: `${getEnv('ORIGIN', 'http://localhost:5173')}/assets/clothing_item/${String(row.id)}.png`,
       type: row.type as ClothingItem['type'],
       color: row.color as ClothingItem['color'],
+      motif: (row.motif ?? null) as ClothingItem['motif'] | null,
       description: String(row.description ?? ''),
       name: String(row.name ?? ''),
       createdAt: new Date(row.created_at),
@@ -38,11 +40,12 @@ export class ClothingItemDAO {
     name: ClothingItem['name'],
     description: ClothingItem['description'],
     type: ClothingItem['type'],
-    color: ClothingItem['color']
+    color: ClothingItem['color'],
+    motif: ClothingItem['motif'] | null
   ): Promise<ClothingItem> {
     const res = await pool.query<ClothingItemTable>(
-      'INSERT INTO clothing_item (user_id, name, description, type, color) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [userId, name, description, type, color]
+      'INSERT INTO clothing_item (user_id, name, description, type, color, motif) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [userId, name, description, type, color, motif]
     );
     if (res.rows.length === 0) {
       throw new Error('Failed to create clothing item');
@@ -106,8 +109,8 @@ export class ClothingItemDAO {
 
   static async updateClothingItem(item: ClothingItem): Promise<void> {
     const res = await pool.query<ClothingItemTable>(
-      'UPDATE clothing_item SET name = $1, description = $2, type = $3, color = $4 WHERE id = $5 RETURNING *',
-      [item.name, item.description, item.type, item.color, item.id]
+      'UPDATE clothing_item SET name = $1, description = $2, type = $3, color = $4, motif = $5 WHERE id = $6 RETURNING *',
+      [item.name, item.description, item.type, item.color, item.motif ?? null, item.id]
     );
     if (res.rows.length === 0) {
       throw new Error('Failed to update clothing item');
