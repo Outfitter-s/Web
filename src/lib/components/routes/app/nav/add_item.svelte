@@ -6,13 +6,16 @@
   import {
     clothingItemColors,
     clothingItemTypes,
+    clothingItempatterns,
     type ClothingItemColor,
     type ClothingItemType,
+    type ClothingItempattern,
   } from '$lib/types';
   import { logger } from '$lib/utils/logger';
   import * as Field from '$lib/components/ui/field';
   import { Button } from '$lib/components/ui/button';
   import * as Dialog from '$lib/components/ui/dialog';
+  import { Square, AlignJustify, Grid, Circle, Flower, Image } from '@lucide/svelte';
   import { capitalize } from '$lib/utils';
   import { itemOpen } from '.';
   import { invalidateAll } from '$app/navigation';
@@ -31,17 +34,36 @@
     }
   });
 
+  function formatPatternLabel(s: string) {
+    return s
+      .split('_')
+      .map((w) => capitalize(w))
+      .join(' ');
+  }
+
+  const PatternIconMap: Record<ClothingItempattern, typeof Square> = {
+    solid: Square,
+    striped: AlignJustify,
+    plaid: Grid,
+    polka_dot: Circle,
+    floral: Flower,
+    graphic: Image,
+    checked: Grid,
+  };
+
   type FormValues = {
     name: string;
     description: string;
     color: ClothingItemColor;
     type: ClothingItemType;
+    pattern: ClothingItempattern;
   };
   let formValues = $state<FormValues>({
     name: '',
     description: '',
     color: clothingItemColors[0],
     type: clothingItemTypes[0],
+    pattern: clothingItempatterns[0],
   });
 
   async function onImageUpload() {
@@ -63,6 +85,7 @@
       if (res.ok) {
         if (result.type) formValues.type = result.type;
         if (result.color) formValues.color = result.color;
+        if (result.pattern) formValues.pattern = result.pattern;
         if (result.type && result.color)
           formValues.name = `${capitalize(result.color)} ${result.type}`;
         const buffer = result.buffer;
@@ -89,6 +112,7 @@
     const file = new File([blob], 'picture.png', { type: blob.type });
     const formData = new FormData(event.target as HTMLFormElement);
     formData.append('image', file);
+    formData.append('pattern', String(formValues.pattern));
     const res = await fetch('/api/wardrobe/item', {
       method: 'POST',
       body: formData,
@@ -115,6 +139,7 @@
       description: '',
       color: clothingItemColors[0],
       type: clothingItemTypes[0],
+      pattern: clothingItempatterns[0],
     };
     pictureTaken = undefined;
     processingImage = false;
@@ -173,7 +198,7 @@
         {/if}
       </Field.Field>
 
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-3 gap-2">
         <Field.Field data-invalid={fieldsErrors.includes('type')}>
           <Field.Label for="type">{i18n.t('wardrobe.createItem.fields.type')}</Field.Label>
           <Select.Root
@@ -219,6 +244,36 @@
           </Select.Root>
           {#if fieldsErrors.includes('color')}
             <Field.Error>{i18n.t('errors.clothing.item.color')}</Field.Error>
+          {/if}
+        </Field.Field>
+
+        <Field.Field data-invalid={fieldsErrors.includes('pattern')}>
+          <Field.Label for="pattern">{i18n.t('wardrobe.createItem.fields.pattern')}</Field.Label>
+          <Select.Root
+            type="single"
+            name="pattern"
+            bind:value={formValues.pattern}
+            onValueChange={() => resetFormError('pattern')}
+          >
+            <Select.Trigger>
+              <div class="flex items-center gap-2">
+                <svelte:component this={PatternIconMap[formValues.pattern]} class="w-4 h-4" />
+                {formatPatternLabel(formValues.pattern)}
+              </div>
+            </Select.Trigger>
+            <Select.Content>
+              {#each clothingItempatterns as pattern (pattern)}
+                <Select.Item value={pattern}>
+                  <div class="flex items-center gap-2">
+                    <svelte:component this={PatternIconMap[pattern]} class="w-4 h-4" />
+                    {formatPatternLabel(pattern)}
+                  </div>
+                </Select.Item>
+              {/each}
+            </Select.Content>
+          </Select.Root>
+          {#if fieldsErrors.includes('pattern')}
+            <Field.Error>{i18n.t('errors.clothing.item.pattern')}</Field.Error>
           {/if}
         </Field.Field>
       </div>
