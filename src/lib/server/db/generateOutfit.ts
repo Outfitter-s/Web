@@ -18,6 +18,7 @@ import {
   monochromeScore,
   complementaryScore,
   analogousScore,
+  patternScore,
   triadicScore,
 } from './outfitStrategies';
 
@@ -58,6 +59,7 @@ class OutfitUtils {
         item.score += monochromeScore(baseItem, item) * colorHarmonyWeight;
         item.score += complementaryScore(baseItem, item) * colorHarmonyWeight;
         item.score += analogousScore(baseItem, item) * colorHarmonyWeight;
+        item.score += patternScore(baseItem, item) * colorHarmonyWeight;
         item.score += triadicScore(baseItem, item) * colorHarmonyWeight;
       }
 
