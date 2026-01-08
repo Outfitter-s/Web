@@ -64,7 +64,7 @@ export const clothingItemColors = [
 ] as const;
 export type ClothingItemColor = (typeof clothingItemColors)[number];
 
-export const clothingItemMotifs = [
+export const clothingItempatterns = [
   'solid',
   'striped',
   'plaid',
@@ -73,14 +73,14 @@ export const clothingItemMotifs = [
   'graphic',
   'checked',
 ] as const;
-export type ClothingItemMotif = (typeof clothingItemMotifs)[number];
+export type ClothingItempattern = (typeof clothingItempatterns)[number];
 
 export const ClothingItemZ = z.object({
   id: UUID.or(z.string()),
   imageUrl: z.url(),
   type: z.enum(clothingItemTypes),
   color: z.enum(clothingItemColors),
-  motif: z.enum(clothingItemMotifs).nullable(),
+  pattern: z.enum(clothingItempatterns).nullable(),
   createdAt: DateZ,
   name: z.string().min(1).max(100),
   description: z.string().max(500).nullable(),

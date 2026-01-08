@@ -135,6 +135,7 @@
         "description": "Please provide a description for this item (max 500 characters).",
         "type": "Please select a type for this item.",
         "color": "Please select a color for this item.",
+        "pattern": "Please select a pattern for this item.",
         "image": "Please take an image of this item.",
         "notFound": "Item not found."
       },
