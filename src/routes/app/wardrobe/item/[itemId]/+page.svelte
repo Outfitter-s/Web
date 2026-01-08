@@ -1,6 +1,21 @@
 <script lang="ts">
   import { capitalize, DateUtils, logger } from '$lib/utils';
-  import { Calendar, Palette, Shirt, Pencil, Save, X, Trash2 } from '@lucide/svelte';
+  import {
+    Calendar,
+    Palette,
+    Shirt,
+    Pencil,
+    Save,
+    X,
+    Trash2,
+    Square,
+    AlignJustify,
+    Grid,
+    Circle,
+    Flower,
+    Image,
+    CheckSquare,
+  } from '@lucide/svelte';
   import ColorDot from '$lib/components/colorDot.svelte';
   import { Button } from '$lib/components/ui/button';
   import { SEO } from '$lib/components';
@@ -11,7 +26,7 @@
   import Input from '$lib/components/ui/input/input.svelte';
   import * as Field from '$lib/components/ui/field';
   import { Textarea } from '$lib/components/ui/textarea';
-  import { clothingItemColors, clothingItemTypes } from '$lib/types';
+  import { clothingItemColors, clothingItemTypes, clothingItempatterns } from '$lib/types';
   import { Toaster } from '$lib/components/Toast/toast';
   import PictureTaker from '$lib/components/PictureTaker.svelte';
   import { invalidateAll } from '$app/navigation';
@@ -24,7 +39,7 @@
   let item = $derived(data.item);
   let editModeEnabled = $state(false);
   // svelte-ignore state_referenced_locally
-  let editedItem = $state({ ...item });
+  let editedItem = $state({ ...item, pattern: item.pattern ?? clothingItempatterns[0] });
   let editedItemImage = $state<string | null>(null);
   let deleteItemConfirmOpen = $state(false);
   let isDeletingItem = $state(false);
@@ -43,6 +58,23 @@
   onDestroy(() => {
     Globals.navBack.backButton.shown = false;
   });
+
+  function formatPatternLabel(s: string) {
+    return s
+      .split('_')
+      .map((w) => capitalize(w))
+      .join(' ');
+  }
+
+  const PatternIconMap: Record<string, typeof Square> = {
+    solid: Square,
+    striped: AlignJustify,
+    plaid: Grid,
+    polka_dot: Circle,
+    floral: Flower,
+    graphic: Image,
+    checked: CheckSquare,
+  };
 
   async function saveItemChanges() {
     try {
@@ -74,7 +106,7 @@
 
   $effect(() => {
     // Reset edited item when item changes
-    editedItem = { ...item };
+    editedItem = { ...item, pattern: item.pattern ?? clothingItempatterns[0] };
   });
 </script>
 
@@ -183,7 +215,7 @@
               size="icon"
               onclick={() => {
                 editModeEnabled = false;
-                editedItem = { ...item };
+                editedItem = { ...item, pattern: item.pattern ?? clothingItempatterns[0] };
                 editedItemImage = null;
               }}
             >
@@ -221,7 +253,7 @@
       {/if}
 
       {#if editModeEnabled}
-        <div class="grid grid-cols-2 gap-2">
+        <div class="grid grid-cols-3 gap-2">
           <Field.Field>
             <Field.Label for="color">{i18n.t('wardrobe.createItem.fields.color')}</Field.Label>
             <Select.Root type="single" name="color" bind:value={editedItem.color}>
@@ -253,11 +285,37 @@
               </Select.Content>
             </Select.Root>
           </Field.Field>
+
+          <Field.Field>
+            <Field.Label for="pattern">{i18n.t('wardrobe.createItem.fields.pattern')}</Field.Label>
+            <Select.Root type="single" name="pattern" bind:value={editedItem.pattern}>
+              <Select.Trigger>
+                <div class="flex items-center gap-2">
+                  {#if editedItem.pattern}
+                    {@const Icon = PatternIconMap[editedItem.pattern]}
+                    <Icon class="w-4 h-4" />
+                    {formatPatternLabel(editedItem.pattern)}
+                  {/if}
+                </div>
+              </Select.Trigger>
+              <Select.Content>
+                {#each clothingItempatterns as pattern (pattern)}
+                  {@const Icon = PatternIconMap[pattern]}
+                  <Select.Item value={pattern}>
+                    <div class="flex items-center gap-2">
+                      <Icon class="w-4 h-4" />
+                      {formatPatternLabel(pattern)}
+                    </div>
+                  </Select.Item>
+                {/each}
+              </Select.Content>
+            </Select.Root>
+          </Field.Field>
         </div>
       {:else}
         <div
           class="grid w-full grid-rows-1"
-          style="grid-template-columns: repeat({item.lastWornAt ? 3 : 2}, minmax(0, 1fr));"
+          style="grid-template-columns: repeat({item.lastWornAt ? 4 : 3}, minmax(0, 1fr));"
         >
           <div class="flex flex-col gap-1">
             <div class="text-lg font-medium">
@@ -275,6 +333,23 @@
               Type
             </div>
             <div>{capitalize(item.type)}</div>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <div class="text-lg font-medium">
+              {#if item.pattern}
+                {@const Icon = PatternIconMap[item.pattern]}
+                <Icon class="mr-2 mb-1 inline size-5" />
+              {/if}
+              {i18n.t('wardrobe.createItem.fields.pattern')}
+            </div>
+            <div class="flex flex-row items-center gap-2">
+              {#if item.pattern}
+                {@const Icon = PatternIconMap[item.pattern]}
+                <Icon class="size-4" />
+                <span>{formatPatternLabel(item.pattern)}</span>
+              {/if}
+            </div>
           </div>
 
           {#if item.lastWornAt}
