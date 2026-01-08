@@ -589,6 +589,11 @@
     }
   },
   "wrapped": {
-    "cta": "See your Outfitter wrapped"
+    "cta": "See your Outfitter wrapped",
+    "tabs": {
+      "mostWornItems": "Most worn items",
+      "mostLikedPost": "Most liked post"
+    },
+    "noLikedPost": "You didn't post any outfit this year."
   }
 }

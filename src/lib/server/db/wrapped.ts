@@ -10,8 +10,7 @@ export interface Wrapped {
 
 export class WrappedDAO {
   static async meetsPrerequisite() {
-    // return (new Date()).getMonth() === 0; // Available only in January
-    return true;
+    return new Date().getMonth() === 0; // Available only in January
   }
 
   static async getWrapped(userId: User['id']): Promise<Wrapped | null> {
