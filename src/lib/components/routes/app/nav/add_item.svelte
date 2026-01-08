@@ -15,6 +15,7 @@
   import * as Field from '$lib/components/ui/field';
   import { Button } from '$lib/components/ui/button';
   import * as Dialog from '$lib/components/ui/dialog';
+  import { Square, AlignJustify, Grid, Circle, Flower, Image } from '@lucide/svelte';
   import { capitalize } from '$lib/utils';
   import { itemOpen } from '.';
   import { invalidateAll } from '$app/navigation';
@@ -32,6 +33,23 @@
       resetForm();
     }
   });
+
+  function formatPatternLabel(s: string) {
+    return s
+      .split('_')
+      .map((w) => capitalize(w))
+      .join(' ');
+  }
+
+  const PatternIconMap: Record<ClothingItempattern, typeof Square> = {
+    solid: Square,
+    striped: AlignJustify,
+    plaid: Grid,
+    polka_dot: Circle,
+    floral: Flower,
+    graphic: Image,
+    checked: Grid,
+  };
 
   type FormValues = {
     name: string;
@@ -237,10 +255,20 @@
             bind:value={formValues.pattern}
             onValueChange={() => resetFormError('pattern')}
           >
-            <Select.Trigger>{capitalize(formValues.pattern)}</Select.Trigger>
+            <Select.Trigger>
+              <div class="flex items-center gap-2">
+                <svelte:component this={PatternIconMap[formValues.pattern]} class="w-4 h-4" />
+                {formatPatternLabel(formValues.pattern)}
+              </div>
+            </Select.Trigger>
             <Select.Content>
               {#each clothingItempatterns as pattern (pattern)}
-                <Select.Item value={pattern}>{capitalize(pattern)}</Select.Item>
+                <Select.Item value={pattern}>
+                  <div class="flex items-center gap-2">
+                    <svelte:component this={PatternIconMap[pattern]} class="w-4 h-4" />
+                    {formatPatternLabel(pattern)}
+                  </div>
+                </Select.Item>
               {/each}
             </Select.Content>
           </Select.Root>
