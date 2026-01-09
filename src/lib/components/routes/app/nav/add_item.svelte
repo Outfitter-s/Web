@@ -6,10 +6,10 @@
   import {
     clothingItemColors,
     clothingItemTypes,
-    clothingItempatterns,
+    ClothingItemPatterns,
     type ClothingItemColor,
     type ClothingItemType,
-    type ClothingItempattern,
+    type ClothingItemPattern,
   } from '$lib/types';
   import { logger } from '$lib/utils/logger';
   import * as Field from '$lib/components/ui/field';
@@ -41,7 +41,7 @@
       .join(' ');
   }
 
-  const PatternIconMap: Record<ClothingItempattern, typeof Square> = {
+  const PatternIconMap: Record<ClothingItemPattern, typeof Square> = {
     solid: Square,
     striped: AlignJustify,
     plaid: Grid,
@@ -56,14 +56,14 @@
     description: string;
     color: ClothingItemColor;
     type: ClothingItemType;
-    pattern: ClothingItempattern;
+    pattern: ClothingItemPattern;
   };
   let formValues = $state<FormValues>({
     name: '',
     description: '',
     color: clothingItemColors[0],
     type: clothingItemTypes[0],
-    pattern: clothingItempatterns[0],
+    pattern: ClothingItemPatterns[0],
   });
 
   async function onImageUpload() {
@@ -112,7 +112,7 @@
     const file = new File([blob], 'picture.png', { type: blob.type });
     const formData = new FormData(event.target as HTMLFormElement);
     formData.append('image', file);
-    formData.append('pattern', String(formValues.pattern));
+    // formData.append('pattern', String(formValues.pattern));
     const res = await fetch('/api/wardrobe/item', {
       method: 'POST',
       body: formData,
@@ -139,7 +139,7 @@
       description: '',
       color: clothingItemColors[0],
       type: clothingItemTypes[0],
-      pattern: clothingItempatterns[0],
+      pattern: ClothingItemPatterns[0],
     };
     pictureTaken = undefined;
     processingImage = false;
@@ -160,6 +160,7 @@
             pictureTaken = file;
             onImageUpload();
           }}
+          showPreview={true}
           bind:pictureTaken
           bind:spinner={processingImage}
           error={fieldsErrors.includes('image') ? 'errors.clothing.item.image' : undefined}
@@ -198,7 +199,7 @@
         {/if}
       </Field.Field>
 
-      <div class="grid grid-cols-3 gap-2">
+      <div class="grid grid-cols-2 gap-2">
         <Field.Field data-invalid={fieldsErrors.includes('type')}>
           <Field.Label for="type">{i18n.t('wardrobe.createItem.fields.type')}</Field.Label>
           <Select.Root
@@ -257,15 +258,16 @@
           >
             <Select.Trigger>
               <div class="flex items-center gap-2">
-                <svelte:component this={PatternIconMap[formValues.pattern]} class="w-4 h-4" />
+                <svelte:component this={PatternIconMap[formValues.pattern]} class="size-4" />
                 {formatPatternLabel(formValues.pattern)}
               </div>
             </Select.Trigger>
             <Select.Content>
-              {#each clothingItempatterns as pattern (pattern)}
+              {#each ClothingItemPatterns as pattern (pattern)}
+                {@const Icon = PatternIconMap[pattern]}
                 <Select.Item value={pattern}>
                   <div class="flex items-center gap-2">
-                    <svelte:component this={PatternIconMap[pattern]} class="w-4 h-4" />
+                    <Icon class="size-4" />
                     {formatPatternLabel(pattern)}
                   </div>
                 </Select.Item>

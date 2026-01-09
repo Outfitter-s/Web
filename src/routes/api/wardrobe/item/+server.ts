@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 import { logger } from '$lib/utils/logger';
 import { ClothingItemDAO } from '$lib/server/db/clothingItem';
-import { clothingItemColors, clothingItemTypes, clothingItempatterns } from '$lib/types';
+import { clothingItemColors, clothingItemTypes, ClothingItemPatterns } from '$lib/types';
 import z from 'zod';
 import { json } from '@sveltejs/kit';
 import { ImageProcessor } from '$lib/server/imageProcessing';
@@ -11,7 +11,7 @@ const schema = z.object({
   description: z.string().max(500).optional(),
   type: z.enum(clothingItemTypes),
   color: z.enum(clothingItemColors),
-  pattern: z.enum(clothingItempatterns).optional(),
+  pattern: z.enum(ClothingItemPatterns).optional(),
   image: z
     .instanceof(File)
     .refine((file) => file.size > 0, { message: 'errors.clothing.item.missingImage' }),
@@ -63,7 +63,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
     const newSchema = schema.extend({
       id: z.string().min(1),
       image: z.instanceof(File).optional(),
-      pattern: z.enum(clothingItempatterns).optional(),
+      pattern: z.enum(ClothingItemPatterns).optional(),
     });
     const form = newSchema.safeParse(formData);
     if (!form.success)
