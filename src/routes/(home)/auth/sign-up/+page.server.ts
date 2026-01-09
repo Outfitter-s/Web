@@ -2,7 +2,7 @@ import { UserDAO } from '$lib/server/db/user';
 import bcrypt from 'bcryptjs';
 import type { Actions, PageServerLoad } from './$types';
 import { generateAccessToken } from '$lib/server/auth';
-import { fail, redirect } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { logger } from '$lib/utils/logger';
 import { env } from '$env/dynamic/private';
 import { getCookiePrefix } from '$lib/server/utils';
