@@ -26,7 +26,7 @@
   import Input from '$lib/components/ui/input/input.svelte';
   import * as Field from '$lib/components/ui/field';
   import { Textarea } from '$lib/components/ui/textarea';
-  import { clothingItemColors, clothingItemTypes, clothingItempatterns } from '$lib/types';
+  import { clothingItemColors, clothingItemTypes, ClothingItemPatterns } from '$lib/types';
   import { Toaster } from '$lib/components/Toast/toast';
   import PictureTaker from '$lib/components/PictureTaker.svelte';
   import { invalidateAll } from '$app/navigation';
@@ -39,7 +39,7 @@
   let item = $derived(data.item);
   let editModeEnabled = $state(false);
   // svelte-ignore state_referenced_locally
-  let editedItem = $state({ ...item, pattern: item.pattern ?? clothingItempatterns[0] });
+  let editedItem = $state({ ...item, pattern: item.pattern ?? ClothingItemPatterns[0] });
   let editedItemImage = $state<string | null>(null);
   let deleteItemConfirmOpen = $state(false);
   let isDeletingItem = $state(false);
@@ -106,7 +106,7 @@
 
   $effect(() => {
     // Reset edited item when item changes
-    editedItem = { ...item, pattern: item.pattern ?? clothingItempatterns[0] };
+    editedItem = { ...item, pattern: item.pattern ?? ClothingItemPatterns[0] };
   });
 </script>
 
@@ -215,7 +215,7 @@
               size="icon"
               onclick={() => {
                 editModeEnabled = false;
-                editedItem = { ...item, pattern: item.pattern ?? clothingItempatterns[0] };
+                editedItem = { ...item, pattern: item.pattern ?? ClothingItemPatterns[0] };
                 editedItemImage = null;
               }}
             >
@@ -253,7 +253,7 @@
       {/if}
 
       {#if editModeEnabled}
-        <div class="grid grid-cols-3 gap-2">
+        <div class="grid grid-cols-2 gap-2">
           <Field.Field>
             <Field.Label for="color">{i18n.t('wardrobe.createItem.fields.color')}</Field.Label>
             <Select.Root type="single" name="color" bind:value={editedItem.color}>
@@ -299,7 +299,7 @@
                 </div>
               </Select.Trigger>
               <Select.Content>
-                {#each clothingItempatterns as pattern (pattern)}
+                {#each ClothingItemPatterns as pattern (pattern)}
                   {@const Icon = PatternIconMap[pattern]}
                   <Select.Item value={pattern}>
                     <div class="flex items-center gap-2">
@@ -313,10 +313,7 @@
           </Field.Field>
         </div>
       {:else}
-        <div
-          class="grid w-full grid-rows-1"
-          style="grid-template-columns: repeat({item.lastWornAt ? 4 : 3}, minmax(0, 1fr));"
-        >
+        <div class="grid w-full gap-4 grid-cols-2">
           <div class="flex flex-col gap-1">
             <div class="text-lg font-medium">
               <Palette class="mr-2 mb-1 inline size-5" />
