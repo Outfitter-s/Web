@@ -1,0 +1,620 @@
+{
+  "seo": {
+    "titleSuffix": "Outfitter",
+    "defaults": {
+      "title": "Outfitter",
+      "description": "Bienvenue sur Outfitter, votre générateur de tenues personnel et gestionnaire de garde‑robe. Créez des tenues stylées à partir de vos vêtements.",
+      "error": {
+        "title": "Une erreur est survenue",
+        "description": "Désolé, une erreur inattendue est survenue. Veuillez réessayer plus tard."
+      }
+    },
+    "home": {
+      "homePage": {
+        "title": "Accueil",
+        "description": "Bienvenue sur Outfitter, votre générateur de tenues personnel et gestionnaire de garde‑robe. Créez des tenues stylées à partir de vos vêtements."
+      },
+      "legal": {
+        "tos": {
+          "title": "Conditions d'utilisation",
+          "description": "Consultez les conditions d'utilisation d'Outfitter."
+        },
+        "privacyPolicy": {
+          "title": "Politique de confidentialité",
+          "description": "Consultez la politique de confidentialité pour comprendre comment Outfitter traite vos données."
+        }
+      }
+    },
+    "auth": {
+      "logIn": {
+        "title": "Connexion",
+        "description": "Connectez‑vous à votre compte Outfitter pour gérer votre garde‑robe et générer des tenues adaptées à vos vêtements."
+      },
+      "signUp": {
+        "title": "Inscription",
+        "description": "Créez un compte sur Outfitter pour commencer à gérer votre garde‑robe et générer des tenues personnalisées."
+      },
+      "forgotPassword": {
+        "title": "Mot de passe oublié",
+        "description": "Réinitialisez le mot de passe de votre compte Outfitter pour retrouver l'accès à vos fonctionnalités de garde‑robe et de génération de tenues."
+      },
+      "resetPassword": {
+        "title": "Réinitialiser le mot de passe",
+        "description": "Choisissez un nouveau mot de passe pour votre compte Outfitter et retrouvez l'accès à vos fonctionnalités."
+      }
+    },
+    "account": {
+      "title": "Compte",
+      "description": "Gérez votre compte Outfitter",
+      "settings": {
+        "title": "Paramètres du compte",
+        "description": "Gérez les paramètres de votre compte Outfitter : nom d'utilisateur, e‑mail, mot de passe et options de sécurité (TOTP, passkeys)."
+      }
+    },
+    "wardrobe": {
+      "title": "Garde‑robe",
+      "description": "Gérez votre garde‑robe en ajoutant des articles et en générant des tenues stylées à partir de votre collection.",
+      "item": {
+        "title": "Article",
+        "description": "Consultez et modifiez les détails de cet article dans votre garde‑robe.",
+        "edit": {
+          "title": "Modifier l'article",
+          "description": "Modifiez les informations de cet article dans votre garde‑robe."
+        }
+      }
+    },
+    "social": {
+      "feed": {
+        "title": "Fil",
+        "description": "Parcourez le fil communautaire d'Outfitter pour découvrir des tenues et articles partagés par d'autres utilisateur·rice·s."
+      },
+      "post": {
+        "title": "Publication",
+        "description": "Consultez une tenue ou un article partagé par un utilisateur."
+      },
+      "profile": {
+        "title": "Profil de {{username}}",
+        "description": "Découvrez le profil de {{username}} sur Outfitter pour voir sa garde‑robe, ses tenues et ses articles."
+      }
+    }
+  },
+  "errors": {
+    "auth": {
+      "badUsername": "Aucun utilisateur trouvé avec ce nom d'utilisateur",
+      "invalidCredentials": "Identifiants invalides. Veuillez réessayer.",
+      "createUser": "Échec de la création de l'utilisateur",
+      "usernameTaken": "Ce nom d'utilisateur est déjà pris. Veuillez en choisir un autre.",
+      "userDoesNotExist": "L'utilisateur n'existe pas.",
+      "userNotFound": "Utilisateur introuvable.",
+      "userIsRequired": "L'utilisateur est requis.",
+      "usernameTooShort": "Le nom d'utilisateur doit comporter au moins 3 caractères.",
+      "usernameTooLong": "Le nom d'utilisateur doit comporter au maximum 20 caractères.",
+      "unauthorized": "Non autorisé.",
+      "emailInUse": "Cet e‑mail est déjà utilisé par un compte actif.",
+      "invalidEmail": "Adresse e‑mail invalide.",
+      "createPasskey": "Échec de la création de la passkey",
+      "passkeyAlreadyExists": "Cette passkey existe déjà.",
+      "challengeExpired": "Le challenge a expiré. Veuillez réessayer.",
+      "noPasskey": "Aucune passkey enregistrée pour cet utilisateur.",
+      "verificationFailed": "La vérification a échoué. Veuillez réessayer.",
+      "passkeyLoginFailed": "Échec de la connexion par passkey. Veuillez réessayer.",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères.",
+      "passwordTooLong": "Le mot de passe doit contenir au plus 100 caractères.",
+      "totp": {
+        "invalidToken": "Jeton TOTP invalide.",
+        "registerFailed": "Échec de l'enregistrement du TOTP. Veuillez réessayer.",
+        "invalidCode": "Code TOTP invalide.",
+        "notEnabled": "Vous devez activer le TOTP pour effectuer cette action.",
+        "needTOTP": "Vous devez fournir un code TOTP pour effectuer cette action."
+      },
+      "passwordReset": {
+        "noToken": "Aucun jeton de réinitialisation fourni !",
+        "expiredToken": "La demande a expiré !",
+        "passwordsDontMatch": "Les mots de passe ne correspondent pas !",
+        "noAccountWithEmail": "Aucun compte associé à cet e‑mail !",
+        "wrongCurrentPassword": "Mot de passe actuel incorrect !"
+      }
+    },
+    "server": {
+      "connectionRefused": "Connexion refusée. Veuillez réessayer plus tard.",
+      "forbidden": "Interdit",
+      "weatherFetchFailed": "Échec de la récupération des données météo. Veuillez réessayer plus tard."
+    },
+    "account": {
+      "settings": {
+        "cannotChangeUsername": "Impossible de changer le nom d'utilisateur.",
+        "invalidProfilePicture": "Image de profil invalide. Veuillez télécharger une image valide."
+      }
+    },
+    "clothing": {
+      "item": {
+        "requiredField": "Le{{s}} champ{{s}} {{is}} requis : {{field}}",
+        "classificationFailed": "La classification de l'article a échoué. Veuillez saisir les valeurs manuellement.",
+        "missingImage": "Un fichier image est requis.",
+        "name": "Veuillez saisir un nom pour cet article (100 caractères max).",
+        "description": "Veuillez fournir une description pour cet article (500 caractères max).",
+        "type": "Veuillez sélectionner un type pour cet article.",
+        "color": "Veuillez sélectionner une couleur pour cet article.",
+        "pattern": "Veuillez sélectionner un motif pour cet article.",
+        "image": "Veuillez prendre une photo de cet article.",
+        "notFound": "Article introuvable."
+      },
+      "outfit": {
+        "delete": "Échec de la suppression de la tenue. Veuillez réessayer plus tard.",
+        "notAuthorized": "Cette tenue ne vous appartient pas.",
+        "notFound": "Tenue introuvable."
+      }
+    },
+    "outfitGeneration": {
+      "notEnoughItems": "Pas assez d'articles pour générer une tenue. Ajoutez plus d'articles à votre garde‑robe.",
+      "apiError": "Échec de la génération de la tenue en raison d'une erreur interne. Veuillez réessayer plus tard."
+    },
+    "social": {
+      "cannotFollowYourself": "Vous ne pouvez pas vous suivre vous‑même.",
+      "searchFailed": "Échec de la recherche d'utilisateurs. Veuillez réessayer plus tard.",
+      "item": {
+        "requiredField": "Le{{s}} champ{{s}} {{is}} requis : {{field}}"
+      },
+      "post": {
+        "notFound": "Publication introuvable.",
+        "deleteFailed": "Échec de la suppression de la publication. Veuillez réessayer plus tard.",
+        "notAuthorized": "Vous n'êtes pas autorisé·e à supprimer cette publication."
+      }
+    },
+    "icsToken": {
+      "creationFailed": "Échec de la création du lien calendrier. Veuillez réessayer plus tard.",
+      "revocationFailed": "Échec de la révocation du lien calendrier. Veuillez réessayer plus tard.",
+      "notFound": "Lien calendrier introuvable."
+    }
+  },
+  "successes": {
+    "passkeyAdded": "Passkey ajoutée avec succès.",
+    "passkeyDeleted": "Passkey supprimée avec succès.",
+    "setUpTOTP": "Le TOTP a été configuré avec succès.",
+    "unlinkTOTP": "Le TOTP a été désactivé avec succès.",
+    "resetPasswordRequest": "Vérifiez votre boîte mail pour réinitialiser votre mot de passe !",
+    "resetPassword": "Votre mot de passe a été réinitialisé avec succès !",
+    "usernameUpdated": "Nom d'utilisateur mis à jour avec succès.",
+    "emailUpdated": "E‑mail mis à jour avec succès.",
+    "profilePictureUpdated": "Photo de profil mise à jour avec succès.",
+    "ics": {
+      "created": "Lien calendrier créé avec succès.",
+      "revoked": "Lien calendrier révoqué avec succès.",
+      "copied": "Lien calendrier copié dans le presse‑papier."
+    },
+    "clothing": {
+      "item": {
+        "created": "Article créé avec succès.",
+        "updated": "Article mis à jour avec succès."
+      }
+    },
+    "social": {
+      "follow": {
+        "followed": "Vous suivez maintenant {{username}}.",
+        "unfollowed": "Vous avez cessé de suivre {{username}}."
+      },
+      "item": {
+        "created": "Publié."
+      },
+      "post": {
+        "edited": "Publication modifiée avec succès."
+      },
+      "comment": {
+        "added": "Commentaire ajouté avec succès."
+      }
+    }
+  },
+  "auth": {
+    "username": "Nom d'utilisateur",
+    "email": "E‑mail",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "rememberMe": "Se souvenir de moi",
+    "forgotPasswordKeyword": "Mot de passe oublié ?",
+    "submit": "Valider",
+    "signIn": {
+      "title": "Connectez‑vous à votre compte",
+      "alreadyHaveAnAccount": {
+        "text": "Vous avez déjà un compte ?",
+        "cta": "Se connecter"
+      }
+    },
+    "logIn": {
+      "title": "Connectez‑vous à votre compte",
+      "dontHaveAnAccount": {
+        "text": "Vous n'avez pas de compte ?",
+        "cta": "S'inscrire"
+      }
+    },
+    "passkey": {
+      "separator": "ou",
+      "button": "Utiliser la passkey"
+    },
+    "totp": {
+      "logIn": {
+        "title": "Connexion avec TOTP",
+        "description": "Saisissez votre code TOTP pour vous connecter.",
+        "nextButton": "Suivant"
+      },
+      "settings": {
+        "page": {
+          "enable": {
+            "description": "L'authentification à deux facteurs n'est pas activée pour votre compte.",
+            "button": "Activer"
+          },
+          "disable": {
+            "description": "L'authentification à deux facteurs est activée pour votre compte.",
+            "button": "Désactiver"
+          }
+        },
+        "manage": {
+          "title": "Gérer le TOTP",
+          "description": "Vous pouvez gérer vos paramètres TOTP ici.",
+          "button": "Désactiver le TOTP",
+          "secondStep": {
+            "description": "Confirmez votre identité en entrant votre code TOTP.",
+            "cancel": "Annuler",
+            "confirm": "Désactiver"
+          }
+        },
+        "setup": {
+          "title": "Configurer le TOTP",
+          "description": "Scannez le QR code avec votre application d'authentification pour configurer le TOTP.",
+          "button": "Configurer le TOTP",
+          "qrCodeAlt": "QR code pour la configuration 2FA",
+          "unableToScan": "Impossible de scanner ? Vous pouvez afficher la clé secrète :",
+          "showHideValue": "Afficher/masquer la valeur",
+          "confirmCode": "Confirmer le code",
+          "nextButton": "Suivant"
+        },
+        "success": {
+          "title": "TOTP configuré avec succès",
+          "description": "Vous avez configuré le TOTP avec succès pour votre compte.",
+          "message": "Votre compte est désormais protégé par une couche de sécurité supplémentaire grâce au TOTP.",
+          "buttons": {
+            "close": "Fermer"
+          }
+        }
+      }
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié ?",
+      "button": "Envoyer le lien de réinitialisation"
+    },
+    "resetPassword": {
+      "title": "Réinitialiser votre mot de passe",
+      "button": "Réinitialiser le mot de passe",
+      "successAction": "Se connecter"
+    },
+    "formWrapper": {
+      "back": "Retour"
+    }
+  },
+  "errorPage": {
+    "cta": {
+      "goHome": "Retour à l'accueil",
+      "goBack": "Revenir en arrière"
+    }
+  },
+  "account": {
+    "tabs": {
+      "settings": "Paramètres",
+      "legal": "Mentions légales"
+    },
+    "settings": {
+      "tabs": {
+        "general": {
+          "title": "Général",
+          "description": "Mettez à jour les paramètres généraux de votre compte.",
+          "changeUsername": {
+            "title": "Changer le nom d'utilisateur",
+            "alerts": {
+              "taken": {
+                "title": "Nom d'utilisateur déjà pris",
+                "description": "Le nom d'utilisateur {{username}} est déjà pris."
+              },
+              "available": {
+                "title": "Nom disponible",
+                "description": "Le nom d'utilisateur {{username}} est disponible !"
+              }
+            }
+          },
+          "changeLang": {
+            "title": "Langue"
+          },
+          "changeEmail": {
+            "title": "Changer l'e‑mail"
+          },
+          "theme": {
+            "theme": "Thème",
+            "mode": "Mode"
+          },
+          "logout": "Se déconnecter",
+          "danger": {
+            "title": "Zone dangereuse"
+          },
+          "profilePicture": "Photo de profil"
+        },
+        "password": {
+          "title": "Mot de passe",
+          "description": "Changez votre mot de passe pour garder votre compte sécurisé."
+        },
+        "calendars": {
+          "title": "Calendriers",
+          "description": "Gérez vos intégrations et paramètres de calendrier.",
+          "createButton": "Créer un nouveau lien de calendrier",
+          "revokeButton": "Révoquer"
+        },
+        "TOTP": {
+          "title": "TOTP",
+          "description": "L'authentification à deux facteurs (2FA) ajoute une couche de sécurité supplémentaire en demandant une seconde preuve d'identité lors de la connexion."
+        },
+        "passkey": {
+          "title": "Passkey",
+          "description": "Une passkey est un moyen sécurisé de se connecter sans mot de passe. Elle utilise des clés cryptographiques stockées sur votre appareil.",
+          "register": {
+            "button": "Enregistrer la passkey"
+          },
+          "remove": {
+            "button": "Supprimer la passkey",
+            "modal": {
+              "confirm": "Supprimer",
+              "title": "Supprimer la passkey",
+              "description": "Êtes‑vous sûr·e de vouloir supprimer cette passkey ? Cette action est irréversible.",
+              "cancel": "Annuler"
+            }
+          }
+        }
+      }
+    }
+  },
+  "nav": {
+    "home": "Accueil",
+    "about": "À propos",
+    "pricing": "Tarifs",
+    "outfits": "Tenues",
+    "account": "Compte",
+    "settings": "Paramètres",
+    "feed": "Fil",
+    "logIn": "Connexion",
+    "signUp": "S'inscrire",
+    "wardrobe": "Garde‑robe",
+    "add": {
+      "title": "Ajouter à votre garde‑robe",
+      "description": "Ajoutez un nouvel article ou une tenue à votre garde‑robe.",
+      "item": "Article",
+      "outfit": "Tenue"
+    }
+  },
+  "wardrobe": {
+    "createItem": {
+      "title": "Ajouter un article",
+      "description": "Remplissez le formulaire ci‑dessous pour ajouter un nouveau vêtement à votre garde‑robe.",
+      "submit": "Créer l'article",
+      "fields": {
+        "name": "Nom",
+        "type": "Type",
+        "color": "Couleur",
+        "pattern": "Motif",
+        "description": "Description",
+        "image": {
+          "label": "Prendre une photo"
+        }
+      }
+    },
+    "itemList": {
+      "items": {
+        "title": "Articles",
+        "empty": {
+          "title": "Pas encore de vêtements",
+          "description": "Vous n'avez ajouté aucun vêtement pour le moment. Commencez par créer votre premier article.",
+          "createButton": "Créer un article"
+        }
+      },
+      "outfits": {
+        "title": "Tenues",
+        "empty": {
+          "title": "Pas encore de tenues",
+          "description": "Vous n'avez encore créé aucune tenue. Commencez en mélangeant vos vêtements.",
+          "createButton": "Créer une tenue"
+        }
+      }
+    },
+    "outfitGeneration": {
+      "initialQuestions": {
+        "style": {
+          "question": "Quel style recherchez‑vous aujourd'hui ?",
+          "options": {
+            "default": "Laissez‑nous choisir",
+            "comfort": "Confort",
+            "new": "Nouveau",
+            "style": "Stylé",
+            "formal": "Formel"
+          }
+        },
+        "weather": {
+          "question": "Quel temps fait‑il ?",
+          "options": {
+            "sunny": "Ensoleillé",
+            "rainy": "Pluvieux",
+            "cold": "Froid",
+            "snowy": "Neigeux"
+          }
+        }
+      },
+      "swiper": {
+        "loadingText": "Génération de vos tenues...",
+        "noMoreCards": {
+          "title": "Plus de tenues",
+          "subTitle": "Revenez plus tard.",
+          "retryButton": "Relancer la génération"
+        }
+      },
+      "chooseOutfitModal": {
+        "title": "Choisir cette tenue",
+        "description": "Celle‑ci sera la tenue que vous porterez aujourd'hui !",
+        "confirmButton": "Choisir",
+        "cancelButton": "J'ai changé d'avis"
+      },
+      "choosen": {
+        "title": "Tenue du jour",
+        "description": "Vous êtes prêt·e pour aujourd'hui ! Voici la tenue choisie.",
+        "change": {
+          "cta": "Changer la tenue",
+          "title": "Changer la tenue",
+          "description": "Êtes‑vous sûr·e de vouloir changer votre tenue pour aujourd'hui ? Cette action est irréversible.",
+          "confirm": "Oui, la changer",
+          "cancel": "Non, la garder"
+        }
+      },
+      "mixAndMatch": {
+        "button": "J'ai de l'inspiration !",
+        "title": "Mixer et assortir",
+        "createButton": "Créer la tenue"
+      }
+    },
+    "reminder": {
+      "noTodayOutfit": "Vous n'avez pas de tenue pour aujourd'hui — créez‑en une !",
+      "createButton": "Créer"
+    },
+    "outfitDetails": {
+      "lastWornOn": "Dernière fois portée le {{date}}"
+    },
+    "itemPage": {
+      "delete": {
+        "title": "Supprimer l'article",
+        "description": "Êtes‑vous sûr·e de vouloir supprimer cet article ? Cette action est irréversible.",
+        "confirm": "Supprimer",
+        "cancel": "Annuler"
+      }
+    }
+  },
+  "transactional": {
+    "emails": {
+      "passwordReset": {
+        "subject": "Réinitialisation de mot de passe Outfitter",
+        "greeting": "Bonjour {{username}},",
+        "body": "Nous avons reçu une demande de réinitialisation de mot de passe pour votre compte Outfitter. Cliquez sur le lien ci‑dessous pour réinitialiser votre mot de passe :",
+        "resetLinkText": "Réinitialiser le mot de passe",
+        "footer": "Si vous n'avez pas demandé de réinitialisation, ignorez cet e‑mail. Votre mot de passe restera inchangé."
+      }
+    }
+  },
+  "social": {
+    "profile": {
+      "follow": {
+        "follow": "Suivre",
+        "unfollow": "Ne plus suivre"
+      },
+      "nbFollowers": "<b>{{count}}</b> abonné{{s}}",
+      "nbFollowing": "<b>{{count}}</b> abonnement{{s}}",
+      "isFollowing": "L'utilisateur vous suit",
+      "notFollowing": "L'utilisateur ne vous suit pas"
+    },
+    "feed": {
+      "search": {
+        "placeholder": "Rechercher des utilisateurs..."
+      },
+      "addPublication": {
+        "title": "Faire une publication",
+        "description": {
+          "label": "Description"
+        },
+        "submit": "Publier",
+        "todaysOutfit": "Portez‑vous la tenue que vous avez sélectionnée pour aujourd'hui ?"
+      },
+      "loadingMore": "Chargement des publications...",
+      "noMorePosts": "Plus de publications à afficher.",
+      "forYou": "Pour vous",
+      "followedFeed": "Abonnements"
+    },
+    "post": {
+      "delete": {
+        "title": "Supprimer la publication",
+        "description": "Êtes‑vous sûr·e de vouloir supprimer cette publication ? Cette action est irréversible.",
+        "confirm": "Supprimer",
+        "cancel": "Annuler"
+      },
+      "blurred": "Publiez une photo de votre tenue pour voir ce contenu",
+      "comments": {
+        "noComments": "Pas encore de commentaires. Soyez le premier·ère à commenter !",
+        "cancel": "Annuler",
+        "addComment": {
+          "title": "Ajouter un commentaire",
+          "placeholder": "Ajouter un commentaire...",
+          "submit": "Publier le commentaire",
+          "button": "Ajouter un commentaire"
+        },
+        "reply": {
+          "button": "Répondre",
+          "placeholder": "Écrire une réponse...",
+          "submit": "Publier la réponse",
+          "title": "Répondre à {{username}}"
+        }
+      }
+    }
+  },
+  "homepage": {
+    "hero": {
+      "version": "Présentation d'Outfitter v{{version}}",
+      "slogan": "Portez‑la, Partagez‑la, Possédez‑la.",
+      "description": "Outfitter est votre compagnon de garde‑robe. Organisez votre style, recevez des recommandations de tenues et connectez‑vous à une communauté passionnée. La mode, simplifiée.",
+      "cta": {
+        "findMyLook": "Trouvez mon look",
+        "learnMore": "En savoir plus"
+      }
+    },
+    "about": {
+      "badge": "À propos d'Outfitter",
+      "title": "Qui sommes‑nous ?",
+      "intro": "Outfitter est né d'un projet universitaire ambitieux en 3ème année de licence d'informatique à l'Université Paul Sabatier de Toulouse. Initié par une équipe d'étudiant·e·s passionné·e·s, ce projet reflète notre engagement pour l'innovation et la création de solutions pratiques. Ce projet académique s'est transformé en une plateforme moderne, alliant expertise technique et créativité pour offrir une expérience utilisateur de qualité.",
+      "description": "Outfitter est une application web conçue pour révolutionner la façon dont vous gérez et stylisez votre garde‑robe. Notre mission est d'aider les passionné·e·s de mode en leur fournissant des outils innovants pour organiser leurs vêtements, découvrir de nouvelles idées de tenues et se connecter à une communauté dynamique."
+    },
+    "features": {
+      "badge": "Fonctionnalités",
+      "title": "Ce que nous proposons",
+      "items": {
+        "wardrobeManagement": {
+          "title": "1. Gestion de la garde‑robe",
+          "description": "Cataloguez et organisez facilement vos vêtements grâce à notre système intuitif. Ajoutez des détails, des photos et classez vos pièces pour un accès rapide."
+        },
+        "outfitGeneration": {
+          "title": "2. Génération de tenues",
+          "description": "Recevez des recommandations personnalisées en fonction de votre garde‑robe. Notre algorithme propose des combinaisons stylées pour vous aider à être au top chaque jour."
+        },
+        "exploreShare": {
+          "title": "3. Explorer & Partager",
+          "description": "Rejoignez une communauté de passionné·e·s de mode. Partagez vos tenues, inspirez‑vous des autres et découvrez de nouvelles tendances."
+        }
+      }
+    }
+  },
+  "footer": {
+    "links": {
+      "home": "Accueil",
+      "about": "À propos",
+      "features": "Fonctionnalités",
+      "account": "Compte",
+      "logIn": "Connexion",
+      "signUp": "S'inscrire"
+    },
+    "rights": "© {{year}} Outfitter. Tous droits réservés.",
+    "madeWith": "Fait avec ❤️"
+  },
+  "ics": {
+    "event": {
+      "title": "Tenue pour le {{date}}",
+      "description": "Consultez la tenue sur {{url}}"
+    }
+  },
+  "wrapped": {
+    "cta": "Voir votre bilan Outfitter",
+    "tabs": {
+      "mostWornItems": "Articles les plus portés",
+      "mostLikedPost": "Publication la plus aimée"
+    },
+    "noLikedPost": "Vous n'avez pas publié de tenue cette année."
+  }
+}
