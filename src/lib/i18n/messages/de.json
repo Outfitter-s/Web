@@ -329,7 +329,12 @@
           },
           "theme": {
             "theme": "Design",
-            "mode": "Modus"
+            "mode": "Modus",
+            "options": {
+              "light": "Licht",
+              "dark": "Dunkles",
+              "system": "System"
+            }
           },
           "logout": "Ausloggen",
           "danger": {
