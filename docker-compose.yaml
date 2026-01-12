@@ -15,6 +15,7 @@ services:
     environment:
       - POSTGRES_HOST=db
       - VALKEY_HOST=valkey
+      - BODY_SIZE_LIMIT=10M
     ports:
       - '4173:3000'
 

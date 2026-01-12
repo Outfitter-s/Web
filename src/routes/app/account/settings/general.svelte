@@ -9,7 +9,13 @@
   import i18n from '$lib/i18n';
   import { logger } from '$lib/utils/logger';
   import { AlertCircle, CheckCheck, Monitor, Moon, Sun, Upload } from '@lucide/svelte';
-  import Theming, { availableModes, availableThemes, type Mode } from '$lib/theming/index.svelte';
+  import Theming, {
+    availableModes,
+    availableThemes,
+    type EffectiveMode,
+    type Mode,
+    type Theme,
+  } from '$lib/theming/index.svelte';
   import { capitalize } from '$lib/utils';
   import ProfilePicture from '$lib/components/social/ProfilePicture.svelte';
   import Separator from '$lib/components/ui/separator/separator.svelte';
@@ -18,7 +24,13 @@
   import { usernameSchema, emailSchema, profilePictureSchema } from './schema';
   import * as Form from '$lib/components/ui/form';
 
-  let currentTheme = $state(page.data.theme);
+  let currentTheme = $state<{
+    theme: Theme;
+    mode: {
+      mode: Mode;
+      effective: EffectiveMode;
+    };
+  }>(page.data.theme);
   let currentLocale = $state(i18n.locale);
 
   let formValues = $state({ username: page.data.user.username, email: page.data.user.email });
@@ -238,7 +250,7 @@
           <span class="size-4">
             {@render modeIcon(currentTheme.mode.mode)}
           </span>
-          {capitalize(currentTheme.mode.mode)}
+          {i18n.t(`account.settings.tabs.general.theme.options.${currentTheme.mode.mode}`)}
         </div>
       </Select.Trigger>
       <Select.Content>
@@ -246,12 +258,12 @@
           <Select.Item
             value={mode}
             disabled={mode === currentTheme.mode.mode}
-            class="flex items-center gap-2"
+            class="flex items-center gap-2 capitalize"
           >
             <span class="size-4">
               {@render modeIcon(mode)}
             </span>
-            {capitalize(mode)}
+            {i18n.t(`account.settings.tabs.general.theme.options.${mode}`)}
           </Select.Item>
         {/each}
       </Select.Content>
@@ -265,13 +277,13 @@
       bind:value={currentTheme.theme}
       onValueChange={() => Theming.setTheme(currentTheme.theme, currentTheme.mode.mode)}
     >
-      <Select.Trigger class="w-full max:w-45">
-        {capitalize(currentTheme.theme)}
+      <Select.Trigger class="w-full max:w-45 capitalize">
+        {currentTheme.theme}
       </Select.Trigger>
       <Select.Content>
         {#each availableThemes as theme (theme)}
-          <Select.Item value={theme} disabled={theme === currentTheme.theme}>
-            {capitalize(theme)}
+          <Select.Item value={theme} class="capitalize" disabled={theme === currentTheme.theme}>
+            {theme}
           </Select.Item>
         {/each}
       </Select.Content>

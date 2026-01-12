@@ -329,7 +329,12 @@
           },
           "theme": {
             "theme": "テーマ",
-            "mode": "モード"
+            "mode": "モード",
+            "options": {
+              "light": "ライト",
+              "dark": "暗い",
+              "system": "システム"
+            }
           },
           "logout": "ログアウト",
           "danger": {
