@@ -189,10 +189,6 @@
       }
     },
     "social": {
-      "follow": {
-        "followed": "Ahora sigues a {{username}}.",
-        "unfollowed": "Has dejado de seguir a {{username}}."
-      },
       "item": {
         "created": "Publicado."
       },

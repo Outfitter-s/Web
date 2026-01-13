@@ -189,10 +189,6 @@
       }
     },
     "social": {
-      "follow": {
-        "followed": "{{username}}さんをフォローしました。",
-        "unfollowed": "{{username}}さんのフォローを解除しました。"
-      },
       "item": {
         "created": "投稿されました。"
       },

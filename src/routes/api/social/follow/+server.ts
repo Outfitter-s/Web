@@ -15,6 +15,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
     const data = schema.safeParse(body);
     if (!data.success) throw new Error(data.error.issues.map((i) => i.message).join(', '));
     const { userId } = data.data;
+    console.log(`User ${user.username} is trying to follow user ID ${userId}`);
     if (user.id === userId) throw new Error('errors.social.cannotFollowYourself');
     await SocialDAO.followUser(user.id, userId);
     return json({ success: true });
@@ -31,6 +32,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
     const data = schema.safeParse(body);
     if (!data.success) throw new Error(data.error.issues.map((i) => i.message).join(', '));
     const { userId } = data.data;
+    console.log(`User ${user.username} is trying to unfollow user ID ${userId}`);
     if (user.id === userId) throw new Error('errors.social.cannotFollowYourself');
     await SocialDAO.unfollowUser(user.id, userId);
     return json({ success: true });
