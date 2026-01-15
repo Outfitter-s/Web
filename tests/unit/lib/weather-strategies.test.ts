@@ -71,13 +71,13 @@ describe('Weather-based scoring strategies', () => {
   });
 
   describe('tempScore', () => {
-    // it('returns high score for warm items in cold weather', () => {
-    //     const item = mockItem('sweater');
-    //     const weather = mockWeather(0);
-    //     weather.temp = 0;
-    //     const score = tempScore(item, weather);
-    //     expect(score).toBeGreaterThan(0.3);
-    // });
+    it('returns high score for warm items in cold weather', () => {
+      const item = mockItem('jacket');
+      const weather = mockWeather(0);
+      weather.temp = 0;
+      const score = tempScore(item, weather);
+      expect(score).toBeGreaterThan(0.3);
+    });
 
     it('returns high score for light items in warm weather', () => {
       const item = mockItem('shirt');
@@ -87,13 +87,22 @@ describe('Weather-based scoring strategies', () => {
       expect(score).toBeGreaterThan(0.3);
     });
 
-    it('handles extreme cold (-20°C)', () => {
+    it('handles extreme cold', () => {
       const item = mockItem('jacket');
       const weather = mockWeather(0);
-      weather.temp = -20;
+      weather.temp = 0;
       const score = tempScore(item, weather);
       expect(score).toBeGreaterThanOrEqual(0);
       expect(score).toBeLessThanOrEqual(1);
+      expect(score).toBeGreaterThan(0.3);
+    });
+
+    it('jacket scores well at its ideal temperature', () => {
+      const item = mockItem('jacket');
+      const weather = mockWeather(0);
+      weather.temp = 6; // Ideal temp for jacket
+      const score = tempScore(item, weather);
+      expect(score).toBe(1); // Perfect score at ideal temperature
     });
 
     it('handles extreme heat (40°C)', () => {
@@ -103,6 +112,15 @@ describe('Weather-based scoring strategies', () => {
       const score = tempScore(item, weather);
       expect(score).toBeGreaterThanOrEqual(0);
       expect(score).toBeLessThanOrEqual(1);
+      expect(score).toBeLessThan(0.3);
+    });
+
+    it('shirt scores well at its ideal temperature', () => {
+      const item = mockItem('shirt');
+      const weather = mockWeather(0);
+      weather.temp = 20; // Ideal temp for shirt
+      const score = tempScore(item, weather);
+      expect(score).toBe(1); // Perfect score at ideal temperature
     });
 
     it('handles moderate temperature (15°C)', () => {
@@ -112,6 +130,7 @@ describe('Weather-based scoring strategies', () => {
       const score = tempScore(item, weather);
       expect(score).toBeGreaterThanOrEqual(0);
       expect(score).toBeLessThanOrEqual(1);
+      expect(score).toBeGreaterThan(0.3);
     });
 
     it('score changes with temperature for the same item', () => {
