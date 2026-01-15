@@ -10,7 +10,7 @@
   import { fade } from 'svelte/transition';
   import { invalidateAll } from '$app/navigation';
   import { Toaster } from '$lib/components/Toast/toast';
-  import { cn, DateUtils, logger } from '$lib/utils';
+  import { cn, logger } from '$lib/utils';
   import * as Field from '$lib/components/ui/field';
   import { Textarea } from '$lib/components/ui/textarea';
   import * as Dialog from '$lib/components/ui/dialog';
@@ -20,6 +20,7 @@
   import * as Carousel from '$lib/components/ui/carousel';
   import type { CarouselAPI } from '$lib/components/ui/carousel/context';
   import type { Comment } from '$lib/types';
+  import CommentComponent from './Comment.svelte';
 
   let { data, form }: PageProps = $props();
   let post = $derived(data.post);
@@ -208,42 +209,6 @@
   </Dialog.Content>
 </Dialog.Root>
 
-{#snippet comment(c: Comment)}
-  <div class="flex flex-col">
-    <div class="flex flex-row gap-2">
-      <ProfilePicture userId={c.user.id} class="size-8 shrink-0" />
-      <div class="flex flex-col">
-        <a
-          href={resolve('/app/[username]', { username: `@${c.user.username}` })}
-          class="font-medium text-xs">{c.user.username}</a
-        >
-        <p class="text-base font-normal wrap-normal">{c.content}</p>
-        <div class="flex flex-row gap-2 items-center">
-          <span class="text-xs text-muted-foreground">{DateUtils.formatDate(c.createdAt)}</span>
-          <Button
-            variant="link"
-            size="sm"
-            onclick={() => {
-              newComment.commentId = c.id;
-              newComment.open = true;
-            }}
-          >
-            {i18n.t('social.post.comments.reply.button')}
-          </Button>
-        </div>
-      </div>
-    </div>
-    <!-- Replies -->
-    {#if c.replies.length > 0}
-      <div class="flex flex-col mt-4 pl-4 ml-4 border-l border-border gap-4">
-        {#each c.replies as reply (reply.id)}
-          {@render comment(reply)}
-        {/each}
-      </div>
-    {/if}
-  </div>
-{/snippet}
-
 <section class="lg:p-2 lg:pt-4 lg:pl-4 max-lg:p-4 w-full" data-post={post.id}>
   <div class="bg-card relative flex flex-col rounded-lg lg:flex-row">
     <!-- Image -->
@@ -390,7 +355,7 @@
 
   <div class="p-2 flex flex-col rounded-lg gap-4 relative bg-card mt-6">
     {#each post.comments as c (c.id)}
-      {@render comment(c)}
+      <CommentComponent comment={c} />
     {:else}
       <p class="text-center text-sm text-muted-foreground">
         {i18n.t('social.post.comments.noComments')}
