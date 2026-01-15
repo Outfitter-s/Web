@@ -621,6 +621,7 @@
       "mostWornItems": "最も着たアイテム",
       "mostLikedPost": "一番「いいね」された投稿"
     },
-    "noLikedPost": "今年はまだコーディネートを投稿していません。"
+    "noLikedPost": "今年はまだコーディネートを投稿していません。",
+    "noWornItems": "今年はまだコーディネートを着ていません。"
   }
 }

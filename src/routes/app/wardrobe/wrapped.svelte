@@ -140,6 +140,10 @@
                         ></button>
                       {/each}
                     </div>
+                  {:else}
+                    <p class="text-center text-base font-mono">
+                      {i18n.t('wrapped.noWornItems')}
+                    </p>
                   {/if}
                 </div>
               {:else if i === 1}
