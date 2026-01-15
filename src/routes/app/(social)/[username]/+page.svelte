@@ -17,11 +17,12 @@
   const POST_LIMIT = 20;
   let { data }: PageProps = $props();
   // svelte-ignore state_referenced_locally
-  let user = $derived(data.user);
+  let user = $state(data.user);
   let pageUser = $derived(data.pageUser);
   // svelte-ignore state_referenced_locally
   let lastPageUsername = $state(pageUser.username);
-  let nbFollowers = $derived(data.nbFollowers);
+  // svelte-ignore state_referenced_locally
+  let nbFollowers = $state(data.nbFollowers);
   let isFollowingAction = $state(false);
   let youFollow = $derived(user.following.includes(pageUser.id));
   let isYourProfile = $derived(user.id === pageUser.id);
@@ -49,12 +50,6 @@
         user.following.push(pageUser.id);
         nbFollowers += 1;
       }
-      Toaster.success(
-        i18n.t(
-          youFollow ? 'successes.social.follow.followed' : 'successes.social.follow.unfollowed',
-          { username: pageUser.username }
-        )
-      );
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       logger.error('Error toggling follow status:', msg);

@@ -158,7 +158,12 @@
       "post": {
         "notFound": "投稿が見つかりません。",
         "deleteFailed": "投稿の削除に失敗しました。後でもう一度お試しください。",
-        "notAuthorized": "この投稿を削除する権限がありません。"
+        "notAuthorized": "この投稿を削除する権限がありません。",
+        "comment": {
+          "notFound": "コメントが見つかりません",
+          "deleteFailed": "コメントを削除できませんでした",
+          "emptyContent": "コメントの内容は空欄にできません"
+        }
       }
     },
     "icsToken": {
@@ -189,10 +194,6 @@
       }
     },
     "social": {
-      "follow": {
-        "followed": "{{username}}さんをフォローしました。",
-        "unfollowed": "{{username}}さんのフォローを解除しました。"
-      },
       "item": {
         "created": "投稿されました。"
       },

@@ -158,7 +158,12 @@
       "post": {
         "notFound": "Beitrag nicht gefunden.",
         "deleteFailed": "Beitrag konnte nicht gelöscht werden.",
-        "notAuthorized": "Du bist nicht berechtigt, diesen Beitrag zu löschen."
+        "notAuthorized": "Du bist nicht berechtigt, diesen Beitrag zu löschen.",
+        "comment": {
+          "notFound": "Kommentar nicht gefunden",
+          "deleteFailed": "Kommentar konnte nicht gelöscht werden",
+          "emptyContent": "Der Kommentar darf nicht leer sein"
+        }
       }
     },
     "icsToken": {
@@ -189,10 +194,6 @@
       }
     },
     "social": {
-      "follow": {
-        "followed": "Du folgst jetzt {{username}}.",
-        "unfollowed": "Du folgst {{username}} nicht mehr."
-      },
       "item": {
         "created": "Gepostet."
       },

@@ -158,7 +158,12 @@
       "post": {
         "notFound": "Publicación no encontrada.",
         "deleteFailed": "Error al eliminar la publicación. Por favor, inténtalo de nuevo más tarde.",
-        "notAuthorized": "No estás autorizado para eliminar esta publicación."
+        "notAuthorized": "No estás autorizado para eliminar esta publicación.",
+        "comment": {
+          "notFound": "Comentario no encontrado",
+          "deleteFailed": "No se pudo eliminar el comentario",
+          "emptyContent": "El contenido del comentario no puede estar vacío"
+        }
       }
     },
     "icsToken": {
@@ -189,10 +194,6 @@
       }
     },
     "social": {
-      "follow": {
-        "followed": "Ahora sigues a {{username}}.",
-        "unfollowed": "Has dejado de seguir a {{username}}."
-      },
       "item": {
         "created": "Publicado."
       },

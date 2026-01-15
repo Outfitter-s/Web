@@ -37,7 +37,7 @@
     window.addEventListener('resize', handleResize);
     const disablePullToRefresh = (e: TouchEvent) => {
       // Prevent default action if the touch move is vertical
-      if (e.touches.length > 1 || e.touches[0].clientY > 0) {
+      if (open && swipeY > 0 && (e.touches.length > 1 || e.touches[0].clientY > 0)) {
         e.preventDefault();
       }
     };

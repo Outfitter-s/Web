@@ -158,7 +158,12 @@
       "post": {
         "notFound": "Publication introuvable.",
         "deleteFailed": "Échec de la suppression de la publication. Veuillez réessayer plus tard.",
-        "notAuthorized": "Vous n'êtes pas autorisé·e à supprimer cette publication."
+        "notAuthorized": "Vous n'êtes pas autorisé·e à supprimer cette publication.",
+        "comment": {
+          "notFound": "Commentaire introuvable.",
+          "deleteFailed": "Échec de la suppression du commentaire.",
+          "emptyContent": "Le contenu du commentaire ne peut pas être vide."
+        }
       }
     },
     "icsToken": {
@@ -189,10 +194,6 @@
       }
     },
     "social": {
-      "follow": {
-        "followed": "Vous suivez maintenant {{username}}.",
-        "unfollowed": "Vous avez cessé de suivre {{username}}."
-      },
       "item": {
         "created": "Publié."
       },

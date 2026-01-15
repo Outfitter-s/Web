@@ -25,29 +25,29 @@ Welcome to Outfitter! This document provides guidelines for setting up your deve
 
 1. **Clone the repository**
 
-   ```bash
-   git clone https://github.com/Outfitter-s/Web outfitter
-   cd outfitter
-   ```
+```bash
+git clone https://github.com/Outfitter-s/Web outfitter
+cd outfitter
+```
 
 2. **Install dependencies**
 
-   ```bash
-   bun install
-   ```
+```bash
+bun install
+```
 
 3. **Initialize the database**
 
-   ```bash
-   bun run db:migrate
-   bun run db:bootstrap
-   ```
+```bash
+bun run db:migrate
+bun run db:bootstrap
+```
 
 4. **Start the development server**
 
-   ```bash
-   bun run dev
-   ```
+```bash
+bun run dev
+```
 
 5. **Access the application**
    Open [http://localhost:5173](http://localhost:5173) in your browser
@@ -57,7 +57,7 @@ Welcome to Outfitter! This document provides guidelines for setting up your deve
 ```
 outfitter/
 ├── src/
-│   ├── routes/              # SvelteKit page routes and API endpoints
+│   ├── routes/             # SvelteKit page routes and API endpoints
 │   │   ├── app/            # Authenticated application pages
 │   │   ├── api/            # REST API endpoints
 │   │   └── (home)/         # Public pages
@@ -70,16 +70,15 @@ outfitter/
 │   │   └── theming/        # Theme management
 │   └── app.css             # Global styles
 ├── scripts/                # Build and utility scripts
-│   ├── db/                # Database-related scripts
-│   └── checkTranslations.ts
+│   ├── db/                 # Database-related scripts
 ├── sql/                    # Database migrations and bootstrap
-│   ├── migrations/        # Incremental SQL migrations
-│   └── bootstrap.sql      # Initial database schema
-├── tests/                 # Test files
-├── transactional/         # Email templates
-├── assets/                # Static assets (clothing items, profile pictures, publications)
-├── svelte.config.js       # Svelte configuration
-├── vite.config.ts         # Vite configuration
+│   ├── migrations/         # Incremental SQL migrations
+│   └── bootstrap.sql       # Initial database schema
+├── tests/                  # Test files
+├── transactional/          # Email templates
+├── assets/                 # Static assets (clothing items, profile pictures, publications)
+├── svelte.config.js        # Svelte configuration
+├── vite.config.ts          # Vite configuration
 └── package.json
 ```
 

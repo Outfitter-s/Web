@@ -158,7 +158,12 @@
       "post": {
         "notFound": "Post not found.",
         "deleteFailed": "Failed to delete post. Please try again later.",
-        "notAuthorized": "You are not authorized to delete this post."
+        "notAuthorized": "You are not authorized to delete this post.",
+        "comment": {
+          "notFound": "Comment not found.",
+          "deleteFailed": "Failed to delete comment.",
+          "emptyContent": "Comment content cannot be empty."
+        }
       }
     },
     "icsToken": {
@@ -189,10 +194,6 @@
       }
     },
     "social": {
-      "follow": {
-        "followed": "You are now following {{username}}.",
-        "unfollowed": "You have unfollowed {{username}}."
-      },
       "item": {
         "created": "Posted."
       },

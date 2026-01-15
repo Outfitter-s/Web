@@ -52,14 +52,18 @@ export class CommentDAO {
     return (await this.getComment(res.rows[0].id)) as Comment;
   }
 
-  static async getComment(id: Comment['id']): Promise<Comment | null> {
+  static async getComment(id: Comment['id'], replies = false): Promise<Comment | null> {
     const res = await pool.query<CommentTable>('SELECT * FROM comment WHERE id = $1', [id]);
     if (res.rowCount === 0) {
       return null;
     }
-    const replies = await this.getRepliesToComment(id);
     const associatedUser = await UserDAO.getUserById(res.rows[0].user_id);
-    return this.convertToComment(res.rows[0], associatedUser, replies);
+    if (replies) {
+      const replies = await this.getRepliesToComment(id);
+      return this.convertToComment(res.rows[0], associatedUser, replies);
+    } else {
+      return this.convertToComment(res.rows[0], associatedUser);
+    }
   }
 
   private static async buildCommentTree(
@@ -128,5 +132,26 @@ export class CommentDAO {
       [postId]
     );
     return this.buildCommentTree(res.rows, null);
+  }
+
+  static async deleteComment(commentId: Comment['id']): Promise<void> {
+    await pool.query('DELETE FROM comment WHERE id = $1', [commentId]);
+  }
+
+  static async update(
+    commentId: Comment['id'],
+    updates: Partial<Pick<Comment, 'content'>>
+  ): Promise<void> {
+    const fields: string[] = [];
+    const values: any[] = [];
+    let idx = 1;
+    for (const [key, value] of Object.entries(updates)) {
+      fields.push(`${key} = $${idx}`);
+      values.push(value);
+      idx++;
+    }
+    values.push(commentId);
+    const query = `UPDATE comment SET ${fields.join(', ')} WHERE id = $${idx}`;
+    await pool.query(query, values);
   }
 }
