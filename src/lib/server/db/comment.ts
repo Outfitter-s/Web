@@ -93,6 +93,7 @@ export class CommentDAO {
     };
     return buildForParent(rootParentId);
   }
+
   static async getRepliesToComment(commentId: Comment['id']): Promise<Comment[]> {
     const res = await pool.query<CommentTable>(
       `
@@ -143,9 +144,13 @@ export class CommentDAO {
     updates: Partial<Pick<Comment, 'content'>>
   ): Promise<void> {
     const fields: string[] = [];
-    const values: any[] = [];
+    const values: unknown[] = [];
     let idx = 1;
-    for (const [key, value] of Object.entries(updates)) {
+    // eslint-disable-next-line prefer-const
+    for (let [key, value] of Object.entries(updates)) {
+      if (key === 'content') {
+        value = filterText(value as string);
+      }
       fields.push(`${key} = $${idx}`);
       values.push(value);
       idx++;
