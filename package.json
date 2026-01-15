@@ -26,7 +26,7 @@
     "*.{js,ts,svelte,json,css,md}": "prettier --write"
   },
   "devDependencies": {
-    "@eslint/compat": "^1.4.1",
+    "@eslint/compat": "^2.0.1",
     "@eslint/js": "^9.39.2",
     "@internationalized/date": "^3.10.1",
     "@lucide/svelte": "^0.562.0",
