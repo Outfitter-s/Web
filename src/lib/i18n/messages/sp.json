@@ -621,6 +621,7 @@
       "mostWornItems": "Prendas más usadas",
       "mostLikedPost": "Publicación más gustada"
     },
-    "noLikedPost": "No publicaste ningún look este año."
+    "noLikedPost": "No publicaste ningún look este año.",
+    "noWornItems": "No has llevado ningún look este año."
   }
 }

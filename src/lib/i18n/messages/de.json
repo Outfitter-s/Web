@@ -621,6 +621,7 @@
       "mostWornItems": "Meistgetragene Teile",
       "mostLikedPost": "Beliebtester Beitrag"
     },
-    "noLikedPost": "Du hast dieses Jahr keine Outfits gepostet."
+    "noLikedPost": "Du hast dieses Jahr keine Outfits gepostet.",
+    "noWornItems": "Du hast dieses Jahr kein Outfit getragen."
   }
 }
