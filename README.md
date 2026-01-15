@@ -1,57 +1,76 @@
 # Outfitter
 
-## Description
+## Projet
 
-Outfitter est une application conçue dans le cadre d'un projet universitaire, qui permet aux utilisateurs de gérer leur garde-robe virtuelle, de partager leurs tenues et d'interagir avec la communauté autour de la mode.
+Outfitter est une plateforme de création et de partage pensée pour vous accompagner et vous aider à vous habiller le matin. Nous sommes partis d’un constat simple : nous mettons trop de temps à choisir nos vêtements, entre hésitation et manque d’inspiration. De plus, certains habits restent oubliés au fond du placard. Outfitter permet de faire revivre ces pièces et d’éviter la fast fashion.
 
-Une fois authentifié, chaque utilisateur peut :
+Prenez en photo et nommez tous les vêtements et accessoires de votre garde-robe, nous nous occupons du reste. Chaque jour, recevez des propositions de tenues adaptées à la météo et à votre style, via une interface intuitive de type "swipe". Si l’inspiration manque, explorez la partie sociale : suivez amis et influenceurs, partagez vos tenues et découvrez celles des autres.
 
-- **Enregistrer des photos** de ses articles de mode (vêtements, accessoires, etc.).
-- **Recevoir des recommandations d'outfits** générés à partir de sa garde-robe.
-- **Se prendre en photo** avec ses tenues et les publier sur l'application.
-- **Découvrir et visionner les photos** des autres utilisateurs.
-- **Suivre ses influenceurs préférés** et ses amis.
-- **Interagir avec le feed de tenues** grâce à un système de réactions inspiré de Tinder (swipe pour "like"/"dislike").
-- **Voir le feed des tenues** de ses amis et les recommandations personnalisées.
+## Équipe et rôles
 
-## Fonctionnalités principales
+- **Angus PAILLAUGUE** : Product Owner, Dev
+- **Maxence BETH** : Dev
+- **Paqui ESTHER** : Dev
+- **Néo BOUGIO** : Dev
+- **Yann LACAZE** : Dev
+- **Clément REVERBEL** : Scrum master, Dev
 
-- **Authentification sécurisée** (inscription, connexion, gestion du profil).
-- **Gestion de la garde-robe** : Ajout, modification, suppression d'articles (vêtements, accessoires) avec photo.
-- **Génération automatique de recommandations de tenues** basée sur les articles de la garde-robe.
-- **Publication de photos de tenues**, consultation du feed communautaire.
-- **Système de followers** : Suivi d'utilisateurs, influenceurs, et amis.
-- **Feed interactif** : Swipe pour aimer ou passer une tenue, affichage des recommandations et des tenues d'amis.
-- **Réactions** sur les tenues.
+## Fonctionnalités
+
+- **Authentification** : Création de compte, connexion, gestion du profil (nom d’utilisateur, email, photo, mot de passe, 2FA via TOTP ou passkey)
+- **Garde-robe** : Ajout, affichage, modification et suppression d’articles (photo, nom, description, couleur, motif, type)
+- **Génération de tenues** : Propositions quotidiennes selon la météo et le style ; création manuelle de tenues à partir de sa garde-robe
+- **Social** : Abonnement à des amis et influenceurs
+- **Posts** : Partage de photos de tenues (une ou plusieurs)
+- **Floutage des posts** : Les posts du flux sont floutés tant que l’utilisateur n’a pas publié sa tenue quotidienne, pour encourager la participation
+- **Commentaires & réactions** : Réagir et commenter les posts
+- **Flux** : Affichage d’un flux personnalisé basé sur les abonnements et un algorithme de recommandation (réactions, commentaires, dates, etc.)
+- **CRUD global** : Tout contenu créé (vêtements, posts, commentaires, réactions, tenues, etc.) peut être modifié ou supprimé par son créateur
 
 ## Stack technique
 
-- **Frontend** : Svelte
+- **Frontend** : Svelte, TailwindCSS, ShadCN
 - **Backend** : SvelteKit
-- **Base de données** : PostgreSQL
-- **Authentification** : JWT, TOTP, Passkey
+- **Base de données** : PostgreSQL (migrations via scripts maison)
+- **Authentification** : JWT, TOTP, Passkey (gestion manuelle)
 - **Stockage des images** : Local
-- **Déploiement** : Docker
+- **Déploiement** : Docker (voir `docker-compose.yaml`), pipeline de build à chaque release, production sur le serveur personnel d’Angus
+- **Collaboration** : Git & GitHub (boards agiles)
+
+## Architecture du projet
+
+```
+outfitter/
+├── src/
+│   ├── routes/
+│   │   ├── app/            # Pages pour utilisateurs authentifiés
+│   │   ├── api/            # Routes API
+│   │   └── (home)/         # Pages publiques (accueil, légal, auth, etc.)
+│   ├── lib/
+│   │   ├── components/     # Composants réutilisables
+│   │   ├── server/         # DAO, valkey, SMTP, etc.
+│   │   ├── utils/          # Fonctions utilitaires (dates, formulaires, logger, ...)
+│   │   ├── types.ts        # Types TypeScript
+│   │   ├── i18n.ts         # Internationalisation
+│   │   └── theming/        # Gestion du thème
+│   └── app.css             # Styles globaux
+├── scripts/                # Scripts divers (migrations, i18n, ...)
+├── sql/                    # Migrations et initialisation BD
+├── tests/                  # Tests
+├── transactional/          # Templates email
+└── assets/                 # Images statiques générées par les utilisateurs
+```
+
+Cette architecture permet une séparation claire entre la logique métier, l’interface utilisateur, les accès aux données et les outils partagés, facilitant la maintenance, l’évolutivité et la collaboration au sein de l’équipe.
 
 ## Contribuer
 
-Les contributions sont les bienvenues !
-Merci de suivre les bonnes pratiques de développement et de soumettre vos Pull Requests sur une branche dédiée.
+Les contributions sont les bienvenues ! Merci de suivre les bonnes pratiques de développement et de soumettre vos Pull Requests sur une branche dédiée.
 
 ## Licence
 
-Ce projet est réalisé dans le cadre d'un projet universitaire.
-Licence MIT
-
-## Auteurs
-
-- [PAILLAUGUE Angus](https://github.com/Angus-Paillaugue)
-- [BOUGIO Néo](https://github.com/NeoEtIchiro)
-- [ESTHER Paqui](https://github.com/Paquies)
-- [REVERBEL Clément](https://github.com/ClementReverbel)
-- [LACAZE Yann](https://github.com/ShowYL)
-- [BETH Maxence](https://github.com/Spleedz)
+Projet universitaire — Licence MIT
 
 ---
 
-Pour toute question ou suggestion, n'hésitez pas à ouvrir une issue ou à contacter l'équipe du projet !
+Pour toute question ou suggestion, ouvrez une issue ou contactez l’équipe du projet !
