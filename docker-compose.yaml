@@ -3,7 +3,6 @@ services:
     build: .
     image: anguspllg/outfitter_web:latest
     container_name: outfiter_web
-    restart: unless-stopped
     volumes:
       - ./assets:/app/assets:Z
     depends_on:
@@ -22,7 +21,6 @@ services:
   image_processing:
     image: anguspllg/outfitter_image_processing:latest
     container_name: outfitter_image_processing
-    restart: unless-stopped
     ports:
       - '5000:5000'
     environment:
@@ -34,7 +32,6 @@ services:
     container_name: outfiter_db
     ports:
       - '5432:5432'
-    restart: unless-stopped
     env_file:
       - .env
     volumes:

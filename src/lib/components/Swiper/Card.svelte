@@ -3,6 +3,7 @@
   import { cn } from '$lib/utils';
   import { Check, X } from '@lucide/svelte';
   import { onMount } from 'svelte';
+  import { OutfitItems } from '../wardrobe';
 
   interface Props {
     card: SwiperCard;
@@ -98,7 +99,7 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class={cn(
-    'absolute top-1/2 left-1/2 h-fit max-h-full w-full select-none',
+    'absolute top-1/2 left-1/2 h-fit w-full select-none',
     move.isSwiped ? 'pointer-events-none cursor-grabbing' : 'cursor-grab'
   )}
   ontouchstart={onTouchStart}
@@ -115,20 +116,12 @@
 >
   <div
     class={cn(
-      'bg-card border-border relative overflow-hidden border transition-all duration-300',
+      'bg-card border-border relative overflow-hidden border h-[80dvh] transition-all duration-300',
       Math.abs(move.currentX) > MOVE_ACCEPT_THRESHOLD ? 'rounded-3xl' : 'rounded-xl'
     )}
   >
-    <div class="relative z-0 aspect-square w-full">
-      <div class="bg-card grid gap-2 overflow-hidden p-4 grid-cols-2">
-        {#each card.outfit.items as item (item.id)}
-          <img
-            src={item.imageUrl}
-            alt={item.name}
-            class="h-full w-auto rounded-lg object-contain size-full"
-          />
-        {/each}
-      </div>
+    <div class="relative z-0 size-full">
+      <OutfitItems items={card.outfit.items} class="size-full" />
     </div>
     <div
       class={cn(

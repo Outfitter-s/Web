@@ -81,11 +81,15 @@
   <!-- Image -->
   <div class={cn('w-full post overflow-hidden', className?.image)} style:clip-path={clipPathStyle}>
     <a class="size-full block relative" {href}>
+      <div class="absolute inset-0 bg-card -z-10"></div>
       <!-- svelte-ignore a11y_missing_attribute -->
       <img
         src={imageUrl}
         draggable="false"
-        class={cn('w-full block h-full object-contain object-center', !imageLoaded && 'invisible')}
+        class={cn(
+          'w-full z-10 block h-full object-contain object-center',
+          !imageLoaded && 'invisible'
+        )}
         onload={() => (imageLoaded = true)}
       />
       {#if !imageLoaded}
