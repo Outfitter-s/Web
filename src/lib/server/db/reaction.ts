@@ -1,5 +1,5 @@
 import type { PostReactions, Reactions, UUID } from '$lib/types';
-import pool from '.';
+import { sql } from 'bun';
 // import { Caching } from './caching';
 
 export interface ReactionTable {
@@ -17,23 +17,17 @@ export class ReactionDAO {
       await this.removeReaction(postId, userId);
       return null;
     }
-    await pool.query(
-      `INSERT INTO reaction (post_id, user_id, type)
-       VALUES ($1, $2, $3)
+    await sql`INSERT INTO reaction (post_id, user_id, type)
+       VALUES (${postId}, ${userId}, ${type})
        ON CONFLICT (post_id, user_id)
-       DO UPDATE SET type = EXCLUDED.type, created_at = NOW()`,
-      [postId, userId, type]
-    );
+       DO UPDATE SET type = EXCLUDED.type, created_at = NOW()`;
     return type;
   }
 
   static async removeReaction(postId: UUID, userId: UUID): Promise<void> {
     // await Caching.del(`reaction:post:${postId}`);
-    await pool.query(
-      `DELETE FROM reaction
-       WHERE post_id = $1 AND user_id = $2`,
-      [postId, userId]
-    );
+    await sql`DELETE FROM reaction
+       WHERE post_id = ${postId} AND user_id = ${userId}`;
   }
 
   static async getReactionsForPost(postId: UUID): Promise<PostReactions> {
@@ -41,11 +35,8 @@ export class ReactionDAO {
     // if (cached) {
     //   return cached;
     // }
-    const res = await pool.query<ReactionTable>(
-      `SELECT * FROM reaction
-       WHERE post_id = $1`,
-      [postId]
-    );
+    const rows = await sql<ReactionTable[]>`SELECT * FROM reaction
+       WHERE post_id = ${postId}`;
     const reactionsCount: PostReactions = {
       like: 0,
       love: 0,
@@ -54,7 +45,7 @@ export class ReactionDAO {
       sad: 0,
     };
 
-    for (const row of res.rows) {
+    for (const row of rows) {
       reactionsCount[row.type]++;
     }
     // await Caching.set(`reaction:post:${postId}`, reactionsCount);
@@ -67,15 +58,12 @@ export class ReactionDAO {
     // if (cached) {
     //   return cached;
     // }
-    const res = await pool.query<ReactionTable>(
-      `SELECT * FROM reaction
-       WHERE post_id = $1 AND user_id = $2`,
-      [postId, userId]
-    );
-    if (res.rows.length === 0) {
+    const rows = await sql<ReactionTable[]>`SELECT * FROM reaction
+       WHERE post_id = ${postId} AND user_id = ${userId}`;
+    if (rows.length === 0) {
       return null;
     }
-    const reaction = res.rows[0].type;
+    const reaction = rows[0].type;
     // await Caching.set(`reaction:post:${postId}:user:${userId}`, reaction);
     return reaction;
   }

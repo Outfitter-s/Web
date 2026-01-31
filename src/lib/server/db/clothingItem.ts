@@ -1,8 +1,8 @@
 import type { ClothingItem, UUID } from '$lib/types';
-import pool from '.';
 import { unlink, writeFile } from 'node:fs/promises';
 import { getEnv } from '../utils';
 import { Caching } from './caching';
+import { sql } from 'bun';
 
 export interface ClothingItemTable {
   id: UUID;
@@ -43,14 +43,13 @@ export class ClothingItemDAO {
     color: ClothingItem['color'],
     pattern: ClothingItem['pattern']
   ): Promise<ClothingItem> {
-    const res = await pool.query<ClothingItemTable>(
-      'INSERT INTO clothing_item (user_id, name, description, type, color, pattern) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-      [userId, name, description, type, color, pattern]
-    );
-    if (res.rows.length === 0) {
+    const [row] = await sql<
+      ClothingItemTable[]
+    >`INSERT INTO clothing_item (user_id, name, description, type, color, pattern) VALUES (${userId}, ${name}, ${description}, ${type}, ${color}, ${pattern}) RETURNING *`;
+    if (!row) {
       throw new Error('Failed to create clothing item');
     }
-    const clothingItem = ClothingItemDAO.convertToClothingItem(res.rows[0]);
+    const clothingItem = ClothingItemDAO.convertToClothingItem(row);
     await ClothingItemDAO.writeClothingItemImage(clothingItem.id, imageBuffer);
 
     return clothingItem;
@@ -60,13 +59,11 @@ export class ClothingItemDAO {
     const cached = await Caching.get<ClothingItem>(`clothingItem:${id}`);
     if (cached) return cached;
 
-    const res = await pool.query<ClothingItemTable>('SELECT * FROM clothing_item WHERE id = $1', [
-      id,
-    ]);
-    if (res.rows.length === 0) {
+    const res = await sql<ClothingItemTable[]>`SELECT * FROM clothing_item WHERE id = ${id}`;
+    if (res.length === 0) {
       return null;
     }
-    const item = res.rows[0];
+    const item = res[0];
     const lastWornAt = await ClothingItemDAO.getLastWornAt(item.id);
     const clothingItem = ClothingItemDAO.convertToClothingItem(item, lastWornAt);
     await Caching.set(`clothingItem:${id}`, clothingItem);
@@ -74,12 +71,11 @@ export class ClothingItemDAO {
   }
 
   static async getClothingItemsByUserId(userId: UUID): Promise<ClothingItem[]> {
-    const res = await pool.query<ClothingItemTable>(
-      'SELECT * FROM clothing_item WHERE user_id = $1 ORDER BY created_at DESC',
-      [userId]
-    );
+    const rows = await sql<
+      ClothingItemTable[]
+    >`SELECT * FROM clothing_item WHERE user_id = ${userId} ORDER BY created_at DESC`;
     const clothingItems: ClothingItem[] = [];
-    for (const row of res.rows) {
+    for (const row of rows) {
       const lastWornAt = await ClothingItemDAO.getLastWornAt(row.id);
       clothingItems.push(ClothingItemDAO.convertToClothingItem(row, lastWornAt));
     }
@@ -87,7 +83,7 @@ export class ClothingItemDAO {
   }
 
   static async deleteClothingItem(id: UUID): Promise<void> {
-    await pool.query('DELETE FROM clothing_item WHERE id = $1', [id]);
+    await sql`DELETE FROM clothing_item WHERE id = ${id}`;
     await unlink(`assets/clothing_item/${id}.png`);
     await Caching.del(`clothingItem:${id}`);
   }
@@ -100,19 +96,17 @@ export class ClothingItemDAO {
     interface LastWornAtResult {
       last_worn_at: Date | null;
     }
-    const res = await pool.query<LastWornAtResult>(
-      'SELECT MAX(outfit.created_at) as last_worn_at FROM outfit INNER JOIN outfit_clothing_items ON outfit.id = outfit_clothing_items.outfit_id WHERE outfit_clothing_items.clothing_item_id = $1',
-      [item]
-    );
-    return res.rows[0].last_worn_at;
+    const rows = await sql<
+      LastWornAtResult[]
+    >`SELECT MAX(outfit.created_at) as last_worn_at FROM outfit INNER JOIN outfit_clothing_items ON outfit.id = outfit_clothing_items.outfit_id WHERE outfit_clothing_items.clothing_item_id = ${item}`;
+    return rows[0].last_worn_at;
   }
 
   static async updateClothingItem(item: ClothingItem): Promise<void> {
-    const res = await pool.query<ClothingItemTable>(
-      'UPDATE clothing_item SET name = $1, description = $2, type = $3, color = $4, pattern = $5 WHERE id = $6 RETURNING *',
-      [item.name, item.description, item.type, item.color, item.pattern ?? null, item.id]
-    );
-    if (res.rows.length === 0) {
+    const rows = await sql<
+      ClothingItemTable[]
+    >`UPDATE clothing_item SET ${sql(item, 'name', 'description', 'type', 'color', 'pattern')} WHERE id = ${item.id} RETURNING *`;
+    if (rows.length === 0) {
       throw new Error('Failed to update clothing item');
     }
     await Caching.del(`clothingItem:${item.id}`);
@@ -127,13 +121,12 @@ export class ClothingItemDAO {
     const cached = await Caching.get<ClothingItem>(`clothingItem:${clothingItemId}`);
     if (cached && cached.userId) return cached.userId;
 
-    const res = await pool.query<{ user_id: UUID }>(
-      'SELECT user_id FROM clothing_item WHERE id = $1',
-      [clothingItemId]
-    );
-    if (res.rows.length === 0) {
+    const rows = await sql<
+      { user_id: UUID }[]
+    >`SELECT user_id FROM clothing_item WHERE id = ${clothingItemId}`;
+    if (rows.length === 0) {
       return null;
     }
-    return res.rows[0].user_id;
+    return rows[0].user_id;
   }
 }

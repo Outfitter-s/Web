@@ -3,7 +3,13 @@
   import * as Dialog from '$lib/components/ui/dialog';
   import { Button } from '$lib/components/ui/button';
   import { Toaster } from '$lib/components/Toast/toast';
-  import { CLOTHING_STYLES, OutfitPreviewZ, type SwiperCard, type Weather } from '$lib/types';
+  import {
+    CLOTHING_STYLES,
+    OutfitPreviewZ,
+    type Outfit,
+    type SwiperCard,
+    type Weather,
+  } from '$lib/types';
   import {
     ArrowRight,
     CloudRainWind,
@@ -17,7 +23,7 @@
   import confetti from 'canvas-confetti';
   import z from 'zod';
   import i18n from '$lib/i18n';
-  import { cn, hashStringToNumber, getWeather, logger } from '$lib/utils';
+  import { cn, hashStringToNumber, getWeather, logger, DateUtils } from '$lib/utils';
   import { fade } from 'svelte/transition';
   import { onDestroy, onMount } from 'svelte';
   import { invalidateAll } from '$app/navigation';
@@ -25,6 +31,19 @@
   import Globals from '$lib/globals.svelte';
   import { FormalIcon } from '$lib/components/domainIcons';
   import Comfort from '$lib/components/domainIcons/Comfort.svelte';
+  import Calendar from '$lib/components/ui/calendar/calendar.svelte';
+  import * as Popover from '$lib/components/ui/popover';
+  import { Label } from '$lib/components/ui/label';
+  import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
+  import { CalendarDate, getLocalTimeZone, today } from '@internationalized/date';
+  import { page } from '$app/state';
+
+  interface Props {
+    provisionalDate: CalendarDate | null;
+    onSelected?: (outfit: SwiperCard, date: Date) => void;
+  }
+
+  let { onSelected, provisionalDate = $bindable(null) }: Props = $props();
 
   const cId = $props.id(); // Deterministic client ID for outfit generation
 
@@ -72,10 +91,12 @@
   }
 
   let chosenOutfit = $state<SwiperCard | null>(null);
+  let outfits = $derived(page.data.outfits as Outfit[]);
   let outfitId: number = $state(hashStringToNumber(cId)); // Start from a hash of the client ID
   let wether = $state<Weather | null>(null);
   let cards = $state<SwiperCard[]>([]);
   let loadingCards = $state(false);
+  let datePopoverOpen = $state(false);
   let acceptedCard = $state<{ card: SwiperCard | null; open: boolean }>({
     card: null,
     open: false,
@@ -83,7 +104,7 @@
   let multistageQuestions = $derived({
     weather: {
       options: Object.keys(weatherPresets),
-      hint: wether ? getClosestWeatherPreset(wether) : null,
+      hint: wether && !provisionalDate ? getClosestWeatherPreset(wether) : null,
       icons: {
         sunny: Sun,
         rainy: CloudRainWind,
@@ -133,7 +154,12 @@
     try {
       const res = await fetch('/api/wardrobe/outfit/save', {
         method: 'POST',
-        body: JSON.stringify({ outfit: acceptedCard.card?.outfit }),
+        body: JSON.stringify({
+          outfit: {
+            ...acceptedCard.card?.outfit,
+            createdAt: provisionalDate?.toDate(getLocalTimeZone()) || new Date(),
+          },
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -174,8 +200,9 @@
         spread: 120,
         startVelocity: 45,
       });
-      acceptedCard = { open: false, card: null };
       await invalidateAll();
+      onSelected?.(acceptedCard.card!, provisionalDate?.toDate(getLocalTimeZone()) || new Date());
+      acceptedCard = { open: false, card: null };
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       logger.error('Error saving outfit:', msg);
@@ -225,7 +252,7 @@
   }
 
   async function initialWeatherFetch() {
-    if (wether) return;
+    if (wether || provisionalDate) return;
     try {
       wether = await getWeather();
     } catch (error) {
@@ -234,7 +261,7 @@
   }
 
   onMount(() => {
-    initialWeatherFetch();
+    if (!provisionalDate) initialWeatherFetch();
   });
 
   $effect(() => {
@@ -259,16 +286,59 @@
     <Dialog.Header>
       <Dialog.Title>{i18n.t('wardrobe.outfitGeneration.chooseOutfitModal.title')}</Dialog.Title>
       <Dialog.Description
-        >{i18n.t('wardrobe.outfitGeneration.chooseOutfitModal.description')}</Dialog.Description
+        >{i18n.t('wardrobe.outfitGeneration.chooseOutfitModal.description', {
+          date: DateUtils.formatDate(provisionalDate?.toDate(getLocalTimeZone()) ?? new Date(), {
+            allowDistance: true,
+          }),
+        })}</Dialog.Description
       >
     </Dialog.Header>
+
+    {#if provisionalDate}
+      <div class="flex flex-col gap-3">
+        <Label for="provisionalDate" class="px-1">For when is it for ?</Label>
+        <Popover.Root bind:open={datePopoverOpen}>
+          <Popover.Trigger id="provisionalDate">
+            {#snippet child({ props })}
+              <Button {...props} variant="outline" class="w-48 justify-between font-normal">
+                {provisionalDate
+                  ? provisionalDate.toDate(getLocalTimeZone()).toLocaleDateString()
+                  : 'Select date'}
+                <ChevronDownIcon />
+              </Button>
+            {/snippet}
+          </Popover.Trigger>
+          <Popover.Content class="w-auto overflow-hidden p-0" align="start">
+            <Calendar
+              type="single"
+              locale={i18n.locale}
+              bind:value={provisionalDate}
+              captionLayout="dropdown"
+              isDateDisabled={(date) => {
+                return outfits.some((outfit) =>
+                  DateUtils.isSameDay(outfit.createdAt, date.toDate(getLocalTimeZone()))
+                );
+              }}
+              onValueChange={() => {
+                datePopoverOpen = false;
+              }}
+              minValue={today(getLocalTimeZone())}
+            />
+          </Popover.Content>
+        </Popover.Root>
+      </div>
+    {/if}
 
     <Dialog.Footer>
       <Button
         type="button"
         variant="secondary"
-        onclick={() => (acceptedCard = { open: false, card: null })}
-        >{i18n.t('wardrobe.outfitGeneration.chooseOutfitModal.cancelButton')}</Button
+        onclick={() => {
+          if (provisionalDate) {
+            provisionalDate = null;
+          }
+          acceptedCard = { open: false, card: null };
+        }}>{i18n.t('wardrobe.outfitGeneration.chooseOutfitModal.cancelButton')}</Button
       >
       <Button onclick={handleConfirm}>
         {i18n.t('wardrobe.outfitGeneration.chooseOutfitModal.confirmButton')}
@@ -278,14 +348,14 @@
   </Dialog.Content>
 </Dialog.Root>
 
-{#if mixAndMatchOpen}
-  <MixAndMatch {onSwiped} />
+{#if mixAndMatchOpen || provisionalDate}
+  <MixAndMatch {onSwiped} {provisionalDate} />
 {:else}
   <!-- This markup is a mess of absolute elements over absolute elements -->
   <!-- It needs fixing but rn it works -->
   <!-- If you find yourself updating/adding things in here and have time to spare, -->
   <!-- please try to fix this mess before it becomes too much debt (it already kind of is...) -->
-  <section class="relative flex h-full grow flex-col overflow-hidden">
+  <section class="relative min-h-[80dvh] flex h-full grow flex-col overflow-hidden">
     <div
       class={cn(
         'mx-auto flex absolute inset-0 h-full w-full max-w-125 grow flex-col justify-center p-2'

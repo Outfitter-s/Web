@@ -4,10 +4,10 @@ import type {
   CredentialDeviceType,
   WebAuthnCredential,
 } from '@simplewebauthn/browser';
-import pool from '.';
 import { Caching } from './caching';
 import { UserDAO } from './user';
 import { getEnv } from '../utils';
+import { sql } from 'bun';
 
 export const rpName = 'Outfitter';
 export const rpID = getEnv('ORIGIN', 'localhost:5173').replace(/^https?:\/\//, '');
@@ -43,13 +43,11 @@ export class PasskeyDAO {
     const cachedPasskey = await Caching.get<Passkey>(`user:${userId}:passkey`);
     if (cachedPasskey) return cachedPasskey;
 
-    const result = await pool.query<PasskeyTable>('SELECT * FROM passkey WHERE user_id = $1', [
-      userId,
-    ]);
-    if (result.rows.length === 0) {
+    const rows = await sql<PasskeyTable[]>`SELECT * FROM passkey WHERE user_id = ${userId}`;
+    if (rows.length === 0) {
       return null;
     }
-    const passkey = PasskeyDAO.convertToPasskey(result.rows[0]);
+    const passkey = PasskeyDAO.convertToPasskey(rows[0]);
     await Caching.set(`user:${userId}:passkey`, passkey);
     return passkey;
   }
@@ -71,43 +69,33 @@ export class PasskeyDAO {
       transport: JSON.stringify(credential.transports || []),
       created_at: new Date().toISOString(),
     };
-    const result = await pool.query(
-      'INSERT INTO passkey (id, public_key, user_id, webauthn_id, counter, device_type, backed_up, transport) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-      [
-        newPasskey.id,
-        Buffer.from(newPasskey.public_key, 'base64'),
-        newPasskey.user_id,
-        newPasskey.webauthn_id,
-        newPasskey.counter,
-        newPasskey.device_type,
-        newPasskey.backed_up,
-        newPasskey.transport,
-      ]
-    );
-    if (result.rows.length === 0) {
+    const rows = await sql<
+      PasskeyTable[]
+    >`INSERT INTO passkey (id, public_key, user_id, webauthn_id, counter, device_type, backed_up, transport) VALUES (${newPasskey.id}, ${Buffer.from(newPasskey.public_key, 'base64')}, ${newPasskey.user_id}, ${newPasskey.webauthn_id}, ${newPasskey.counter}, ${newPasskey.device_type}, ${newPasskey.backed_up}, ${newPasskey.transport}) RETURNING *`;
+    if (rows.length === 0) {
       throw new Error('errors.auth.createPasskey');
     }
 
-    const passkey = PasskeyDAO.convertToPasskey(result.rows[0]);
+    const passkey = PasskeyDAO.convertToPasskey(rows[0]);
     await Caching.del(`user:${userId}:passkey`); // Invalidate cache
     await Caching.del(`user:${userId}`); // Invalidate cache
     return passkey;
   }
 
   static async getPasskeyByCredentialID(credentialID: Passkey['id']): Promise<Passkey | null> {
-    const result = await pool.query<PasskeyTable>('SELECT * FROM passkey WHERE webauthn_id = $1', [
-      credentialID,
-    ]);
-    if (result.rows.length === 0) {
+    const rows = await sql<
+      PasskeyTable[]
+    >`SELECT * FROM passkey WHERE webauthn_id = ${credentialID}`;
+    if (rows.length === 0) {
       return null;
     }
-    const passkey = PasskeyDAO.convertToPasskey(result.rows[0]);
+    const passkey = PasskeyDAO.convertToPasskey(rows[0]);
     return passkey;
   }
 
   static async deletePasskey(userId: User['id']): Promise<void> {
-    const result = await pool.query('DELETE FROM passkey WHERE user_id = $1 RETURNING *', [userId]);
-    if (result.rowCount === 0) {
+    const result = await sql`DELETE FROM passkey WHERE user_id = ${userId} RETURNING *`;
+    if (result.affectedRows === 0) {
       throw new Error('errors.auth.deletePasskey');
     }
     await Caching.del(`user:${userId}:passkey`); // Invalidate cache
@@ -115,14 +103,13 @@ export class PasskeyDAO {
   }
 
   static async getUserByCredentialID(credentialID: Passkey['id']): Promise<User | null> {
-    const result = await pool.query<PasskeyTable>(
-      'SELECT user_id FROM passkey WHERE webauthn_id = $1',
-      [credentialID]
-    );
-    if (result.rows.length === 0) {
+    const rows = await sql<
+      PasskeyTable[]
+    >`SELECT user_id FROM passkey WHERE webauthn_id = ${credentialID}`;
+    if (rows.length === 0) {
       return null;
     }
-    const userId = result.rows[0].user_id;
+    const userId = rows[0].user_id;
     return UserDAO.getUserById(userId);
   }
 }

@@ -1,18 +1,14 @@
-import type { User } from '$lib/types';
-import pool from '.';
+import type { User, UUID } from '$lib/types';
+import { sql } from 'bun';
 import { UserDAO } from './user';
 
 export class SocialDAO {
   static async getFollowingUsers(userId: User['id']): Promise<User[]> {
-    const result = await pool.query(
-      `SELECT u.id FROM followers f
+    const rows = await sql`SELECT u.id FROM followers f
        JOIN users u ON f.following_id = u.id
-       WHERE f.follower_id = $1`,
-      [userId]
-    );
-
+       WHERE f.follower_id = ${userId}`;
     const users: User[] = [];
-    for (const userId of result.rows) {
+    for (const userId of rows) {
       const user = await UserDAO.getUserById(userId);
       delete user.passwordHash;
       users.push(user);
@@ -21,48 +17,33 @@ export class SocialDAO {
   }
 
   static async getNbFollowers(userId: User['id']): Promise<number> {
-    const result = await pool.query(
-      `SELECT COUNT(*) AS nb_followers FROM followers
-       WHERE following_id = $1`,
-      [userId]
-    );
-    return parseInt(result.rows[0].nb_followers, 10);
+    const rows = await sql`SELECT COUNT(*) AS nb_followers FROM followers
+       WHERE following_id = ${userId}`;
+    return parseInt(rows[0].nb_followers, 10);
   }
 
   static async followUser(followerId: User['id'], followingId: User['id']): Promise<void> {
-    await pool.query(
-      `INSERT INTO followers (follower_id, following_id)
-       VALUES ($1, $2)
-       ON CONFLICT (follower_id, following_id) DO NOTHING`,
-      [followerId, followingId]
-    );
+    await sql`INSERT INTO followers (follower_id, following_id)
+       VALUES (${followerId}, ${followingId})
+       ON CONFLICT (follower_id, following_id) DO NOTHING`;
   }
 
   static async unfollowUser(followerId: User['id'], followingId: User['id']): Promise<void> {
-    await pool.query(
-      `DELETE FROM followers
-       WHERE follower_id = $1 AND following_id = $2`,
-      [followerId, followingId]
-    );
+    await sql`DELETE FROM followers
+       WHERE follower_id = ${followerId} AND following_id = ${followingId}`;
   }
 
   static async getFollowingIds(userId: User['id']): Promise<User['id'][]> {
-    const result = await pool.query(
-      `SELECT following_id FROM followers
-       WHERE follower_id = $1`,
-      [userId]
-    );
-    return result.rows.map((row) => row.following_id);
+    const rows = await sql<{ following_id: UUID }[]>`SELECT following_id FROM followers
+       WHERE follower_id = ${userId}`;
+    return rows.map((row) => row.following_id);
   }
 
   static async searchUsers(query: string, limit: number = 6): Promise<User[]> {
-    const result = await pool.query(
-      `SELECT id, username, email FROM users
-       WHERE username ILIKE $1
-       LIMIT $2`,
-      [`%${query}%`, limit]
-    );
+    const rows = await sql<User[]>`SELECT id, username, email FROM users
+       WHERE username ILIKE ${'%' + query + '%'}
+       LIMIT ${limit}`;
 
-    return result.rows;
+    return rows;
   }
 }

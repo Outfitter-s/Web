@@ -1,8 +1,8 @@
 import { type Comment, type User, type UUID } from '$lib/types';
-import pool from '.';
 import { filterText } from '../socialFilter';
 import { PublicationDAO } from './publication';
 import { UserDAO } from './user';
+import { sql } from 'bun';
 
 export interface CommentTable {
   id: UUID;
@@ -45,24 +45,23 @@ export class CommentDAO {
         throw new Error('errors.social.post.comments.parentComment.notFound');
       }
     }
-    const res = await pool.query<CommentTable>(
-      'INSERT INTO comment (publication_id, user_id, comment_id, content) VALUES ($1, $2, $3, $4) RETURNING *',
-      [postId ?? null, userId, commentId ?? null, filterText(content)]
-    );
-    return (await this.getComment(res.rows[0].id)) as Comment;
+    const rows = await sql<
+      CommentTable[]
+    >`INSERT INTO comment (publication_id, user_id, comment_id, content) VALUES (${postId ?? null}, ${userId}, ${commentId ?? null}, ${filterText(content)}) RETURNING *`;
+    return (await this.getComment(rows[0].id)) as Comment;
   }
 
   static async getComment(id: Comment['id'], replies = false): Promise<Comment | null> {
-    const res = await pool.query<CommentTable>('SELECT * FROM comment WHERE id = $1', [id]);
-    if (res.rowCount === 0) {
+    const rows = await sql<CommentTable[]>`SELECT * FROM comment WHERE id = ${id}`;
+    if (rows.length === 0) {
       return null;
     }
-    const associatedUser = await UserDAO.getUserById(res.rows[0].user_id);
+    const associatedUser = await UserDAO.getUserById(rows[0].user_id);
     if (replies) {
       const replies = await this.getRepliesToComment(id);
-      return this.convertToComment(res.rows[0], associatedUser, replies);
+      return this.convertToComment(rows[0], associatedUser, replies);
     } else {
-      return this.convertToComment(res.rows[0], associatedUser);
+      return this.convertToComment(rows[0], associatedUser);
     }
   }
 
@@ -95,12 +94,11 @@ export class CommentDAO {
   }
 
   static async getRepliesToComment(commentId: Comment['id']): Promise<Comment[]> {
-    const res = await pool.query<CommentTable>(
-      `
+    const rows = await sql<CommentTable[]>`
       WITH RECURSIVE comment_tree AS (
         SELECT *
         FROM comment
-        WHERE comment_id = $1
+        WHERE comment_id = ${commentId}
         UNION ALL
         SELECT c.*
         FROM comment c
@@ -109,18 +107,15 @@ export class CommentDAO {
       SELECT *
       FROM comment_tree
       ORDER BY created_at ASC
-      `,
-      [commentId]
-    );
-    return this.buildCommentTree(res.rows, commentId);
+      `;
+    return this.buildCommentTree(rows, commentId);
   }
   static async getCommentsForPost(postId: Comment['postId']): Promise<Comment[]> {
-    const res = await pool.query<CommentTable>(
-      `
+    const rows = await sql<CommentTable[]>`
       WITH RECURSIVE comment_tree AS (
         SELECT *
         FROM comment
-        WHERE publication_id = $1 AND comment_id IS NULL
+        WHERE publication_id = ${postId} AND comment_id IS NULL
         UNION ALL
         SELECT c.*
         FROM comment c
@@ -129,14 +124,12 @@ export class CommentDAO {
       SELECT *
       FROM comment_tree
       ORDER BY created_at ASC
-      `,
-      [postId]
-    );
-    return this.buildCommentTree(res.rows, null);
+      `;
+    return this.buildCommentTree(rows, null);
   }
 
   static async deleteComment(commentId: Comment['id']): Promise<void> {
-    await pool.query('DELETE FROM comment WHERE id = $1', [commentId]);
+    await sql`DELETE FROM comment WHERE id = ${commentId}`;
   }
 
   static async update(
@@ -157,6 +150,6 @@ export class CommentDAO {
     }
     values.push(commentId);
     const query = `UPDATE comment SET ${fields.join(', ')} WHERE id = $${idx}`;
-    await pool.query(query, values);
+    await sql.unsafe(query, values);
   }
 }

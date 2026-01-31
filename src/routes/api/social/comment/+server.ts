@@ -1,6 +1,6 @@
 import z from 'zod';
 import type { RequestHandler } from './$types';
-import { CommentZ, UUID } from '$lib/types';
+import { UUID } from '$lib/types';
 import { CommentDAO } from '$lib/server/db/comment';
 import { json } from '@sveltejs/kit';
 
