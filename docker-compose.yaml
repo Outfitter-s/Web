@@ -36,7 +36,6 @@ services:
       - .env
     volumes:
       - pg_data:/var/lib/postgresql
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:Z
 
   valkey:
     container_name: valkey

@@ -50,10 +50,10 @@ export class OutfitDAO {
     return outfit;
   }
 
-  static async getAllUserOutfits(userId: UUID): Promise<Outfit[]> {
+  static async getAllUserOutfits(userId: UUID, past = false): Promise<Outfit[]> {
     const res = await pool.query<OutfitTable>(
-      'SELECT * FROM outfit WHERE user_id = $1 ORDER BY created_at DESC',
-      [userId]
+      'SELECT * FROM outfit WHERE user_id = $1 AND created_at > $2 ORDER BY created_at DESC',
+      [userId, past ? new Date(0) : new Date(new Date().setHours(0, 0, 0, 0))]
     );
     const outfits: Outfit[] = [];
 
@@ -80,8 +80,8 @@ export class OutfitDAO {
 
   static async createOutfit(userId: UUID, outfit: OutfitPreview): Promise<Outfit> {
     const res = await pool.query<OutfitTable>(
-      'INSERT INTO outfit (user_id) VALUES ($1) RETURNING *',
-      [userId]
+      'INSERT INTO outfit (user_id, created_at) VALUES ($1, $2) RETURNING *',
+      [userId, outfit.createdAt]
     );
     if (res.rows.length === 0) {
       throw new Error('Failed to create outfit');

@@ -99,7 +99,7 @@ export const OutfitZ = z.object({
   createdAt: DateZ,
 });
 export type Outfit = z.infer<typeof OutfitZ>;
-export const OutfitPreviewZ = OutfitZ.omit({ createdAt: true, id: true });
+export const OutfitPreviewZ = OutfitZ.omit({ id: true, createdAt: true });
 export type OutfitPreview = z.infer<typeof OutfitPreviewZ>;
 
 // Weather

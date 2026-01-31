@@ -460,7 +460,7 @@
       },
       "chooseOutfitModal": {
         "title": "Choose this outfit",
-        "description": "This will be the outfit you will be rocking today!",
+        "description": "This will be the outfit you will be rocking {{date}}!",
         "confirmButton": "Choose",
         "cancelButton": "I changed my mind"
       },
@@ -623,5 +623,10 @@
     },
     "noLikedPost": "You didn't post any outfit this year.",
     "noWornItems": "You didn't worn any outfit this year."
+  },
+  "date": {
+    "today": "today",
+    "tomorrow": "tomorrow",
+    "yesterday": "yesterday"
   }
 }

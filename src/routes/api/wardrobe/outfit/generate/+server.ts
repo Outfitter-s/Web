@@ -17,12 +17,12 @@ export async function POST({ locals, request }) {
     const data = schema.safeParse(body);
     if (!data.success) throw new Error(data.error.issues.map((i) => i.path[0]).join(', '));
     const { count, weather, style } = data.data;
-    logger.debug('Generating outfits', { userId: user.id, count, weather, style });
 
     const outfits = await generateOutfits(user.id, weather, count, { style });
     return json(outfits);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
+    logger.error(`Error generating outfits for user ${user.id}: ${msg}`);
     return json({ error: msg }, { status: 500 });
   }
 }

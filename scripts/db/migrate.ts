@@ -5,42 +5,31 @@
 // --  already been done.                                 --
 // ---------------------------------------------------------
 
-import pool from './pool.ts';
 import { HERE } from '../shared.ts';
-import { readdir, readFile } from 'node:fs/promises';
+import { readdir } from 'node:fs/promises';
 import { join } from 'node:path';
+import { sql } from 'bun';
 
-const getLastMigrationDate = async (): Promise<Date> => {
-  const { rows } = await pool.query<{ created_at: string }>(
-    'SELECT created_at FROM migrations ORDER BY created_at DESC LIMIT 1'
-  );
-  return rows.length > 0 ? new Date(rows[0].created_at) : new Date(0);
+const initScriptPath = join(HERE, `../sql/migrations/init.sql`);
+await sql.file(initScriptPath);
+
+const getAppliedMigrations = async (): Promise<Set<string>> => {
+  const rows = await sql<{ name: string }[]>`SELECT name FROM migrations`;
+  return new Set(rows.map((row) => row.name));
 };
 
 async function applyMigration(name: string) {
   const migrationPath = join(HERE, `../sql/migrations/${name}`);
-  const sql = await readFile(migrationPath, 'utf8');
-  if (!sql) {
-    throw new Error(`Migration file ${name} not found.`);
-  }
-  const migrationSQL = await pool.query(sql);
+  await sql.file(migrationPath);
   const timeStamp = name.match(/migration\.(\d+)\.sql/);
   const migrationTime = new Date(parseInt(timeStamp![1], 10));
   // Update migrations table
-  await pool.query('INSERT INTO migrations (name, created_at) VALUES ($1, $2)', [
-    name,
-    migrationTime,
-  ]);
+  await sql`INSERT INTO migrations (name, created_at) VALUES (${name}, ${migrationTime})`;
   console.log(`Migration ${name} applied successfully.`);
-  return migrationSQL;
 }
 
-const lastMigrationDate = await getLastMigrationDate();
-if (lastMigrationDate) {
-  console.log(`Last migration: ${lastMigrationDate}`);
-} else {
-  console.log('No previous migrations found.');
-}
+const appliedMigrations = await getAppliedMigrations();
+console.log(`Applied migrations: ${appliedMigrations.size}`);
 
 const availableMigrations = (await readdir(join(HERE, '../sql/migrations')))
   .filter((f) => f.match(/migration\.(\d+)\.sql/))
@@ -50,14 +39,7 @@ const availableMigrations = (await readdir(join(HERE, '../sql/migrations')))
     return timeA - timeB;
   });
 
-const newMigrations = availableMigrations
-  .filter((file) => {
-    const timeStamp = file.match(/migration\.(\d+)\.sql/);
-    if (!timeStamp) return false;
-    const migrationTime = new Date(parseInt(timeStamp[1], 10));
-    return !lastMigrationDate || migrationTime > lastMigrationDate;
-  })
-  .sort();
+const newMigrations = availableMigrations.filter((file) => !appliedMigrations.has(file));
 console.log(`Available migrations: ${availableMigrations.length}`);
 console.log(`New migrations to apply: ${newMigrations.length}`);
 

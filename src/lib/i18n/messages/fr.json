@@ -460,7 +460,7 @@
       },
       "chooseOutfitModal": {
         "title": "Choisir cette tenue",
-        "description": "Celle‑ci sera la tenue que vous porterez aujourd'hui !",
+        "description": "Celle‑ci sera la tenue que vous porterez {{date}}!",
         "confirmButton": "Choisir",
         "cancelButton": "J'ai changé d'avis"
       },
@@ -623,5 +623,10 @@
     },
     "noLikedPost": "Vous n'avez pas publié de tenue cette année.",
     "noWornItems": "Vous n'avez pas porté de vêtement cette année."
+  },
+  "date": {
+    "today": "aujourd'hui",
+    "tomorrow": "demain",
+    "yesterday": "hier"
   }
 }

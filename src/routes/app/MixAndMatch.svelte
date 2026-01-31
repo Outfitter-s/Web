@@ -6,15 +6,17 @@
   import i18n from '$lib/i18n';
   import { type ClothingItem, clothingItemTypes, type SwiperCard } from '$lib/types';
   import { hashStringToNumber } from '$lib/utils';
+  import { getLocalTimeZone, type CalendarDate } from '@internationalized/date';
   import { ChevronRight } from '@lucide/svelte';
   import { onDestroy, onMount } from 'svelte';
   import { SvelteSet } from 'svelte/reactivity';
 
   interface Props {
     onSwiped: (card: SwiperCard, accepted: boolean) => void;
+    provisionalDate: CalendarDate | null;
   }
 
-  let { onSwiped }: Props = $props();
+  let { onSwiped, provisionalDate }: Props = $props();
   let items = $state<ClothingItem[]>(page.data.items.sort(sortByType));
   let selectedItems = $state(new SvelteSet<ClothingItem['id']>());
 
@@ -36,6 +38,7 @@
       id: 1000,
       outfit: {
         items: items.filter((item) => selectedItems.has(item.id)),
+        createdAt: provisionalDate?.toDate(getLocalTimeZone()) ?? new Date(),
       },
     };
     onSwiped(card, true);

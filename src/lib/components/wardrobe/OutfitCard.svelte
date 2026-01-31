@@ -22,7 +22,7 @@
 <div class="relative aspect-square isolate">
   {#if showDate}
     <div class="relative w-fit bg-card rounded-full px-4 py-2 shadow-sm">
-      <p class="font-medium text-base">
+      <p class="font-medium text-base capitalize">
         {DateUtils.formatDate(outfit.createdAt)}
       </p>
     </div>
