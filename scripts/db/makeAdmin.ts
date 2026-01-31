@@ -3,7 +3,7 @@
 // --  regular user into an admin   --
 // -----------------------------------
 
-import pool from './pool.ts';
+import { sql } from 'bun';
 
 if (Bun.argv.length !== 3) {
   throw new Error('Usage: bun run db:make-admin <USERNAME>');
@@ -11,7 +11,7 @@ if (Bun.argv.length !== 3) {
 
 const username = Bun.argv[2];
 
-await pool.query("UPDATE users SET role = 'admin' WHERE username = $1", [username]);
+await sql`UPDATE users SET role = 'admin' WHERE username = ${username}`;
 
 console.log(`Made user ${username} an admin!`);
 process.exit(0);
