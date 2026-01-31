@@ -1,7 +1,7 @@
 import type { ClothingItem, ClothingItemType, Outfit, OutfitPreview, UUID } from '$lib/types';
-import pool from '.';
 import { Caching } from './caching';
 import { ClothingItemDAO } from './clothingItem';
+import { sql } from 'bun';
 
 export interface OutfitTable {
   id: UUID;
@@ -26,16 +26,15 @@ export class OutfitDAO {
   static async getOutfitById(id: UUID): Promise<Outfit | null> {
     const cached = await Caching.get<Outfit>(`outfit:${id}`);
     if (cached) return cached;
-    const res = await pool.query<OutfitTable>('SELECT * FROM outfit WHERE id = $1', [id]);
-    if (res.rows.length === 0) {
+    const rows = await sql<OutfitTable[]>`SELECT * FROM outfit WHERE id = ${id}`;
+    if (rows.length === 0) {
       return null;
     }
 
-    const itemsRes = await pool.query<OutfitItemTable>(
-      'SELECT * FROM outfit_clothing_items WHERE outfit_id = $1',
-      [id]
-    );
-    const clothingItemIds = itemsRes.rows.map((row) => row.clothing_item_id);
+    const itemsRes = await sql<
+      OutfitItemTable[]
+    >`SELECT * FROM outfit_clothing_items WHERE outfit_id = ${id}`;
+    const clothingItemIds = itemsRes.map((row) => row.clothing_item_id);
 
     const clothingItems: ClothingItem[] = [];
     for (const clothingItemId of clothingItemIds) {
@@ -45,24 +44,23 @@ export class OutfitDAO {
       }
     }
 
-    const outfit = OutfitDAO.convertToOutfit(res.rows[0], clothingItems);
+    const outfit = OutfitDAO.convertToOutfit(rows[0], clothingItems);
     await Caching.set(`outfit:${id}`, outfit);
     return outfit;
   }
 
   static async getAllUserOutfits(userId: UUID, past = false): Promise<Outfit[]> {
-    const res = await pool.query<OutfitTable>(
-      'SELECT * FROM outfit WHERE user_id = $1 AND created_at > $2 ORDER BY created_at DESC',
-      [userId, past ? new Date(0) : new Date(new Date().setHours(0, 0, 0, 0))]
-    );
+    const rows = await sql<
+      OutfitTable[]
+    >`SELECT * FROM outfit WHERE user_id = ${userId} AND created_at > ${past ? new Date(0) : new Date(new Date().setHours(0, 0, 0, 0))} ORDER BY created_at DESC`;
+
     const outfits: Outfit[] = [];
 
-    for (const row of res.rows) {
-      const itemsRes = await pool.query<OutfitItemTable>(
-        'SELECT * FROM outfit_clothing_items WHERE outfit_id = $1',
-        [row.id]
-      );
-      const clothingItemIds = itemsRes.rows.map((r) => r.clothing_item_id);
+    for (const row of rows) {
+      const itemsRows = await sql<
+        OutfitItemTable[]
+      >`SELECT * FROM outfit_clothing_items WHERE outfit_id = ${row.id}`;
+      const clothingItemIds = itemsRows.map((r) => r.clothing_item_id);
 
       const clothingItems: ClothingItem[] = [];
       for (const clothingItemId of clothingItemIds) {
@@ -78,21 +76,20 @@ export class OutfitDAO {
     return outfits;
   }
 
-  static async createOutfit(userId: UUID, outfit: OutfitPreview): Promise<Outfit> {
-    const res = await pool.query<OutfitTable>(
-      'INSERT INTO outfit (user_id, created_at) VALUES ($1, $2) RETURNING *',
-      [userId, outfit.createdAt]
-    );
-    if (res.rows.length === 0) {
+  static async createOutfit(
+    userId: UUID,
+    outfit: OutfitPreview & { createdAt?: Date }
+  ): Promise<Outfit> {
+    const rows = await sql<
+      OutfitTable[]
+    >`INSERT INTO outfit (user_id, created_at) VALUES (${userId}, ${outfit.createdAt ?? new Date()}) RETURNING *`;
+    if (rows.length === 0) {
       throw new Error('Failed to create outfit');
     }
-    const outfitRow = res.rows[0];
+    const outfitRow = rows[0];
 
     for (const item of outfit.items) {
-      await pool.query(
-        'INSERT INTO outfit_clothing_items (outfit_id, clothing_item_id) VALUES ($1, $2)',
-        [outfitRow.id, item.id]
-      );
+      await sql`INSERT INTO outfit_clothing_items (outfit_id, clothing_item_id) VALUES (${outfitRow.id}, ${item.id})`;
     }
 
     return this.getOutfitById(outfitRow.id) as Promise<Outfit>;
@@ -100,18 +97,17 @@ export class OutfitDAO {
 
   static async deleteOutfit(outfitId: UUID): Promise<void> {
     // Remove references from associated posts
-    await pool.query('UPDATE publication SET outfit_id = NULL WHERE outfit_id = $1', [outfitId]);
-    await pool.query('DELETE FROM outfit_clothing_items WHERE outfit_id = $1', [outfitId]);
-    await pool.query('DELETE FROM outfit WHERE id = $1', [outfitId]);
+    await sql`UPDATE publication SET outfit_id = NULL WHERE outfit_id = ${outfitId}`;
+    await sql`DELETE FROM outfit_clothing_items WHERE outfit_id = ${outfitId}`;
+    await sql`DELETE FROM outfit WHERE id = ${outfitId}outfitId}`;
     await Caching.del(`outfit:${outfitId}`);
   }
 
   static async outfitBelongsToUser(userId: UUID, outfitId: UUID): Promise<void> {
-    const res = await pool.query<OutfitTable>(
-      'SELECT * FROM outfit WHERE id = $1 AND user_id = $2',
-      [outfitId, userId]
-    );
-    if (res.rows.length === 0) throw new Error('errors.clothing.outfit.notAuthorized');
+    const rows = await sql<
+      OutfitTable[]
+    >`SELECT * FROM outfit WHERE id = ${outfitId} AND user_id = ${userId}`;
+    if (rows.length === 0) throw new Error('errors.clothing.outfit.notAuthorized');
   }
 
   static async getTodaysOutfitIdForUser(
@@ -120,14 +116,13 @@ export class OutfitDAO {
   ): Promise<UUID | null> {
     if (!todaysOutfit) return null;
 
-    const res = await pool.query<OutfitTable>(
-      'SELECT * FROM outfit WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
-      [userId]
+    const rows = await sql<OutfitTable[]>(
+      `SELECT * FROM outfit WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 1`
     );
-    if (res.rows.length === 0) {
+    if (rows.length === 0) {
       return null;
     }
 
-    return res.rows[0].id;
+    return rows[0].id;
   }
 }

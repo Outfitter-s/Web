@@ -1,5 +1,5 @@
 import type { ClothingItem, Publication, User } from '$lib/types';
-import pool from '.';
+import { sql } from 'bun';
 import { ClothingItemDAO, type ClothingItemTable } from './clothingItem';
 import { PublicationDAO } from './publication';
 
@@ -15,8 +15,7 @@ export class WrappedDAO {
 
   static async getWrapped(userId: User['id']): Promise<Wrapped | null> {
     const getMostWorn = async () => {
-      const q = await pool.query<ClothingItemTable>(
-        `
+      const rows = await sql<ClothingItemTable[]>`
         SELECT
           ci.*,
           COUNT(oci.clothing_item_id) AS appearance_count
@@ -27,23 +26,20 @@ export class WrappedDAO {
         JOIN
           outfit o ON oci.outfit_id = o.id
         WHERE
-          o.user_id = $1
+          o.user_id = ${userId}
         AND EXTRACT(YEAR FROM o.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
         GROUP BY
           ci.id
         ORDER BY
           appearance_count DESC
         LIMIT 5;
-        `,
-        [userId]
-      );
-      const mostWorn: ClothingItem[] = q.rows.map((i) => ClothingItemDAO.convertToClothingItem(i));
+        `;
+      const mostWorn: ClothingItem[] = rows.map((i) => ClothingItemDAO.convertToClothingItem(i));
       return mostWorn;
     };
 
     const getMostLikedPost = async () => {
-      const q = await pool.query<{ post_id: Publication['id']; reaction_count: number }>(
-        `SELECT
+      const rows = await sql<{ post_id: Publication['id']; reaction_count: number }[]>`SELECT
           p.id AS post_id,
           COUNT(r) AS reaction_count
         FROM
@@ -51,19 +47,17 @@ export class WrappedDAO {
         LEFT JOIN
           reaction r ON p.id = r.post_id
         WHERE
-          p.user_id = $1
+          p.user_id = ${userId}
           AND EXTRACT(YEAR FROM p.created_at) = EXTRACT(YEAR FROM CURRENT_DATE)
         GROUP BY
           p.id
         ORDER BY
           reaction_count DESC
-        LIMIT 1;`,
-        [userId]
-      );
-      if (q.rows.length === 0) {
+        LIMIT 1;`;
+      if (rows.length === 0) {
         return null;
       }
-      const post = PublicationDAO.getPublicationById(q.rows[0].post_id);
+      const post = PublicationDAO.getPublicationById(rows[0].post_id);
       return post;
     };
 

@@ -8,7 +8,6 @@ import {
   type User,
   type UUID,
 } from '$lib/types';
-import pool from '.';
 import { getEnv } from '../utils';
 import { unlink, writeFile } from 'node:fs/promises';
 import { UserDAO } from './user';
@@ -17,6 +16,7 @@ import { ReactionDAO } from './reaction';
 import { filterText } from '../socialFilter';
 import { DateUtils } from '$lib/utils';
 import { CommentDAO } from './comment';
+import { sql } from 'bun';
 
 export interface PublicationTable {
   id: UUID;
@@ -71,24 +71,21 @@ export class PublicationDAO {
     todaysOutfit: boolean
   ): Promise<Publication> {
     const outfitId = await OutfitDAO.getTodaysOutfitIdForUser(userId, todaysOutfit);
-    const res = await pool.query<PublicationTable>(
-      'INSERT INTO publication (user_id, description, outfit_id) VALUES ($1, $2, $3) RETURNING *',
-      [userId, filterText(description), outfitId]
-    );
-    if (res.rows.length === 0) {
+    const rows = await sql<
+      PublicationTable[]
+    >`INSERT INTO publication (user_id, description, outfit_id) VALUES (${userId}, ${filterText(description)}, ${outfitId}) RETURNING *`;
+    if (rows.length === 0) {
       throw new Error('Failed to create publication');
     }
 
-    const post = await this.getPublicationById(res.rows[0].id);
+    const post = await this.getPublicationById(rows[0].id);
     if (!post) {
       throw new Error('Failed to retrieve created publication');
     }
     for (const imageBuffer of imagesBuffers.slice(0, PublicationImagesLengths.max)) {
-      const res = await pool.query(
-        'INSERT INTO publication_image (publication_id) VALUES ($1) RETURNING *',
-        [post.id]
-      );
-      const row = res.rows[0];
+      const insertRows =
+        await sql`INSERT INTO publication_image (publication_id) VALUES (${post.id}) RETURNING *`;
+      const row = insertRows[0];
       await this.writePostImage(row.id, imageBuffer);
     }
 
@@ -99,13 +96,13 @@ export class PublicationDAO {
     id: Publication['id'],
     userId?: User['id']
   ): Promise<Publication | null> {
-    const res = await pool.query<PublicationTable>('SELECT * FROM publication WHERE id = $1', [id]);
+    const rows = await sql<PublicationTable[]>`SELECT * FROM publication WHERE id = ${id}`;
 
-    if (res.rows.length === 0) {
+    if (rows.length === 0) {
       return null;
     }
 
-    const item = res.rows[0];
+    const item = rows[0];
     const user = await UserDAO.getUserById(item.user_id);
     const outfit = (await OutfitDAO.getOutfitById(item.outfit_id as UUID)) ?? undefined;
     const reactions = await ReactionDAO.getReactionsForPost(item.id);
@@ -129,16 +126,15 @@ export class PublicationDAO {
     limit: number,
     offset: number
   ): Promise<Publication[]> {
-    const res = await pool.query<PublicationTable>(
-      'SELECT * FROM publication WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3',
-      [userId, limit, offset]
-    );
+    const rows = await sql<
+      PublicationTable[]
+    >`SELECT * FROM publication WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
 
-    if (res.rows.length === 0) {
+    if (rows.length === 0) {
       return [];
     }
 
-    return await PublicationDAO.publicationTableToPublicationArray(res.rows);
+    return await PublicationDAO.publicationTableToPublicationArray(rows);
   }
 
   static async getFollowedFeed(
@@ -160,7 +156,7 @@ export class PublicationDAO {
     params.push(limit);
 
     const limitPlaceholder = `$${params.length}`;
-    const res = await pool.query<PublicationTable>(
+    const rows = await sql.unsafe<PublicationTable[]>(
       `SELECT p.*
        FROM publication p
        JOIN followers f ON f.following_id = p.user_id
@@ -171,7 +167,7 @@ export class PublicationDAO {
       params
     );
 
-    return await PublicationDAO.publicationTableToPublicationArray(res.rows, userId);
+    return await PublicationDAO.publicationTableToPublicationArray(rows, userId);
   }
 
   // The algorithm
@@ -260,7 +256,7 @@ export class PublicationDAO {
     const nbDaysPlaceholder = `$${params.length - 1}`;
     const limitPlaceholder = `$${params.length}`;
 
-    const res = await pool.query<PublicationTable>(
+    const rows = await sql.unsafe<PublicationTable[]>(
       `SELECT p.*
        FROM publication p
        LEFT JOIN reaction r ON p.id = r.post_id AND r.created_at >= NOW() - ${nbDaysPlaceholder}::interval
@@ -271,7 +267,7 @@ export class PublicationDAO {
       params
     );
 
-    return await PublicationDAO.publicationTableToPublicationArray(res.rows);
+    return await PublicationDAO.publicationTableToPublicationArray(rows);
   }
 
   static async deletePublication(postId: UUID): Promise<void> {
@@ -283,18 +279,17 @@ export class PublicationDAO {
       }
     }
 
-    await pool.query('DELETE FROM publication WHERE id = $1', [postId]);
+    await sql`DELETE FROM publication WHERE id = ${postId}`;
   }
 
   static async getOwner(publicationId: UUID): Promise<UUID | null> {
-    const res = await pool.query<{ user_id: UUID }>(
-      'SELECT user_id FROM publication WHERE id = $1',
-      [publicationId]
-    );
-    if (res.rows.length === 0) {
+    const rows = await sql<
+      { user_id: UUID }[]
+    >`SELECT user_id FROM publication WHERE id = ${publicationId}`;
+    if (rows.length === 0) {
       return null;
     }
-    return res.rows[0].user_id;
+    return rows[0].user_id;
   }
 
   static async updatePublication(
@@ -307,10 +302,7 @@ export class PublicationDAO {
     if (!existingPublication) {
       throw new Error('Publication not found');
     }
-    await pool.query('UPDATE publication SET description = $1 WHERE id = $2', [
-      filterText(publication.description ?? existingPublication.description),
-      id,
-    ]);
+    await sql`UPDATE publication SET description = ${filterText(publication.description ?? existingPublication.description)} WHERE id = ${id}`;
   }
 
   static async writePostImage(id: UUID, imageBuffer: Buffer): Promise<void> {
@@ -319,19 +311,17 @@ export class PublicationDAO {
   }
 
   static async hasUserPostedToday(userId: UUID): Promise<boolean> {
-    const res = await pool.query<PublicationTable>(
-      'SELECT * FROM publication WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
-      [userId]
-    );
-    const hasPosted = res.rows.length > 0 && DateUtils.isToday(res.rows[0].created_at);
+    const rows = await sql<
+      PublicationTable[]
+    >`SELECT * FROM publication WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 1`;
+    const hasPosted = rows.length > 0 && DateUtils.isToday(rows[0].created_at);
     return hasPosted;
   }
 
   static async getPostImages(publicationId: UUID): Promise<string[]> {
-    const res = await pool.query<PublicationImageTable>(
-      'SELECT * FROM publication_image WHERE publication_id = $1',
-      [publicationId]
-    );
-    return res.rows.map((row) => row.id);
+    const rows = await sql<
+      PublicationImageTable[]
+    >`SELECT * FROM publication_image WHERE publication_id = ${publicationId}`;
+    return rows.map((row) => row.id);
   }
 }

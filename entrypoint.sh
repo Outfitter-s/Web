@@ -3,10 +3,8 @@
 
 set -e
 
-# Import environment variables from .env file
-if [ -f .env ]; then
-  export $(grep -v '^#' .env | xargs)
-fi
+# Since the DATABASE_URL en var is constructed using other en vars, we need to export it here to account for overrides from docker-compose
+export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
 
 mkdir -p /app/assets/{profile_pictures,clothing_item,publication}
 
