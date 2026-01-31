@@ -41,7 +41,7 @@ export class UserDAO {
     }
     const rows = await sql<
       UserTable[]
-    >`INSERT INTO users (username, email, password_hash) VALUES ($1{username}, ${email}, ${passwordHash}) RETURNING *`;
+    >`INSERT INTO users (username, email, password_hash) VALUES (${username}, ${email}, ${passwordHash}) RETURNING *`;
     if (rows.length === 0) {
       throw new Error('errors.auth.createUser');
     }
@@ -176,7 +176,7 @@ export class UserDAO {
       `UPDATE users SET ${setString} WHERE id = $${fields.length + 1}`,
       [...values, id]
     );
-    if (result.rowCount === 0) {
+    if (result.affectedRows === 0) {
       throw new Error('errors.auth.updateUser');
     }
     await Caching.del(`user:${id}`);

@@ -29,7 +29,7 @@ export class DateUtils {
     date2: Date,
     unit: 'days' | 'hours' | 'minutes' | 'seconds'
   ): number {
-    const diff = Math.abs(date2.getTime() - date1.getTime());
+    const diff = date2.getTime() - date1.getTime();
     switch (unit) {
       case 'days':
         return Math.ceil(diff / (1000 * 60 * 60 * 24));

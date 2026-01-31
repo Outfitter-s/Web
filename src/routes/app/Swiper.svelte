@@ -200,9 +200,9 @@
         spread: 120,
         startVelocity: 45,
       });
-      acceptedCard = { open: false, card: null };
       await invalidateAll();
       onSelected?.(acceptedCard.card!, provisionalDate?.toDate(getLocalTimeZone()) || new Date());
+      acceptedCard = { open: false, card: null };
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       logger.error('Error saving outfit:', msg);

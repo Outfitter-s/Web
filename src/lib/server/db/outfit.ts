@@ -52,7 +52,7 @@ export class OutfitDAO {
   static async getAllUserOutfits(userId: UUID, past = false): Promise<Outfit[]> {
     const rows = await sql<
       OutfitTable[]
-    >`SELECT * FROM outfit WHERE user_id = ${userId} AND created_at > ${past ? new Date(0) : new Date(new Date().setHours(0, 0, 0, 0))} ORDER BY created_at DESC`;
+    >`SELECT * FROM outfit WHERE user_id = ${userId} AND created_at >= ${past ? new Date(0) : new Date(new Date().setHours(0, 0, 0, 0))} ORDER BY created_at DESC`;
 
     const outfits: Outfit[] = [];
 
@@ -116,9 +116,9 @@ export class OutfitDAO {
   ): Promise<UUID | null> {
     if (!todaysOutfit) return null;
 
-    const rows = await sql<OutfitTable[]>(
-      `SELECT * FROM outfit WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 1`
-    );
+    const rows = await sql<
+      OutfitTable[]
+    >`SELECT * FROM outfit WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 1`;
     if (rows.length === 0) {
       return null;
     }

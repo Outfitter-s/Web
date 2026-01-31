@@ -121,9 +121,9 @@ export class ClothingItemDAO {
     const cached = await Caching.get<ClothingItem>(`clothingItem:${clothingItemId}`);
     if (cached && cached.userId) return cached.userId;
 
-    const rows = await sql<{ user_id: UUID }[]>(
-      `SELECT user_id FROM clothing_item WHERE id = ${clothingItemId}`
-    );
+    const rows = await sql<
+      { user_id: UUID }[]
+    >`SELECT user_id FROM clothing_item WHERE id = ${clothingItemId}`;
     if (rows.length === 0) {
       return null;
     }
