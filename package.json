@@ -38,7 +38,7 @@
     "@types/bun": "latest",
     "@types/canvas-confetti": "^1.9.0",
     "@types/chalk": "^2.2.4",
-    "@types/colorthief": "^2.6.0",
+    "@types/colorthief": "^2.6.1",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/nodemailer": "^7.0.5",
     "@types/qrcode": "^1.5.6",

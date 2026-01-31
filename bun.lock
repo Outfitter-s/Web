@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "outfitter",
@@ -35,7 +36,7 @@
         "@types/bun": "latest",
         "@types/canvas-confetti": "^1.9.0",
         "@types/chalk": "^2.2.4",
-        "@types/colorthief": "^2.6.0",
+        "@types/colorthief": "^2.6.1",
         "@types/jsonwebtoken": "^9.0.10",
         "@types/nodemailer": "^7.0.5",
         "@types/qrcode": "^1.5.6",
@@ -610,7 +611,7 @@
 
     "@types/chalk": ["@types/chalk@2.2.4", "", { "dependencies": { "chalk": "*" } }, "sha512-pb/QoGqtCpH2famSp72qEsXkNzcErlVmiXlQ/ww+5AddD8TmmYS7EWg5T20YiNCAiTgs8pMf2G8SJG5h/ER1ZQ=="],
 
-    "@types/colorthief": ["@types/colorthief@2.6.0", "", {}, "sha512-GZBHPzkgEsyZqO7a9rhqkcW2BJZW+UpRlIUorY8vfOk7BVFVZMuDvZRPyaExv7ML0DaeB/t78PUOTkGo/THDpQ=="],
+    "@types/colorthief": ["@types/colorthief@2.6.1", "", { "dependencies": { "@types/node": "*" } }, "sha512-3hlRky7ybPuQDNx3RV29P/CTvuC7zkk//Xt/NyOwNg5RhL/y54a0q4aW7MNMkvBkGJqX2g2igNCoCh3ZtK4gZQ=="],
 
     "@types/cookie": ["@types/cookie@0.6.0", "", {}, "sha512-4Kh9a6B2bQciAhf7FSuMRRkUWecJgJu9nPnx3yzpsfXX/c50REIqpHY4C82bXP90qrLtXtkDxTZosYO3UpOwlA=="],
 
